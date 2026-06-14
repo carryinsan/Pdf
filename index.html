@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhantomPDF Vault - Bulletproof Engine</title>
+  <title>PhantomPDF Vault - Advanced Multimedia Engine</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,7 +11,8 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'] }
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'], mono: ['Fira Code', 'monospace'] },
+          colors: { phantom: { 900: '#0a0a0a', 800: '#171717', 700: '#262626', emerald: '#10b981' } }
         }
       }
     }
@@ -24,33 +25,73 @@
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
     select {
-      appearance: none;
+      appearance: none; background-color: #0a0a0a;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;
     }
+
+    /* Formatted Content Viewer Styles */
+    .rendered-content h1 { font-size: 1.875rem; font-weight: 800; margin-bottom: 1rem; color: #111827; border-bottom: 2px solid #e5e7eb; padding-bottom: 0.5rem; }
+    .rendered-content h2 { font-size: 1.5rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #374151; }
+    .rendered-content p { margin-bottom: 1rem; line-height: 1.75; }
+    .rendered-content strong { font-weight: 700; color: #000; }
+    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem 0; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+    
+    .terminal-editor textarea {
+      font-family: 'Fira Code', monospace;
+    }
   </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
+<body class="bg-phantom-900 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
 
   <!-- TOAST NOTIFICATIONS -->
-  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+  <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- FULLSCREEN VIEWER MODAL -->
+  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-900/95 backdrop-blur-xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
+    <div class="flex items-center justify-between p-4 border-b border-phantom-700 bg-phantom-900 shadow-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400" id="icon-fs-brand"></div>
+        <div>
+          <h2 class="font-bold text-white tracking-tight leading-tight">Decrypted Vault Viewer</h2>
+          <p class="text-[10px] text-neutral-500 font-mono uppercase" id="fs-filename">Document.pdf</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="handleExportCleanPDF()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold rounded-lg text-sm flex items-center gap-2 transition-all">
+          <span id="icon-fs-download"></span> Export Clean PDF
+        </button>
+        <button onclick="toggleFullscreenViewer(false)" class="p-2 hover:bg-phantom-700 text-neutral-400 hover:text-white rounded-lg transition-colors">
+          <span id="icon-fs-close"></span>
+        </button>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 md:p-12 flex justify-center">
+      <div class="bg-white text-neutral-900 w-full max-w-4xl min-h-full rounded-xl shadow-2xl p-8 md:p-16 relative overflow-hidden">
+        <div id="fs-watermark" class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] select-none overflow-hidden z-0 hidden">
+          <span id="fs-watermark-text" class="text-7xl md:text-9xl font-black transform -rotate-45 block whitespace-nowrap text-center w-full">RESTRICTED</span>
+        </div>
+        <div id="fs-content" class="rendered-content relative z-10 font-serif text-lg"></div>
+      </div>
+    </div>
+  </div>
 
   <!-- HEADER -->
-  <header class="border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-md sticky top-0 z-40">
+  <header class="border-b border-phantom-700 bg-phantom-800/50 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-lg" id="icon-brand"></div>
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/5 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10" id="icon-brand-main"></div>
         <div>
           <span class="font-extrabold text-lg tracking-tight text-white block">PhantomPDF <span class="text-emerald-400">Vault</span></span>
-          <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold block" id="crypto-status">Bulletproof Byte-Engine</span>
+          <span class="text-[10px] uppercase tracking-wider text-emerald-500 font-bold block bg-emerald-500/10 px-1.5 py-0.5 rounded inline-block mt-0.5">Advanced Media Engine</span>
         </div>
       </div>
       
-      <div class="flex bg-neutral-950 p-1 rounded-xl border border-neutral-800">
-        <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm">
+      <div class="flex bg-phantom-900 p-1.5 rounded-xl border border-phantom-700">
+        <button onclick="switchTab('create')" id="btn-tab-create" class="px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm">
           <span id="icon-tab-create"></span> Create
         </button>
-        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200">
+        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800">
           <span id="icon-tab-unlock"></span> Unlock
         </button>
       </div>
@@ -61,138 +102,162 @@
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
 
     <!-- CREATE SECTION -->
-    <section id="tab-create" class="space-y-6 block animate-in fade-in duration-300">
+    <section id="tab-create" class="space-y-6 block animate-in fade-in duration-500 slide-in-from-bottom-4">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div class="lg:col-span-4 space-y-5 bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-between">
-          <div class="space-y-4">
-            <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <h2 class="font-bold text-white flex items-center gap-2"><span id="icon-sliders"></span> Vault Parameters</h2>
-              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">AES-256</span>
+        <div class="lg:col-span-4 space-y-6 bg-phantom-800 border border-phantom-700 rounded-2xl p-6 shadow-2xl flex flex-col justify-between">
+          <div class="space-y-5">
+            <div class="flex items-center justify-between border-b border-phantom-700 pb-4">
+              <h2 class="font-bold text-white flex items-center gap-2"><span id="icon-sliders"></span> Crypto Parameters</h2>
             </div>
             
             <div class="space-y-1.5">
-              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span id="icon-doc-title"></span> Document Title
-              </label>
-              <input id="doc-filename" type="text" value="SecureDocument" placeholder="MySecretDoc" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
+              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5"><span id="icon-doc-title"></span> Document Title</label>
+              <input id="doc-filename" type="text" value="SecureReport" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
             </div>
 
             <div class="space-y-1.5">
-              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span id="icon-doc-key"></span> Protection Key
-              </label>
+              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5"><span id="icon-doc-key"></span> AES-256 Passphrase</label>
               <div class="relative">
-                <input id="doc-password" type="password" placeholder="Enter custom passphrase..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
-                <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3 text-neutral-600 hover:text-neutral-400">
+                <input id="doc-password" type="password" placeholder="System Default Key..." class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
+                <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-neutral-300 transition-colors">
                   <span class="btn-eye-icon"></span>
                 </button>
               </div>
             </div>
 
             <div class="space-y-1.5">
-              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <span id="icon-doc-wm"></span> Decoy Layer Watermark
-              </label>
-              <input id="doc-watermark" type="text" placeholder="e.g., RESTRICTED ACCESS" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
+              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5"><span id="icon-doc-wm"></span> Decoy PDF Watermark</label>
+              <input id="doc-watermark" type="text" placeholder="CONFIDENTIAL" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
+            </div>
+
+            <div class="p-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+              <p class="text-[11px] text-emerald-400/80 leading-relaxed font-mono">
+                Auto-Formatting Active:<br>
+                # Header 1<br>
+                ## Header 2<br>
+                **Bold Text**
+              </p>
             </div>
           </div>
 
-          <div class="pt-6">
-            <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.98]">
-              <span id="icon-btn-secure"></span>
-              <span>Secure & Download</span>
+          <div class="pt-4">
+            <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/20 active:scale-[0.98]">
+              <span id="icon-btn-secure"></span> Encrypt & Package Payload
             </button>
           </div>
         </div>
 
-        <div class="lg:col-span-8 bg-neutral-900 border border-neutral-800 rounded-2xl p-1 shadow-2xl flex flex-col h-[520px]">
-          <div class="flex items-center justify-between px-5 py-3 border-b border-neutral-800/60 bg-neutral-900/40 rounded-t-2xl">
-            <div class="flex items-center gap-2 text-xs font-bold text-neutral-400">
-              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Secure Terminal Editor
+        <div class="lg:col-span-8 bg-phantom-800 border border-phantom-700 rounded-2xl p-1 shadow-2xl flex flex-col h-[580px] terminal-editor relative">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-phantom-700/60 bg-phantom-800/40 rounded-t-2xl">
+            <div class="flex items-center gap-3 text-sm font-bold text-neutral-300">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></span>
+              Rich Media Terminal
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-phantom-700 hover:bg-phantom-600 rounded-lg text-xs font-bold text-white transition-colors">
+                <span id="icon-image-plus"></span> Attach Image
+                <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="handleImageUpload(event)">
+              </label>
             </div>
           </div>
-          <textarea id="doc-content" placeholder="Type or paste the raw confidential documents. This text will be encrypted into exact hex-bytes and injected flawlessly..." class="w-full flex-1 bg-transparent text-neutral-100 placeholder-neutral-700 p-6 resize-none focus:outline-none leading-relaxed font-serif text-lg outline-none"></textarea>
+          
+          <div class="flex-1 flex flex-col p-5 overflow-hidden">
+            <textarea id="doc-content" placeholder="# Secret Document Setup
+Write your confidential text here. 
+
+Formatting supported:
+# Main Header
+## Secondary Header
+This is some **bold text** demonstrating inline emphasis.
+
+You can also attach images using the button above. The entire payload (text + images) is encrypted via AES-256 and embedded into the raw hex of the PDF stream." class="w-full flex-1 bg-transparent text-emerald-50 placeholder-neutral-600 resize-none focus:outline-none leading-relaxed text-sm lg:text-base outline-none overflow-y-auto mb-4"></textarea>
+            
+            <!-- Image Preview Strip -->
+            <div id="image-preview-container" class="flex gap-3 overflow-x-auto pb-2 min-h-[80px] hidden border-t border-phantom-700 pt-4">
+              <!-- Dynamically populated via JS -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- UNLOCK SECTION -->
-    <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-300">
-      <div class="text-center max-w-xl mx-auto mb-6">
-        <h1 class="text-3xl font-extrabold text-white tracking-tight">Decryption Terminal</h1>
-        <p class="text-neutral-400 text-sm mt-1">Upload a secured PhantomPDF asset to decode its internal payload.</p>
+    <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500 slide-in-from-bottom-4">
+      <div class="text-center max-w-xl mx-auto mb-8 mt-4">
+        <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
+        <p class="text-neutral-400 text-sm">Upload a secured PhantomPDF asset to decode and parse its multimedia payload.</p>
       </div>
 
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
-        <div id="drop-zone" class="border-2 border-dashed border-neutral-800 hover:border-emerald-500/50 bg-neutral-900/20 hover:bg-emerald-500/[0.01] rounded-2xl p-12 text-center transition-all cursor-pointer group" onclick="triggerFileInput()">
+        <div id="drop-zone" class="border-2 border-dashed border-phantom-700 hover:border-emerald-500/50 bg-phantom-800/30 hover:bg-emerald-500/[0.02] rounded-3xl p-16 text-center transition-all cursor-pointer group shadow-xl" onclick="triggerFileInput()">
           <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
-          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-500/5 transition-all" id="icon-upload-zone"></div>
-          <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Drag and drop your PhantomPDF here</h3>
-          <p class="text-neutral-500 text-sm mt-1 mb-6">or click to browse directories</p>
-          <span class="inline-flex bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-colors tracking-wide uppercase border border-neutral-700">Browse Storage</span>
+          <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-900 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-500/10 transition-all shadow-inner" id="icon-upload-zone"></div>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">Initialize Decryption Pipeline</h3>
+          <p class="text-neutral-500 mt-2 mb-8">Drag & drop your locked PDF file anywhere in this zone</p>
+          <span class="inline-flex bg-phantom-700 group-hover:bg-phantom-600 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-600 shadow-md">Browse Local Files</span>
         </div>
       </div>
 
-      <div id="unlock-stage-process" class="max-w-md mx-auto bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl hidden">
-        <div class="flex items-center gap-4 mb-5 pb-5 border-b border-neutral-800">
-          <div class="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
+      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-800 border border-phantom-700 rounded-2xl p-6 shadow-2xl hidden">
+        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-700">
+          <div class="w-14 h-14 bg-phantom-900 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0 shadow-inner" id="icon-file-ready"></div>
           <div class="flex-1 overflow-hidden">
-            <h3 id="target-file-name" class="font-bold text-white truncate text-sm">SecureDocument.pdf</h3>
-            <p id="target-file-size" class="text-xs text-neutral-500 mt-0.5">84.2 KB</p>
+            <h3 id="target-file-name" class="font-bold text-white truncate text-base">SecureDocument.pdf</h3>
+            <p id="target-file-size" class="text-xs text-emerald-400/80 font-mono mt-1 tracking-wider">LOCKED PAYLOAD DETECTED</p>
           </div>
-          <button onclick="resetUnlockModule()" class="text-xs font-bold text-neutral-500 hover:text-red-400 transition-colors">Remove</button>
+          <button onclick="resetUnlockModule()" class="p-2 bg-phantom-900 hover:bg-red-500/20 text-neutral-500 hover:text-red-400 rounded-lg transition-colors border border-phantom-700 hover:border-red-500/30"><span id="icon-trash"></span></button>
         </div>
 
-        <div class="space-y-4">
-          <div class="space-y-1.5">
+        <div class="space-y-5">
+          <div class="space-y-2">
             <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span id="icon-unlock-key"></span> Decryption Passphrase
+              <span id="icon-unlock-key"></span> Vault Keyphrase
             </label>
             <div class="relative">
-              <input id="unlock-password" type="password" placeholder="Enter password..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
-              <button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3 text-neutral-600 hover:text-neutral-400">
+              <input id="unlock-password" type="password" placeholder="System Default Key..." class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all shadow-inner" />
+              <button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-neutral-300">
                 <span class="btn-eye-icon"></span>
               </button>
             </div>
           </div>
           
-          <button id="btn-trigger-decrypt" onclick="handleDecryptPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-            <span id="icon-btn-unlock"></span>
-            <span>Decrypt & Read Vault</span>
+          <button id="btn-trigger-decrypt" onclick="handleDecryptPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/20">
+            <span id="icon-btn-unlock"></span> Decrypt & Extract Media
           </button>
         </div>
       </div>
 
-      <div id="unlock-stage-viewer" class="space-y-5 hidden">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-neutral-900 border border-neutral-800 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/30" id="icon-success"></div>
+      <div id="unlock-stage-viewer" class="space-y-5 hidden animate-in zoom-in-95 duration-300">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-phantom-800 border border-emerald-500/30 p-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/40 text-emerald-400" id="icon-success"></div>
             <div>
-              <h2 class="font-bold text-white text-md flex items-center gap-2">Decryption Succeeded</h2>
-              <p class="text-neutral-500 text-xs mt-0.5">Parsed from: <span id="viewing-file-name" class="font-mono text-neutral-400"></span></p>
+              <h2 class="font-extrabold text-white text-lg tracking-tight">Access Granted</h2>
+              <p class="text-emerald-400/80 text-xs mt-0.5 font-mono">Decrypted: <span id="viewing-file-name" class="text-neutral-400"></span></p>
             </div>
           </div>
-          <div class="flex gap-2.5 w-full md:w-auto">
-            <button onclick="handleExportCleanPDF()" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
-              <span id="icon-btn-download"></span> Export Clean
+          <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="toggleFullscreenViewer(true)" class="flex-1 md:flex-none bg-phantom-700 hover:bg-phantom-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-phantom-600 flex items-center justify-center gap-2">
+              <span id="icon-expand"></span> View Rendered
             </button>
-            <button onclick="resetUnlockModule()" class="flex-1 md:flex-none bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">Close</button>
+            <button onclick="handleExportCleanPDF()" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold px-4 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+              <span id="icon-btn-download"></span> Export PDF
+            </button>
+            <button onclick="resetUnlockModule()" class="px-3 bg-phantom-900 hover:bg-phantom-700 text-neutral-400 hover:text-white rounded-xl transition-all border border-phantom-700 flex items-center justify-center"><span id="icon-x"></span></button>
           </div>
         </div>
 
-        <div class="bg-neutral-50 text-neutral-950 rounded-2xl p-8 md:p-12 min-h-[500px] shadow-2xl relative overflow-hidden flex flex-col justify-between select-text selection:bg-emerald-200 selection:text-neutral-900 border border-neutral-200">
-          <div id="viewer-watermark" class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.04] select-none overflow-hidden text-center z-0">
-            <span id="viewer-watermark-text" class="text-6xl md:text-8xl font-black transform -rotate-45 block w-full whitespace-nowrap">RESTRICTED</span>
+        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 min-h-[400px] shadow-inner relative overflow-y-auto">
+          <div class="flex items-center gap-2 mb-4 pb-4 border-b border-phantom-800">
+            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Raw Payload Inspector</span>
           </div>
-          <div id="viewer-text-content" class="relative z-10 whitespace-pre-wrap font-serif leading-relaxed text-md md:text-lg text-neutral-900 max-w-4xl mx-auto flex-1 w-full">
-            Plaintext...
-          </div>
+          <!-- Raw inspector for quick preview before full screen -->
+          <div id="inspector-content" class="rendered-content text-neutral-300 font-serif text-sm"></div>
         </div>
       </div>
     </section>
-
   </main>
 
   <script>
@@ -200,26 +265,31 @@
     // 1. INLINE ICONS (Zero external loading delays)
     // =====================================================================
     const ICONS = {
-      zap: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
-      filePlus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
-      unlock: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
-      sliders: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
-      fileText: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-      lock: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
-      printer: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
-      eye: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-      eyeOff: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
-      shieldCheck: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
-      uploadCloud: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover:text-emerald-400 transition-all"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
-      fileKey: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
-      key: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
-      download: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
-      alert: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-      check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      zap: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+      filePlus: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+      unlock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
+      sliders: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+      fileText: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+      lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
+      printer: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
+      eye: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      eyeOff: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+      shieldCheck: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
+      uploadCloud: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover:text-emerald-400 transition-colors"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
+      fileKey: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
+      key: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
+      download: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+      alert: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+      check: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+      imagePlus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="14" y1="4" x2="18" y2="4"/></svg>`,
+      expand: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`,
+      close: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+      trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+      x: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
     };
 
     function renderIcons() {
-      document.getElementById('icon-brand').innerHTML = ICONS.zap;
+      document.getElementById('icon-brand-main').innerHTML = ICONS.zap;
       document.getElementById('icon-tab-create').innerHTML = ICONS.filePlus;
       document.getElementById('icon-tab-unlock').innerHTML = ICONS.unlock;
       document.getElementById('icon-sliders').innerHTML = ICONS.sliders;
@@ -233,29 +303,146 @@
       document.getElementById('icon-btn-unlock').innerHTML = ICONS.unlock;
       document.getElementById('icon-success').innerHTML = ICONS.unlock;
       document.getElementById('icon-btn-download').innerHTML = ICONS.download;
+      document.getElementById('icon-image-plus').innerHTML = ICONS.imagePlus;
+      document.getElementById('icon-expand').innerHTML = ICONS.expand;
+      document.getElementById('icon-fs-brand').innerHTML = ICONS.zap;
+      document.getElementById('icon-fs-download').innerHTML = ICONS.download;
+      document.getElementById('icon-fs-close').innerHTML = ICONS.close;
+      document.getElementById('icon-trash').innerHTML = ICONS.trash;
+      document.getElementById('icon-x').innerHTML = ICONS.x;
       document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
     }
 
     // =====================================================================
-    // 2. BULLETPROOF CRYPTO & HEX UTILS (Solves Corrupt Payload Error)
+    // 2. PAYLOAD & MEDIA HANDLING
     // =====================================================================
-    function bytesToHex(bytes) {
-      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    let uploadedImages = []; // Array of { id, dataURL, w, h }
+    let activeFile = null;
+    let decryptedPayloadData = null;
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) return showToast('Image too large (Max 5MB).', 'error');
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          // Resize large images via Canvas to prevent massive payloads
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          const MAX_W = 800;
+          if (width > MAX_W) { height = Math.round(height * (MAX_W / width)); width = MAX_W; }
+          
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,width,height); // Flatten PNG alpha
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Must be JPEG for native PDF DCTDecode insertion
+          const dataURL = canvas.toDataURL('image/jpeg', 0.85); 
+          const id = 'img_' + Date.now();
+          uploadedImages.push({ id, dataURL, w: width, h: height });
+          renderImageStrip();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = ''; // reset
     }
 
+    function removeImage(id) {
+      uploadedImages = uploadedImages.filter(img => img.id !== id);
+      renderImageStrip();
+    }
+
+    function renderImageStrip() {
+      const container = document.getElementById('image-preview-container');
+      if (uploadedImages.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      container.innerHTML = uploadedImages.map(img => `
+        <div class="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-phantom-700 group">
+          <img src="${img.dataURL}" class="w-full h-full object-cover" />
+          <button onclick="removeImage('${img.id}')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-red-400 hover:text-red-300">
+            ${ICONS.trash}
+          </button>
+        </div>
+      `).join('');
+    }
+
+    // Markdown-lite Parsing Algorithm
+    function parseToBlocks(text) {
+      const blocks = [];
+      const lines = text.split('\n');
+      for(let line of lines) {
+        if(line.startsWith('# ')) { blocks.push({ type: 'h1', text: line.substring(2) }); }
+        else if(line.startsWith('## ')) { blocks.push({ type: 'h2', text: line.substring(3) }); }
+        else if(line.trim() === '') { blocks.push({ type: 'space' }); }
+        else {
+          // Parse inline bold
+          const segments = [];
+          let currentStr = "";
+          let isBold = false;
+          let i = 0;
+          while(i < line.length) {
+            if(line[i] === '*' && line[i+1] === '*') {
+              if(currentStr) segments.push({ b: isBold, t: currentStr });
+              isBold = !isBold; currentStr = ""; i += 2;
+            } else { currentStr += line[i]; i++; }
+          }
+          if(currentStr) segments.push({ b: isBold, t: currentStr });
+          blocks.push({ type: 'p', segments });
+        }
+      }
+      return blocks;
+    }
+
+    function renderBlocksToHTML(payload) {
+      let html = '';
+      if(!payload || !payload.blocks) return html;
+
+      for(let block of payload.blocks) {
+        if(block.type === 'h1') html += `<h1>${escapeHTML(block.text)}</h1>`;
+        else if(block.type === 'h2') html += `<h2>${escapeHTML(block.text)}</h2>`;
+        else if(block.type === 'space') html += `<div class="h-4"></div>`;
+        else if(block.type === 'p') {
+          html += `<p>`;
+          for(let seg of block.segments) html += seg.b ? `<strong>${escapeHTML(seg.t)}</strong>` : escapeHTML(seg.t);
+          html += `</p>`;
+        }
+      }
+      if(payload.images && payload.images.length > 0) {
+        html += `<div class="mt-8 pt-8 border-t border-neutral-200">`;
+        for(let img of payload.images) html += `<img src="${img.dataURL}" alt="Secure Attachment" />`;
+        html += `</div>`;
+      }
+      return html;
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));
+    }
+
+
+    // =====================================================================
+    // 3. INTERNAL CRYPTO ENGINE (Byte-Exact & Failsafe)
+    // =====================================================================
+    function bytesToHex(bytes) {
+      let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex;
+    }
     function hexToBytes(hex) {
       const bytes = new Uint8Array(hex.length / 2);
       for (let i = 0; i < hex.length; i += 2) bytes[i/2] = parseInt(hex.substring(i, i+2), 16);
       return bytes;
     }
 
-    const FALLBACK_KEY = "PHTM_INT_VAULT_K";
+    const FALLBACK_KEY = "PHTM_ADV_V5_KEY";
 
-    async function internalEncrypt(text, password) {
+    async function internalEncrypt(jsonString, password) {
       const enc = new TextEncoder();
-      const payloadBytes = enc.encode(text);
-      let finalBytes;
-
+      const payloadBytes = enc.encode(jsonString); // JSON can be large due to images
+      
       if (window.crypto && window.crypto.subtle) {
         try {
           const salt = window.crypto.getRandomValues(new Uint8Array(16));
@@ -264,40 +451,31 @@
           const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
           const cipherBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, payloadBytes);
           
-          finalBytes = new Uint8Array(29 + cipherBuffer.byteLength);
-          finalBytes[0] = 1; // Flag 1 = WebCrypto Valid
-          finalBytes.set(salt, 1);
-          finalBytes.set(iv, 17);
-          finalBytes.set(new Uint8Array(cipherBuffer), 29);
+          const finalBytes = new Uint8Array(29 + cipherBuffer.byteLength);
+          finalBytes[0] = 1; finalBytes.set(salt, 1); finalBytes.set(iv, 17); finalBytes.set(new Uint8Array(cipherBuffer), 29);
           return bytesToHex(finalBytes);
-        } catch (e) { console.warn("Native crypto failed, using fallback", e); }
+        } catch (e) { console.warn("Native crypto failed, using sync fallback."); }
       }
 
-      // Sync XOR Fallback
+      // XOR Stream Fallback for Sandbox/Insecure contexts
       const keyBytes = enc.encode(password || FALLBACK_KEY);
-      finalBytes = new Uint8Array(1 + payloadBytes.length);
-      finalBytes[0] = 2; // Flag 2 = XOR Fallback
+      const finalBytes = new Uint8Array(1 + payloadBytes.length);
+      finalBytes[0] = 2;
       for(let i=0; i<payloadBytes.length; i++) finalBytes[i+1] = payloadBytes[i] ^ keyBytes[i % keyBytes.length];
       return bytesToHex(finalBytes);
     }
 
     async function internalDecrypt(hex, password) {
-      if (!hex || hex.length === 0) throw new Error("Payload is empty.");
       const bytes = hexToBytes(hex);
       const type = bytes[0];
 
       if (type === 1) {
-        if (!window.crypto || !window.crypto.subtle) throw new Error("Decryption requires Secure Context (HTTPS/Localhost).");
-        try {
-          const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
-          const enc = new TextEncoder();
-          const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
-          const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
-          const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
-          return new TextDecoder().decode(decrypted);
-        } catch(e) {
-          throw new Error("Decryption failed. Incorrect password or corrupted data.");
-        }
+        const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
+        const enc = new TextEncoder();
+        const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
+        const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
+        const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
+        return new TextDecoder().decode(decrypted);
       } else if (type === 2) {
         const enc = new TextEncoder();
         const keyBytes = enc.encode(password || FALLBACK_KEY);
@@ -306,212 +484,220 @@
         for(let i=0; i<payload.length; i++) out[i] = payload[i] ^ keyBytes[i % keyBytes.length];
         return new TextDecoder().decode(out);
       }
-      throw new Error("Invalid security flag in payload.");
+      throw new Error("Invalid payload security flag.");
     }
 
 
     // =====================================================================
-    // 3. EXACT BYTE-MATH PDF ENGINE (Solves Blank Pages)
+    // 4. ADVANCED NATIVE PDF GENERATOR (Handles Fonts & Images!)
     // =====================================================================
-    class InternalPDFEngine {
+    class AdvancedPDFEngine {
       constructor() {
-        this.chunks = [];
-        this.objects = [];
-        this.byteLength = 0;
+        this.chunks = []; this.objects = []; this.byteLength = 0;
         this.encoder = new TextEncoder();
         this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
       }
-
       append(str) {
         const bytes = this.encoder.encode(str);
         this.chunks.push(bytes);
-        const offset = this.byteLength;
-        this.byteLength += bytes.length;
-        return offset;
+        const offset = this.byteLength; this.byteLength += bytes.length; return offset;
       }
-
-      addObj(content) {
+      appendBytes(uint8array) {
+        this.chunks.push(uint8array);
+        const offset = this.byteLength; this.byteLength += uint8array.length; return offset;
+      }
+      addObj(contentStr) {
         const id = this.objects.length + 1;
         this.objects.push(this.byteLength);
-        this.append(`${id} 0 obj\n${content}\nendobj\n`);
-        return id;
+        this.append(`${id} 0 obj\n${contentStr}\nendobj\n`); return id;
       }
-
-      build(textLines, watermarkText, hexPayload) {
-        const pagesRefIds = [];
-        const fontId = this.objects.length + 3; // Pre-calculate font object ID
-
-        // Break text lines into Pages
-        const maxLinesPerPage = 38;
-        const pageGroups = [];
-        for (let i=0; i<textLines.length; i+=maxLinesPerPage) pageGroups.push(textLines.slice(i, i+maxLinesPerPage));
-        if (pageGroups.length === 0) pageGroups.push([""]);
-
-        // Pages Dict (Placeholder Kid array, will replace)
-        const pagesObjIdx = this.objects.length + 2; 
-
-        // 1. Catalog
-        const catalogId = this.addObj(`<< /Type /Catalog /Pages ${pagesObjIdx} 0 R >>`);
+      
+      // Builds a beautiful clean PDF combining Text Blocks and Images
+      buildFormatted(blocks, images, watermark, hexPayload) {
+        const PAGE_WIDTH = 600, PAGE_HEIGHT = 800;
+        const MARGIN_X = 50, MARGIN_Y = 50;
         
-        // 2. Pages (We will build Kids list dynamically)
-        let kidsList = "";
-        const pagesId = this.objects.length + 1;
-        this.objects.push(this.byteLength); // Reserve offset
-        // We defer adding the actual page string until we generate the pages
-
-        // 3. Font
-        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
-
-        // Generate Pages
-        for (let pageLines of pageGroups) {
-          // Content Stream
-          let streamData = `BT /F1 12 Tf\n50 750 Td\n`;
-          for (let line of pageLines) {
-            // Strip complex unicode from rendered visual text to prevent PDF font errors
-            let esc = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
-            streamData += `(${esc}) Tj\n0 -18 Td\n`;
+        // Setup Catalog, Pages, Fonts
+        const catalogId = 1, pagesId = 2, fontRegId = 3, fontBoldId = 4;
+        
+        // Analyze layout to calculate page count
+        let pagesData = []; // [{ streamData: "", xobjects: ["Im1", "Im2"] }]
+        let currentPage = { stream: `BT\n${MARGIN_X} ${PAGE_HEIGHT - MARGIN_Y} Td\n`, xobjects: [], y: PAGE_HEIGHT - MARGIN_Y };
+        
+        const nextLine = (points) => {
+          currentPage.y -= points;
+          if(currentPage.y < MARGIN_Y) {
+            currentPage.stream += `ET\n`;
+            pagesData.push(currentPage);
+            currentPage = { stream: `BT\n${MARGIN_X} ${PAGE_HEIGHT - MARGIN_Y} Td\n`, xobjects: [], y: PAGE_HEIGHT - MARGIN_Y };
+          } else {
+            currentPage.stream += `0 -${points} Td\n`;
           }
-          streamData += `ET\n`;
+        };
 
-          if (watermarkText) {
-            let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
-            streamData += `q 0.8 0 0 rg 0.35 gs\nBT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+        const escapePdfStr = (str) => str.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
+
+        // Layout Text Blocks
+        for(let block of blocks) {
+          if(block.type === 'h1') {
+            currentPage.stream += `/F2 24 Tf\n`; nextLine(30);
+            currentPage.stream += `(${escapePdfStr(block.text)}) Tj\n`; nextLine(10);
           }
+          else if(block.type === 'h2') {
+            currentPage.stream += `/F2 18 Tf\n`; nextLine(24);
+            currentPage.stream += `(${escapePdfStr(block.text)}) Tj\n`; nextLine(8);
+          }
+          else if(block.type === 'space') { nextLine(14); }
+          else if(block.type === 'p') {
+            nextLine(18);
+            // Crude Word wrap algorithm
+            let currentLineLen = 0;
+            const MAX_LINE_LEN = 90; 
+            for(let seg of block.segments) {
+              currentPage.stream += seg.b ? `/F2 12 Tf\n` : `/F1 12 Tf\n`;
+              let words = seg.t.split(' ');
+              for(let w of words) {
+                if(currentLineLen + w.length > MAX_LINE_LEN) { nextLine(16); currentLineLen = 0; }
+                currentPage.stream += `(${escapePdfStr(w + ' ')}) Tj\n`;
+                currentLineLen += w.length + 1;
+              }
+            }
+          }
+        }
+        currentPage.stream += `ET\n`; // End text mode
 
-          const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
-          const pId = this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
-          pagesRefIds.push(`${pId} 0 R`);
+        // Layout Images
+        let imageObjects = []; // { id, dict }
+        if(images && images.length > 0) {
+          for(let i=0; i<images.length; i++) {
+            let img = images[i];
+            // Extract pure base64 jpeg
+            const b64Data = img.dataURL.split(',')[1];
+            const rawBytes = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+            
+            // Hex encode image data for ASCIIHexDecode Filter (Vanilla JS safe)
+            let hexStr = '';
+            for(let b=0; b<rawBytes.length; b++) hexStr += rawBytes[b].toString(16).padStart(2, '0');
+            hexStr += '>'; // ASCIIHexDecode EOF marker
+
+            // Calculate display dimensions
+            const maxW = PAGE_WIDTH - (MARGIN_X*2);
+            let dW = img.w, dH = img.h;
+            if(dW > maxW) { dH = Math.round(dH * (maxW/dW)); dW = maxW; }
+            
+            // Check if fits on current page, else new page
+            if(currentPage.y - dH < MARGIN_Y) {
+              pagesData.push(currentPage);
+              currentPage = { stream: ``, xobjects: [], y: PAGE_HEIGHT - MARGIN_Y };
+            }
+            
+            const xobjName = `Im${i+1}`;
+            currentPage.stream += `q\n${dW} 0 0 ${dH} ${MARGIN_X} ${currentPage.y - dH} cm\n/${xobjName} Do\nQ\n`;
+            currentPage.xobjects.push(xobjName);
+            currentPage.y -= (dH + 20);
+
+            imageObjects.push({
+              name: xobjName,
+              width: img.w, height: img.h,
+              hexData: hexStr
+            });
+          }
+        }
+        pagesData.push(currentPage);
+
+        // Watermark application to all pages
+        if(watermark) {
+          let escWm = escapePdfStr(watermark);
+          for(let p of pagesData) {
+            p.stream += `q 0.8 0 0 rg 0.15 gs\nBT /F2 64 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+          }
         }
 
-        // Backfill the Pages Object
-        const pagesStr = `<< /Type /Pages /Kids [${pagesRefIds.join(' ')}] /Count ${pageGroups.length} >>`;
-        const pagesBytes = this.encoder.encode(`${pagesId} 0 obj\n${pagesStr}\nendobj\n`);
-        
-        // We hack it in by replacing the placeholder logic
-        // Because of the sequential nature, we must rebuild the buffer.
-        // Actually, it's easier to just rebuild correctly from scratch knowing the ids:
-      }
-
-      // Simpler sequential build
-      buildSequential(textLines, watermarkText, hexPayload) {
-        const maxLinesPerPage = 38;
-        const pageGroups = [];
-        for (let i=0; i<textLines.length; i+=maxLinesPerPage) pageGroups.push(textLines.slice(i, i+maxLinesPerPage));
-        if (pageGroups.length === 0) pageGroups.push([""]);
-
-        const catalogId = 1;
-        const pagesId = 2;
-        const fontId = 3;
-        
-        // Count total objects to come
-        // catalog(1), pages(1), font(1), info(1) = 4 baseline
-        // For each page: stream(1), page(1) = 2 per page
-        
+        // GENERATE PDF OBJECTS IN SEQUENCE
+        // 1-4. Base Dicts
         let kidsArray = [];
-        let currentObjId = 4;
-        for (let i=0; i<pageGroups.length; i++) {
-           kidsArray.push(`${currentObjId + 1} 0 R`); // page obj will be right after stream
-           currentObjId += 2;
-        }
+        let currObjId = 5; // 1:Cat, 2:Pages, 3:F1, 4:F2
+        
+        for(let i=0; i<pagesData.length; i++) { kidsArray.push(`${currObjId+1} 0 R`); currObjId += 2; }
+        let imageStartObjId = currObjId; 
 
         this.addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
-        this.addObj(`<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pageGroups.length} >>`);
+        this.addObj(`<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pagesData.length} >>`);
         this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
+        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
 
-        for (let pageLines of pageGroups) {
-          let streamData = `BT /F1 12 Tf\n50 750 Td\n`;
-          for (let line of pageLines) {
-            let esc = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
-            streamData += `(${esc}) Tj\n0 -18 Td\n`;
-          }
-          streamData += `ET\n`;
-
-          if (watermarkText) {
-            let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
-            streamData += `q 0.8 0 0 rg 0.2 gs\nBT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
-          }
+        // 5+. Pages & Streams
+        for(let p of pagesData) {
+          const streamId = this.addObj(`<< /Length ${p.stream.length} >>\nstream\n${p.stream}\nendstream`);
           
-          const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
-          this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
+          let xobjDict = "";
+          if(p.xobjects.length > 0) {
+             xobjDict = `/XObject << `;
+             for(let xname of p.xobjects) {
+               const imgIdx = imageObjects.findIndex(io => io.name === xname);
+               xobjDict += `/${xname} ${imageStartObjId + imgIdx} 0 R `;
+             }
+             xobjDict += `>> `;
+          }
+
+          this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}] /Resources << /Font << /F1 ${fontRegId} 0 R /F2 ${fontBoldId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> ${xobjDict}>> /Contents ${streamId} 0 R >>`);
         }
 
-        // Info dict (Holds payload as HEX)
-        let infoStr = `<< /Producer (PhantomVault Engine) `;
-        if (hexPayload) infoStr += `/PhantomPayload <${hexPayload}> `;
+        // Add Image XObjects
+        for(let img of imageObjects) {
+          this.addObj(`<< /Type /XObject /Subtype /Image /Width ${img.width} /Height ${img.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length ${img.hexData.length} >>\nstream\n${img.hexData}\nendstream`);
+        }
+
+        // Info & Payload
+        let infoStr = `<< /Producer (PhantomVault Advanced) `;
+        if(hexPayload) infoStr += `/PhantomPayload <${hexPayload}> `;
         infoStr += `>>`;
         const infoId = this.addObj(infoStr);
 
+        // XRef & Trailer
         const xrefOffset = this.byteLength;
         this.append(`xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`);
         for (let off of this.objects) this.append(String(off).padStart(10, '0') + " 00000 n \n");
-
         this.append(`trailer\n<< /Size ${this.objects.length + 1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
 
         const finalBuffer = new Uint8Array(this.byteLength);
-        let offset = 0;
-        for (let chunk of this.chunks) {
-          finalBuffer.set(chunk, offset);
-          offset += chunk.length;
-        }
+        let offset = 0; for (let chunk of this.chunks) { finalBuffer.set(chunk, offset); offset += chunk.length; }
         return finalBuffer;
       }
     }
 
 
     // =====================================================================
-    // 4. UI LOGIC
+    // 5. APP CONTROLLERS
     // =====================================================================
-    let activeFile = null;
-    let decryptedPayloadData = null;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      renderIcons();
-      setupDragAndDrop();
-    });
 
     function switchTab(tabId) {
       document.getElementById('tab-create').classList.toggle('hidden', tabId !== 'create');
       document.getElementById('tab-unlock').classList.toggle('hidden', tabId !== 'unlock');
       
-      document.getElementById('btn-tab-create').className = tabId === 'create' 
-        ? "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm"
-        : "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
-        
-      document.getElementById('btn-tab-unlock').className = tabId === 'unlock' 
-        ? "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm"
-        : "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
+      const actCls = "px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm";
+      const inactCls = "px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800";
+      
+      document.getElementById('btn-tab-create').className = tabId === 'create' ? actCls : inactCls;
+      document.getElementById('btn-tab-unlock').className = tabId === 'unlock' ? actCls : inactCls;
     }
 
-    function togglePasswordVisibility(inputId, button) {
-      const input = document.getElementById(inputId);
-      input.type = input.type === 'password' ? 'text' : 'password';
-      button.innerHTML = input.type === 'password' ? ICONS.eye : ICONS.eyeOff;
+    function togglePasswordVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.innerHTML = inp.type === 'password' ? `<span class="btn-eye-icon">${ICONS.eye}</span>` : `<span class="btn-eye-icon">${ICONS.eyeOff}</span>`;
     }
 
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      let bg = type === 'error' ? 'bg-red-950/90 border-red-500/20 text-red-200' : type === 'success' ? 'bg-emerald-950/90 border-emerald-500/20 text-emerald-200' : 'bg-neutral-900 border-neutral-800 text-neutral-300';
+      let bg = type === 'error' ? 'bg-red-950/90 border-red-500/30 text-red-200' : type === 'success' ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-200' : 'bg-phantom-800 border-phantom-600 text-neutral-200';
       let icon = type === 'error' ? ICONS.alert : type === 'success' ? ICONS.check : ICONS.zap;
       toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 max-w-[340px]`;
-      toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-xs font-medium leading-relaxed">${message}</p></div>`;
+      toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-sm font-bold leading-relaxed tracking-wide">${message}</p></div>`;
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
-      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
-    }
-
-    function autoWrapText(text, maxLineChars) {
-      let lines = [];
-      text.split('\n').forEach(para => {
-        if (!para) return lines.push("");
-        let curr = "";
-        para.split(' ').forEach(word => {
-          if ((curr + word).length > maxLineChars) { lines.push(curr.trim()); curr = word + " "; } 
-          else curr += word + " ";
-        });
-        if (curr.trim()) lines.push(curr.trim());
-      });
-      return lines;
+      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
     }
 
     async function handleGenerateSecurePDF() {
@@ -521,36 +707,49 @@
       let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
       if (!filename.endsWith('.pdf')) filename += '.pdf';
 
-      if (!content.trim()) return showToast('Please enter text to encrypt.', 'error');
+      if (!content.trim() && uploadedImages.length === 0) return showToast('Add text or images to encrypt.', 'error');
+
+      const lockBtn = document.getElementById('btn-lock-pdf');
+      lockBtn.disabled = true; lockBtn.innerHTML = `<svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Compiling Structure...`;
 
       try {
-        const payloadObj = { text: content, watermarkText };
+        // Parse text to blocks for payload storage
+        const blocks = parseToBlocks(content);
+        const payloadObj = { blocks, watermarkText, images: uploadedImages };
+        
+        // Massive Payload Encryption
         const hexPayload = await internalEncrypt(JSON.stringify(payloadObj), password);
 
-        const decoyLines = [
-          "CONFIDENTIAL FILE SECURED", "",
-          "If you are reading this in a standard PDF viewer, access is DENIED.",
-          "This PDF's structure is cryptographically obfuscated natively.",
-          "Use PhantomPDF Vault to decrypt the exact byte payload."
+        // Generate Decoy PDF
+        const decoyBlocks = [
+          { type: 'h1', text: 'CONFIDENTIAL VAULT SECURED' },
+          { type: 'space' },
+          { type: 'p', segments: [{b:false, t:'If you are reading this in a standard viewer, access is DENIED.'}] },
+          { type: 'p', segments: [{b:false, t:'This multimedia structure is cryptographically obfuscated.'}] },
+          { type: 'p', segments: [{b:true, t:'Use PhantomPDF Vault to decrypt the exact byte matrix.'}] },
+          { type: 'space' },
         ];
-        for(let i=0; i<15; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
+        // Inject fake hex dump visual
+        for(let i=0; i<15; i++) decoyBlocks.push({ type:'p', segments:[{b:false, t: Math.random().toString(16).substring(2).repeat(8).toUpperCase() }] });
 
-        const pdfEngine = new InternalPDFEngine();
-        const pdfBytes = pdfEngine.buildSequential(decoyLines, watermarkText, hexPayload);
+        const pdfEngine = new AdvancedPDFEngine();
+        const pdfBytes = pdfEngine.buildFormatted(decoyBlocks, [], watermarkText, hexPayload);
 
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; link.download = filename;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         
-        showToast('Secure PDF Built Successfully!', 'success');
-      } catch (err) { console.error(err); showToast('Algorithm error during generation.', 'error'); }
+        showToast('Secure Multimedia PDF Generated!', 'success');
+      } catch (err) { console.error(err); showToast('Encryption memory limit exceeded.', 'error'); }
+      finally { lockBtn.disabled = false; lockBtn.innerHTML = `<span id="icon-btn-secure">${ICONS.shieldCheck}</span> Encrypt & Package Payload`; }
     }
 
+    // --- DECRYPTION CONTROLLERS ---
     function setupDragAndDrop() {
       const dropZone = document.getElementById('drop-zone');
-      ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
-      ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
+      ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
+      ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
       dropZone.addEventListener('drop', e => e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]), false);
     }
 
@@ -561,7 +760,6 @@
       if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) return showToast('Invalid file format.', 'error');
       activeFile = file;
       document.getElementById('target-file-name').innerText = file.name;
-      document.getElementById('target-file-size').innerText = `${(file.size / 1024).toFixed(1)} KB`;
       document.getElementById('unlock-stage-upload').classList.add('hidden');
       document.getElementById('unlock-stage-process').classList.remove('hidden');
     }
@@ -572,59 +770,83 @@
       document.getElementById('unlock-stage-process').classList.add('hidden');
       document.getElementById('unlock-stage-viewer').classList.add('hidden');
       document.getElementById('unlock-stage-upload').classList.remove('hidden');
+      toggleFullscreenViewer(false);
     }
 
     async function handleDecryptPDF() {
       if (!activeFile) return;
+      const decryptBtn = document.getElementById('btn-trigger-decrypt');
+      decryptBtn.disabled = true; decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Decrypting...`;
+
       try {
         const textData = await activeFile.text(); 
-        
-        // Regex target specifically targets exact Hex strings embedded in our custom dictionary format
         const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
-        if (!match) throw new Error("No recognized Internal Phantom Payload found in this file.");
+        if (!match) throw new Error("No recognized Phantom Payload found.");
         
         const payloadHex = match[1];
         const decryptedJsonStr = await internalDecrypt(payloadHex, document.getElementById('unlock-password').value);
         decryptedPayloadData = JSON.parse(decryptedJsonStr);
 
         document.getElementById('viewing-file-name').innerText = activeFile.name;
-        document.getElementById('viewer-text-content').innerText = decryptedPayloadData.text;
+        document.getElementById('fs-filename').innerText = activeFile.name;
         
-        const wmContainer = document.getElementById('viewer-watermark');
+        // Render HTML for viewer
+        const htmlContent = renderBlocksToHTML(decryptedPayloadData);
+        document.getElementById('inspector-content').innerHTML = htmlContent;
+        document.getElementById('fs-content').innerHTML = htmlContent;
+        
+        // Watermark handling
+        const wmFS = document.getElementById('fs-watermark');
         if (decryptedPayloadData.watermarkText) {
-          document.getElementById('viewer-watermark-text').innerText = decryptedPayloadData.watermarkText;
-          wmContainer.classList.remove('hidden');
-        } else wmContainer.classList.add('hidden');
+          document.getElementById('fs-watermark-text').innerText = decryptedPayloadData.watermarkText;
+          wmFS.classList.remove('hidden');
+        } else wmFS.classList.add('hidden');
 
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        showToast('Payload decoded successfully.', 'success');
+        showToast('Payload unlocked successfully.', 'success');
       } catch (err) {
-        console.error(err);
         showToast(err.message, 'error');
+      } finally {
+        decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Decrypt & Extract Media`;
+      }
+    }
+
+    function toggleFullscreenViewer(show) {
+      const viewer = document.getElementById('fullscreen-viewer');
+      if (show) {
+        viewer.classList.remove('hidden');
+        setTimeout(() => viewer.classList.remove('opacity-0'), 10);
+        document.body.style.overflow = 'hidden';
+      } else {
+        viewer.classList.add('opacity-0');
+        setTimeout(() => viewer.classList.add('hidden'), 300);
+        document.body.style.overflow = 'auto';
       }
     }
 
     function handleExportCleanPDF() {
       if (!decryptedPayloadData || !activeFile) return;
       try {
-        // Auto wrap for clean PDF export (approx 95 chars wide for 12pt Helvetica)
-        const wrappedLines = autoWrapText(decryptedPayloadData.text, 95);
-
-        const pdfEngine = new InternalPDFEngine();
-        // Null payload prevents re-encrypting a decoy
-        const pdfBytes = pdfEngine.buildSequential(wrappedLines, decryptedPayloadData.watermarkText, null);
+        const pdfEngine = new AdvancedPDFEngine();
+        const pdfBytes = pdfEngine.buildFormatted(
+          decryptedPayloadData.blocks || [], 
+          decryptedPayloadData.images || [], 
+          decryptedPayloadData.watermarkText, 
+          null // Null prevents re-encryption
+        );
 
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; link.download = `Clean_${activeFile.name}`;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         
-        showToast('Clean PDF exported successfully.', 'success');
-      } catch (err) { 
-        showToast('Export failed.', 'error'); 
-      }
+        showToast('Clean PDF exported securely.', 'success');
+      } catch (err) { showToast('PDF Export encountered an error.', 'error'); console.error(err); }
     }
+
+    // Init script
+    window.onload = renderIcons;
   </script>
 </body>
 </html>
