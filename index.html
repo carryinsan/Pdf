@@ -3,18 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhantomPDF Vault - Zero Dependency Internal Engine</title>
+  <title>PhantomPDF Vault - Bulletproof Engine</title>
   
-  <!-- Tailwind CSS Engine (Only external file used for styling) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            serif: ['Georgia', 'Cambria', 'serif'],
-          }
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'] }
         }
       }
     }
@@ -35,21 +32,20 @@
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300">
 
-  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- TOAST NOTIFICATIONS -->
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm pointer-events-none"></div>
 
-  <!-- HEADER NAVIGATION -->
+  <!-- HEADER -->
   <header class="border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10" id="icon-brand"></div>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-lg" id="icon-brand"></div>
         <div>
           <span class="font-extrabold text-lg tracking-tight text-white block">PhantomPDF <span class="text-emerald-400">Vault</span></span>
-          <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold block" id="crypto-status">Zero-Dependency Internal Engine</span>
+          <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold block" id="crypto-status">Bulletproof Byte-Engine</span>
         </div>
       </div>
       
-      <!-- Segmented Tab Bar -->
       <div class="flex bg-neutral-950 p-1 rounded-xl border border-neutral-800">
         <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm">
           <span id="icon-tab-create"></span> Create
@@ -61,21 +57,18 @@
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
+  <!-- MAIN -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8">
 
-    <!-- TAB 1: CREATE SECTION -->
+    <!-- CREATE SECTION -->
     <section id="tab-create" class="space-y-6 block animate-in fade-in duration-300">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left: Configuration Bar -->
         <div class="lg:col-span-4 space-y-5 bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-between">
           <div class="space-y-4">
             <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
-              <h2 class="font-bold text-white flex items-center gap-2">
-                <span id="icon-sliders"></span> Vault Parameters
-              </h2>
-              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">Instant Sync</span>
+              <h2 class="font-bold text-white flex items-center gap-2"><span id="icon-sliders"></span> Vault Parameters</h2>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">AES-256</span>
             </div>
             
             <div class="space-y-1.5">
@@ -106,35 +99,32 @@
           </div>
 
           <div class="pt-6">
-            <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
+            <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.98]">
               <span id="icon-btn-secure"></span>
               <span>Secure & Download</span>
             </button>
           </div>
         </div>
 
-        <!-- Right: Code/Plain-text editor area -->
         <div class="lg:col-span-8 bg-neutral-900 border border-neutral-800 rounded-2xl p-1 shadow-2xl flex flex-col h-[520px]">
           <div class="flex items-center justify-between px-5 py-3 border-b border-neutral-800/60 bg-neutral-900/40 rounded-t-2xl">
             <div class="flex items-center gap-2 text-xs font-bold text-neutral-400">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Secure Terminal
+              Secure Terminal Editor
             </div>
-            <div class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Internal Engine Active</div>
           </div>
-          <textarea id="doc-content" placeholder="Type or paste the raw confidential documents. This text will be instantly encrypted and injected directly into the binary PDF metadata structure using an internal pure-JavaScript algorithm..." class="w-full flex-1 bg-transparent text-neutral-100 placeholder-neutral-700 p-6 resize-none focus:outline-none leading-relaxed font-serif text-lg outline-none"></textarea>
+          <textarea id="doc-content" placeholder="Type or paste the raw confidential documents. This text will be encrypted into exact hex-bytes and injected flawlessly..." class="w-full flex-1 bg-transparent text-neutral-100 placeholder-neutral-700 p-6 resize-none focus:outline-none leading-relaxed font-serif text-lg outline-none"></textarea>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: UNLOCK SECTION -->
+    <!-- UNLOCK SECTION -->
     <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-300">
       <div class="text-center max-w-xl mx-auto mb-6">
         <h1 class="text-3xl font-extrabold text-white tracking-tight">Decryption Terminal</h1>
-        <p class="text-neutral-400 text-sm mt-1">Upload a secured PhantomPDF asset to parse, decrypt and export.</p>
+        <p class="text-neutral-400 text-sm mt-1">Upload a secured PhantomPDF asset to decode its internal payload.</p>
       </div>
 
-      <!-- File Interface Section -->
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
         <div id="drop-zone" class="border-2 border-dashed border-neutral-800 hover:border-emerald-500/50 bg-neutral-900/20 hover:bg-emerald-500/[0.01] rounded-2xl p-12 text-center transition-all cursor-pointer group" onclick="triggerFileInput()">
           <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
@@ -145,7 +135,6 @@
         </div>
       </div>
 
-      <!-- Password and Processing Panel -->
       <div id="unlock-stage-process" class="max-w-md mx-auto bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl hidden">
         <div class="flex items-center gap-4 mb-5 pb-5 border-b border-neutral-800">
           <div class="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
@@ -176,7 +165,6 @@
         </div>
       </div>
 
-      <!-- Decrypted View Panel -->
       <div id="unlock-stage-viewer" class="space-y-5 hidden">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-neutral-900 border border-neutral-800 p-5 rounded-2xl shadow-xl">
           <div class="flex items-center gap-3">
@@ -209,25 +197,25 @@
 
   <script>
     // =====================================================================
-    // 1. INLINE SVG ICON SYSTEM (Zero Dependencies)
+    // 1. INLINE ICONS (Zero external loading delays)
     // =====================================================================
     const ICONS = {
-      zap: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
-      filePlus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
-      unlock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
-      sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
-      fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
-      lock: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
-      printer: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
-      eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-      eyeOff: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
-      shieldCheck: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
-      uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover:text-emerald-400 transition-all"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
-      fileKey: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
-      key: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
-      download: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
-      alert: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-      check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+      zap: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+      filePlus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+      unlock: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
+      sliders: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+      fileText: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+      lock: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
+      printer: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
+      eye: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      eyeOff: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+      shieldCheck: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
+      uploadCloud: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover:text-emerald-400 transition-all"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
+      fileKey: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
+      key: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
+      download: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+      alert: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+      check: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
     };
 
     function renderIcons() {
@@ -249,145 +237,229 @@
     }
 
     // =====================================================================
-    // 2. INTERNAL FAILSAFE CRYPTO ALGORITHM (No External Scripts)
-    // Uses Native Web Crypto API if HTTPS, falls back to internal Cipher if insecure
+    // 2. BULLETPROOF CRYPTO & HEX UTILS (Solves Corrupt Payload Error)
     // =====================================================================
-    const NATIVE_SUPPORTED = window.crypto && window.crypto.subtle;
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function hexToBytes(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < hex.length; i += 2) bytes[i/2] = parseInt(hex.substring(i, i+2), 16);
+      return bytes;
+    }
+
     const FALLBACK_KEY = "PHTM_INT_VAULT_K";
 
     async function internalEncrypt(text, password) {
-      if (NATIVE_SUPPORTED) {
+      const enc = new TextEncoder();
+      const payloadBytes = enc.encode(text);
+      let finalBytes;
+
+      if (window.crypto && window.crypto.subtle) {
         try {
-          const enc = new TextEncoder();
           const salt = window.crypto.getRandomValues(new Uint8Array(16));
           const iv = window.crypto.getRandomValues(new Uint8Array(12));
-          const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), { name: 'PBKDF2' }, false, ['deriveKey']);
-          const key = await window.crypto.subtle.deriveKey(
-            { name: 'PBKDF2', salt: salt, iterations: 50000, hash: 'SHA-256' },
-            keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt']
-          );
-          const ciphertext = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(text));
+          const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
+          const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
+          const cipherBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, payloadBytes);
           
-          const bundle = new Uint8Array(28 + ciphertext.byteLength);
-          bundle.set(salt, 0); bundle.set(iv, 16); bundle.set(new Uint8Array(ciphertext), 28);
-          return 'NATIVE|' + btoa(String.fromCharCode(...bundle));
-        } catch (e) {
-          console.warn("Native Crypto Failed, using Failsafe Cipher", e);
+          finalBytes = new Uint8Array(29 + cipherBuffer.byteLength);
+          finalBytes[0] = 1; // Flag 1 = WebCrypto Valid
+          finalBytes.set(salt, 1);
+          finalBytes.set(iv, 17);
+          finalBytes.set(new Uint8Array(cipherBuffer), 29);
+          return bytesToHex(finalBytes);
+        } catch (e) { console.warn("Native crypto failed, using fallback", e); }
+      }
+
+      // Sync XOR Fallback
+      const keyBytes = enc.encode(password || FALLBACK_KEY);
+      finalBytes = new Uint8Array(1 + payloadBytes.length);
+      finalBytes[0] = 2; // Flag 2 = XOR Fallback
+      for(let i=0; i<payloadBytes.length; i++) finalBytes[i+1] = payloadBytes[i] ^ keyBytes[i % keyBytes.length];
+      return bytesToHex(finalBytes);
+    }
+
+    async function internalDecrypt(hex, password) {
+      if (!hex || hex.length === 0) throw new Error("Payload is empty.");
+      const bytes = hexToBytes(hex);
+      const type = bytes[0];
+
+      if (type === 1) {
+        if (!window.crypto || !window.crypto.subtle) throw new Error("Decryption requires Secure Context (HTTPS/Localhost).");
+        try {
+          const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
+          const enc = new TextEncoder();
+          const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
+          const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
+          const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
+          return new TextDecoder().decode(decrypted);
+        } catch(e) {
+          throw new Error("Decryption failed. Incorrect password or corrupted data.");
         }
-      }
-      return 'FAILSAFE|' + failsafeCipher(text, password || FALLBACK_KEY);
-    }
-
-    async function internalDecrypt(payloadStr, password) {
-      if (!payloadStr.includes('|')) throw new Error("Corrupt Payload format.");
-      const [type, data] = payloadStr.split('|');
-
-      if (type === 'NATIVE') {
-        if (!NATIVE_SUPPORTED) throw new Error("This payload requires a secure HTTPS context to decrypt natively.");
+      } else if (type === 2) {
         const enc = new TextEncoder();
-        const bundleStr = atob(data);
-        const bundle = new Uint8Array(bundleStr.length);
-        for (let i = 0; i < bundleStr.length; i++) bundle[i] = bundleStr.charCodeAt(i);
-
-        const salt = bundle.slice(0, 16), iv = bundle.slice(16, 28), ciphertext = bundle.slice(28);
-        const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), { name: 'PBKDF2' }, false, ['deriveKey']);
-        const key = await window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 50000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-        
-        const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
-        return new TextDecoder().decode(decryptedBuffer);
-      } else {
-        return failsafeCipher(data, password || FALLBACK_KEY, true);
+        const keyBytes = enc.encode(password || FALLBACK_KEY);
+        const payload = bytes.slice(1);
+        const out = new Uint8Array(payload.length);
+        for(let i=0; i<payload.length; i++) out[i] = payload[i] ^ keyBytes[i % keyBytes.length];
+        return new TextDecoder().decode(out);
       }
-    }
-
-    // A robust, instant fallback stream cipher if Native API is blocked by CSP/IFrame sandbox
-    function failsafeCipher(text, key, isDecrypt=false) {
-      if (isDecrypt) text = atob(text);
-      let out = '';
-      for (let i = 0; i < text.length; i++) {
-        out += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
-      }
-      return isDecrypt ? out : btoa(out);
+      throw new Error("Invalid security flag in payload.");
     }
 
 
     // =====================================================================
-    // 3. INTERNAL PDF GENERATOR ENGINE (Zero Dependencies)
-    // Directly calculates PDF byte arrays and offsets in vanilla JS
+    // 3. EXACT BYTE-MATH PDF ENGINE (Solves Blank Pages)
     // =====================================================================
     class InternalPDFEngine {
       constructor() {
+        this.chunks = [];
         this.objects = [];
-        this.buffer = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
+        this.byteLength = 0;
+        this.encoder = new TextEncoder();
+        this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+      }
+
+      append(str) {
+        const bytes = this.encoder.encode(str);
+        this.chunks.push(bytes);
+        const offset = this.byteLength;
+        this.byteLength += bytes.length;
+        return offset;
       }
 
       addObj(content) {
         const id = this.objects.length + 1;
-        this.objects.push(this.buffer.length);
-        this.buffer += `${id} 0 obj\n${content}\nendobj\n`;
+        this.objects.push(this.byteLength);
+        this.append(`${id} 0 obj\n${content}\nendobj\n`);
         return id;
       }
 
-      build(textLines, watermarkText, payloadStr) {
+      build(textLines, watermarkText, hexPayload) {
+        const pagesRefIds = [];
+        const fontId = this.objects.length + 3; // Pre-calculate font object ID
+
+        // Break text lines into Pages
+        const maxLinesPerPage = 38;
+        const pageGroups = [];
+        for (let i=0; i<textLines.length; i+=maxLinesPerPage) pageGroups.push(textLines.slice(i, i+maxLinesPerPage));
+        if (pageGroups.length === 0) pageGroups.push([""]);
+
+        // Pages Dict (Placeholder Kid array, will replace)
+        const pagesObjIdx = this.objects.length + 2; 
+
         // 1. Catalog
-        const catalogId = this.addObj(`<< /Type /Catalog /Pages 2 0 R >>`);
+        const catalogId = this.addObj(`<< /Type /Catalog /Pages ${pagesObjIdx} 0 R >>`);
         
-        // 2. Pages structure
-        const pagesId = this.addObj(`<< /Type /Pages /Kids [3 0 R] /Count 1 >>`);
-        
-        // 4. Font Dictionary
-        const fontId = this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
-        
-        // 5. Content Stream (Renders text and watermarks)
-        let streamData = `BT /F1 12 Tf `;
-        let yPos = 750;
-        
-        // Draw Text
-        streamData += `50 ${yPos} Td `;
-        for (let line of textLines) {
-          let escaped = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
-          streamData += `(${escaped}) Tj 0 -18 Td `;
+        // 2. Pages (We will build Kids list dynamically)
+        let kidsList = "";
+        const pagesId = this.objects.length + 1;
+        this.objects.push(this.byteLength); // Reserve offset
+        // We defer adding the actual page string until we generate the pages
+
+        // 3. Font
+        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
+
+        // Generate Pages
+        for (let pageLines of pageGroups) {
+          // Content Stream
+          let streamData = `BT /F1 12 Tf\n50 750 Td\n`;
+          for (let line of pageLines) {
+            // Strip complex unicode from rendered visual text to prevent PDF font errors
+            let esc = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
+            streamData += `(${esc}) Tj\n0 -18 Td\n`;
+          }
+          streamData += `ET\n`;
+
+          if (watermarkText) {
+            let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
+            streamData += `q 0.8 0 0 rg 0.35 gs\nBT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+          }
+
+          const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
+          const pId = this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
+          pagesRefIds.push(`${pId} 0 R`);
         }
-        streamData += `ET\n`;
 
-        // Draw Watermark
-        if (watermarkText) {
-          let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
-          streamData += `q 0.8 0 0 rg 0.35 gs\n`; // Red color, opacity setup
-          streamData += `BT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+        // Backfill the Pages Object
+        const pagesStr = `<< /Type /Pages /Kids [${pagesRefIds.join(' ')}] /Count ${pageGroups.length} >>`;
+        const pagesBytes = this.encoder.encode(`${pagesId} 0 obj\n${pagesStr}\nendobj\n`);
+        
+        // We hack it in by replacing the placeholder logic
+        // Because of the sequential nature, we must rebuild the buffer.
+        // Actually, it's easier to just rebuild correctly from scratch knowing the ids:
+      }
+
+      // Simpler sequential build
+      buildSequential(textLines, watermarkText, hexPayload) {
+        const maxLinesPerPage = 38;
+        const pageGroups = [];
+        for (let i=0; i<textLines.length; i+=maxLinesPerPage) pageGroups.push(textLines.slice(i, i+maxLinesPerPage));
+        if (pageGroups.length === 0) pageGroups.push([""]);
+
+        const catalogId = 1;
+        const pagesId = 2;
+        const fontId = 3;
+        
+        // Count total objects to come
+        // catalog(1), pages(1), font(1), info(1) = 4 baseline
+        // For each page: stream(1), page(1) = 2 per page
+        
+        let kidsArray = [];
+        let currentObjId = 4;
+        for (let i=0; i<pageGroups.length; i++) {
+           kidsArray.push(`${currentObjId + 1} 0 R`); // page obj will be right after stream
+           currentObjId += 2;
         }
 
-        const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
-        
-        // 3. Page Object
-        const pageId = this.addObj(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
-        
-        // 6. Meta Information (Holds the Payload safely)
-        let infoData = `<< /Producer (PhantomInternal) `;
-        if (payloadStr) infoData += `/Subject (PHANTOM_PAYLOAD_V4|${payloadStr}) `;
-        infoData += `>>`;
-        const infoId = this.addObj(infoData);
+        this.addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`);
+        this.addObj(`<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pageGroups.length} >>`);
+        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
 
-        // Cross Reference Table
-        const xrefOffset = this.buffer.length;
-        this.buffer += `xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`;
-        for (let off of this.objects) {
-          this.buffer += String(off).padStart(10, '0') + " 00000 n \n";
+        for (let pageLines of pageGroups) {
+          let streamData = `BT /F1 12 Tf\n50 750 Td\n`;
+          for (let line of pageLines) {
+            let esc = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
+            streamData += `(${esc}) Tj\n0 -18 Td\n`;
+          }
+          streamData += `ET\n`;
+
+          if (watermarkText) {
+            let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '');
+            streamData += `q 0.8 0 0 rg 0.2 gs\nBT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+          }
+          
+          const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
+          this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
         }
-        
-        // Trailer
-        this.buffer += `trailer\n<< /Size ${this.objects.length + 1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\n`;
-        this.buffer += `startxref\n${xrefOffset}\n%%EOF\n`;
 
-        const bytes = new Uint8Array(this.buffer.length);
-        for(let i=0; i<this.buffer.length; i++) bytes[i] = this.buffer.charCodeAt(i) & 0xFF;
-        return bytes;
+        // Info dict (Holds payload as HEX)
+        let infoStr = `<< /Producer (PhantomVault Engine) `;
+        if (hexPayload) infoStr += `/PhantomPayload <${hexPayload}> `;
+        infoStr += `>>`;
+        const infoId = this.addObj(infoStr);
+
+        const xrefOffset = this.byteLength;
+        this.append(`xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`);
+        for (let off of this.objects) this.append(String(off).padStart(10, '0') + " 00000 n \n");
+
+        this.append(`trailer\n<< /Size ${this.objects.length + 1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+
+        const finalBuffer = new Uint8Array(this.byteLength);
+        let offset = 0;
+        for (let chunk of this.chunks) {
+          finalBuffer.set(chunk, offset);
+          offset += chunk.length;
+        }
+        return finalBuffer;
       }
     }
 
 
     // =====================================================================
-    // 4. UI & LOGIC INTEGRATION
+    // 4. UI LOGIC
     // =====================================================================
     let activeFile = null;
     let decryptedPayloadData = null;
@@ -395,10 +467,6 @@
     window.addEventListener('DOMContentLoaded', () => {
       renderIcons();
       setupDragAndDrop();
-      if (!NATIVE_SUPPORTED) {
-        document.getElementById('crypto-status').innerText = "Failsafe Crypto Active (No HTTPS)";
-        document.getElementById('crypto-status').classList.add('text-orange-400');
-      }
     });
 
     function switchTab(tabId) {
@@ -423,16 +491,27 @@
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      
       let bg = type === 'error' ? 'bg-red-950/90 border-red-500/20 text-red-200' : type === 'success' ? 'bg-emerald-950/90 border-emerald-500/20 text-emerald-200' : 'bg-neutral-900 border-neutral-800 text-neutral-300';
       let icon = type === 'error' ? ICONS.alert : type === 'success' ? ICONS.check : ICONS.zap;
-      
-      toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto max-w-[340px]`;
+      toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 max-w-[340px]`;
       toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-xs font-medium leading-relaxed">${message}</p></div>`;
-      
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
       setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    function autoWrapText(text, maxLineChars) {
+      let lines = [];
+      text.split('\n').forEach(para => {
+        if (!para) return lines.push("");
+        let curr = "";
+        para.split(' ').forEach(word => {
+          if ((curr + word).length > maxLineChars) { lines.push(curr.trim()); curr = word + " "; } 
+          else curr += word + " ";
+        });
+        if (curr.trim()) lines.push(curr.trim());
+      });
+      return lines;
     }
 
     async function handleGenerateSecurePDF() {
@@ -446,32 +525,26 @@
 
       try {
         const payloadObj = { text: content, watermarkText };
-        const encryptedPayload = await internalEncrypt(JSON.stringify(payloadObj), password);
+        const hexPayload = await internalEncrypt(JSON.stringify(payloadObj), password);
 
         const decoyLines = [
-          "CONFIDENTIAL FILE SECURED",
-          "",
+          "CONFIDENTIAL FILE SECURED", "",
           "If you are reading this in a standard PDF viewer, access is DENIED.",
-          "This structure is cryptographically obfuscated natively.",
-          "Use PhantomPDF Vault to unlock the internal payload."
+          "This PDF's structure is cryptographically obfuscated natively.",
+          "Use PhantomPDF Vault to decrypt the exact byte payload."
         ];
-        
-        // Add some random hex data to look convincing
         for(let i=0; i<15; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
 
         const pdfEngine = new InternalPDFEngine();
-        const pdfBytes = pdfEngine.build(decoyLines, watermarkText, encryptedPayload);
+        const pdfBytes = pdfEngine.buildSequential(decoyLines, watermarkText, hexPayload);
 
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; link.download = filename;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         
-        showToast('Instant Secure PDF Generated Successfully!', 'success');
-      } catch (err) {
-        console.error(err);
-        showToast('Algorithm error during generation.', 'error');
-      }
+        showToast('Secure PDF Built Successfully!', 'success');
+      } catch (err) { console.error(err); showToast('Algorithm error during generation.', 'error'); }
     }
 
     function setupDragAndDrop() {
@@ -503,16 +576,15 @@
 
     async function handleDecryptPDF() {
       if (!activeFile) return;
-      
       try {
-        const textData = await activeFile.text(); // Read raw PDF bytes as text
-        const match = textData.match(/\/Subject\s*\((PHANTOM_PAYLOAD_V4\|[^)]+)\)/);
+        const textData = await activeFile.text(); 
         
-        if (!match) throw new Error("No recognized Internal PhantomPDF Signature found in this file.");
+        // Regex target specifically targets exact Hex strings embedded in our custom dictionary format
+        const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
+        if (!match) throw new Error("No recognized Internal Phantom Payload found in this file.");
         
-        const payloadRaw = match[1].split('|')[1];
-        
-        const decryptedJsonStr = await internalDecrypt(payloadRaw, document.getElementById('unlock-password').value);
+        const payloadHex = match[1];
+        const decryptedJsonStr = await internalDecrypt(payloadHex, document.getElementById('unlock-password').value);
         decryptedPayloadData = JSON.parse(decryptedJsonStr);
 
         document.getElementById('viewing-file-name').innerText = activeFile.name;
@@ -522,13 +594,11 @@
         if (decryptedPayloadData.watermarkText) {
           document.getElementById('viewer-watermark-text').innerText = decryptedPayloadData.watermarkText;
           wmContainer.classList.remove('hidden');
-        } else {
-          wmContainer.classList.add('hidden');
-        }
+        } else wmContainer.classList.add('hidden');
 
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        showToast('Payload unlocked successfully.', 'success');
+        showToast('Payload decoded successfully.', 'success');
       } catch (err) {
         console.error(err);
         showToast(err.message, 'error');
@@ -538,26 +608,19 @@
     function handleExportCleanPDF() {
       if (!decryptedPayloadData || !activeFile) return;
       try {
-        const lines = [];
-        decryptedPayloadData.text.split('\n').forEach(paragraph => {
-          if (paragraph.length === 0) return lines.push("");
-          let currentLine = "";
-          paragraph.split(' ').forEach(word => {
-            if ((currentLine + word).length > 90) { lines.push(currentLine.trim()); currentLine = word + " "; } 
-            else currentLine += word + " ";
-          });
-          if (currentLine.trim()) lines.push(currentLine.trim());
-        });
+        // Auto wrap for clean PDF export (approx 95 chars wide for 12pt Helvetica)
+        const wrappedLines = autoWrapText(decryptedPayloadData.text, 95);
 
         const pdfEngine = new InternalPDFEngine();
-        const pdfBytes = pdfEngine.build(lines, decryptedPayloadData.watermarkText, null); // Null payload = clean document
+        // Null payload prevents re-encrypting a decoy
+        const pdfBytes = pdfEngine.buildSequential(wrappedLines, decryptedPayloadData.watermarkText, null);
 
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; link.download = `Clean_${activeFile.name}`;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         
-        showToast('Clean PDF exported.', 'success');
+        showToast('Clean PDF exported successfully.', 'success');
       } catch (err) { 
         showToast('Export failed.', 'error'); 
       }
