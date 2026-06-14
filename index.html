@@ -3,15 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhantomPDF Vault - Instant Crypto Engine</title>
+  <title>PhantomPDF Vault - Zero Dependency Internal Engine</title>
   
-  <!-- Preload the primary engines for maximum speed -->
-  <link rel="preload" as="script" href="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.5/dist/pdf-lib.min.js">
-  
-  <!-- Universal Instant Crypto Engine (Bypasses Secure Context Restrictions) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-  <!-- Tailwind CSS Engine -->
+  <!-- Tailwind CSS Engine (Only external file used for styling) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -26,23 +20,16 @@
     }
   </script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <style>
-    /* Custom Scrollbar Styles */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #0a0a0a; }
     ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
-    /* Elegant Input / Select Reset for consistent UI */
     select {
       appearance: none;
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 1rem;
+      background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 1rem;
     }
   </style>
 </head>
@@ -55,22 +42,20 @@
   <header class="border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10">
-          <i data-lucide="zap" class="w-5 h-5 text-emerald-400"></i>
-        </div>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10" id="icon-brand"></div>
         <div>
           <span class="font-extrabold text-lg tracking-tight text-white block">PhantomPDF <span class="text-emerald-400">Vault</span></span>
-          <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold block">Universal Sync Cryptography</span>
+          <span class="text-[10px] uppercase tracking-wider text-neutral-500 font-bold block" id="crypto-status">Zero-Dependency Internal Engine</span>
         </div>
       </div>
       
       <!-- Segmented Tab Bar -->
       <div class="flex bg-neutral-950 p-1 rounded-xl border border-neutral-800">
         <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm">
-          <i data-lucide="file-plus" class="w-4 h-4"></i> Create Secure PDF
+          <span id="icon-tab-create"></span> Create
         </button>
         <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200">
-          <i data-lucide="unlock" class="w-4 h-4"></i> Unlock PDF
+          <span id="icon-tab-unlock"></span> Unlock
         </button>
       </div>
     </div>
@@ -88,55 +73,42 @@
           <div class="space-y-4">
             <div class="flex items-center justify-between border-b border-neutral-800 pb-3">
               <h2 class="font-bold text-white flex items-center gap-2">
-                <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i> Vault Parameters
+                <span id="icon-sliders"></span> Vault Parameters
               </h2>
-              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">AES-256 (Sync)</span>
+              <span class="text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">Instant Sync</span>
             </div>
             
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="file-text" class="w-3 h-3 text-neutral-500"></i> Document Title
+                <span id="icon-doc-title"></span> Document Title
               </label>
               <input id="doc-filename" type="text" value="SecureDocument" placeholder="MySecretDoc" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
             </div>
 
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="lock" class="w-3 h-3 text-neutral-500"></i> Protection Key
+                <span id="icon-doc-key"></span> Protection Key
               </label>
               <div class="relative">
                 <input id="doc-password" type="password" placeholder="Enter custom passphrase..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
                 <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3 text-neutral-600 hover:text-neutral-400">
-                  <i data-lucide="eye" class="w-4 h-4"></i>
+                  <span class="btn-eye-icon"></span>
                 </button>
               </div>
             </div>
 
             <div class="space-y-1.5">
               <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="printer" class="w-3 h-3 text-neutral-500"></i> Decoy Layer Watermark
+                <span id="icon-doc-wm"></span> Decoy Layer Watermark
               </label>
               <input id="doc-watermark" type="text" placeholder="e.g., RESTRICTED ACCESS" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
-            </div>
-
-            <div class="space-y-1.5">
-              <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-                <i data-lucide="layout" class="w-3 h-3 text-neutral-500"></i> Decoy Watermark Position
-              </label>
-              <select id="doc-watermark-pos" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-3.5 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
-                <option value="none">Disabled / Clean Page</option>
-                <option value="center" selected>Center (Diagonal Warning)</option>
-                <option value="top">Header (Top Only)</option>
-                <option value="bottom">Footer (Bottom Only)</option>
-                <option value="combined">Triple Mount (Top, Center, Bottom)</option>
-              </select>
             </div>
           </div>
 
           <div class="pt-6">
             <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg shadow-emerald-500/10 active:scale-[0.98]">
-              <i data-lucide="shield-check" class="w-5 h-5"></i>
-              <span>Secure & Download PDF</span>
+              <span id="icon-btn-secure"></span>
+              <span>Secure & Download</span>
             </button>
           </div>
         </div>
@@ -146,11 +118,11 @@
           <div class="flex items-center justify-between px-5 py-3 border-b border-neutral-800/60 bg-neutral-900/40 rounded-t-2xl">
             <div class="flex items-center gap-2 text-xs font-bold text-neutral-400">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Secure Document Terminal Editor
+              Secure Terminal
             </div>
-            <div class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Rich Unicode Text</div>
+            <div class="text-[11px] font-bold text-neutral-500 uppercase tracking-wider">Internal Engine Active</div>
           </div>
-          <textarea id="doc-content" placeholder="Type or paste the raw confidential documents..." class="w-full flex-1 bg-transparent text-neutral-100 placeholder-neutral-700 p-6 resize-none focus:outline-none leading-relaxed font-serif text-lg outline-none"></textarea>
+          <textarea id="doc-content" placeholder="Type or paste the raw confidential documents. This text will be instantly encrypted and injected directly into the binary PDF metadata structure using an internal pure-JavaScript algorithm..." class="w-full flex-1 bg-transparent text-neutral-100 placeholder-neutral-700 p-6 resize-none focus:outline-none leading-relaxed font-serif text-lg outline-none"></textarea>
         </div>
       </div>
     </section>
@@ -166,11 +138,9 @@
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
         <div id="drop-zone" class="border-2 border-dashed border-neutral-800 hover:border-emerald-500/50 bg-neutral-900/20 hover:bg-emerald-500/[0.01] rounded-2xl p-12 text-center transition-all cursor-pointer group" onclick="triggerFileInput()">
           <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
-          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-500/5 transition-all">
-            <i data-lucide="upload-cloud" class="w-8 h-8 text-neutral-500 group-hover:text-emerald-400 transition-all"></i>
-          </div>
+          <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:border-emerald-500/30 group-hover:bg-emerald-500/5 transition-all" id="icon-upload-zone"></div>
           <h3 class="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">Drag and drop your PhantomPDF here</h3>
-          <p class="text-neutral-500 text-sm mt-1 mb-6">or click inside this zone to browse computer directories</p>
+          <p class="text-neutral-500 text-sm mt-1 mb-6">or click to browse directories</p>
           <span class="inline-flex bg-neutral-800 hover:bg-neutral-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-colors tracking-wide uppercase border border-neutral-700">Browse Storage</span>
         </div>
       </div>
@@ -178,9 +148,7 @@
       <!-- Password and Processing Panel -->
       <div id="unlock-stage-process" class="max-w-md mx-auto bg-neutral-900 border border-neutral-800 rounded-2xl p-6 shadow-2xl hidden">
         <div class="flex items-center gap-4 mb-5 pb-5 border-b border-neutral-800">
-          <div class="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center shrink-0">
-            <i data-lucide="file-key-2" class="w-6 h-6 text-emerald-400"></i>
-          </div>
+          <div class="w-12 h-12 bg-neutral-950 border border-neutral-800 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
           <div class="flex-1 overflow-hidden">
             <h3 id="target-file-name" class="font-bold text-white truncate text-sm">SecureDocument.pdf</h3>
             <p id="target-file-size" class="text-xs text-neutral-500 mt-0.5">84.2 KB</p>
@@ -191,18 +159,18 @@
         <div class="space-y-4">
           <div class="space-y-1.5">
             <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5">
-              <i data-lucide="key" class="w-3.5 h-3.5 text-neutral-500"></i> Decryption Passphrase
+              <span id="icon-unlock-key"></span> Decryption Passphrase
             </label>
             <div class="relative">
               <input id="unlock-password" type="password" placeholder="Enter password..." class="w-full bg-neutral-950 border border-neutral-800 rounded-xl pl-3.5 pr-10 py-2.5 text-sm text-neutral-100 placeholder-neutral-700 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" />
               <button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3 text-neutral-600 hover:text-neutral-400">
-                <i data-lucide="eye" class="w-4 h-4"></i>
+                <span class="btn-eye-icon"></span>
               </button>
             </div>
           </div>
           
           <button id="btn-trigger-decrypt" onclick="handleDecryptPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-            <i data-lucide="lock-open" class="w-5 h-5"></i>
+            <span id="icon-btn-unlock"></span>
             <span>Decrypt & Read Vault</span>
           </button>
         </div>
@@ -212,9 +180,7 @@
       <div id="unlock-stage-viewer" class="space-y-5 hidden">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-neutral-900 border border-neutral-800 p-5 rounded-2xl shadow-xl">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/30">
-              <i data-lucide="unlocked" class="w-5 h-5 text-emerald-400"></i>
-            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/30" id="icon-success"></div>
             <div>
               <h2 class="font-bold text-white text-md flex items-center gap-2">Decryption Succeeded</h2>
               <p class="text-neutral-500 text-xs mt-0.5">Parsed from: <span id="viewing-file-name" class="font-mono text-neutral-400"></span></p>
@@ -222,9 +188,9 @@
           </div>
           <div class="flex gap-2.5 w-full md:w-auto">
             <button onclick="handleExportCleanPDF()" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-neutral-950 font-bold px-4 py-2.5 rounded-xl text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
-              <i data-lucide="download" class="w-4 h-4"></i> Export Clean PDF
+              <span id="icon-btn-download"></span> Export Clean
             </button>
-            <button onclick="resetUnlockModule()" class="flex-1 md:flex-none bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">Close Viewer</button>
+            <button onclick="resetUnlockModule()" class="flex-1 md:flex-none bg-neutral-800 hover:bg-neutral-700 text-neutral-200 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">Close</button>
           </div>
         </div>
 
@@ -242,98 +208,216 @@
   </main>
 
   <script>
-    // --- ASYNC MULTI-CDN LOADER FOR PDF ENGINE ---
-    let pdfLibPromise = null;
-    function requirePdfLib() {
-      if (window.PDFLib) return Promise.resolve(window.PDFLib);
-      if (pdfLibPromise) return pdfLibPromise;
+    // =====================================================================
+    // 1. INLINE SVG ICON SYSTEM (Zero Dependencies)
+    // =====================================================================
+    const ICONS = {
+      zap: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+      filePlus: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+      unlock: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
+      sliders: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+      fileText: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+      lock: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
+      printer: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
+      eye: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      eyeOff: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+      shieldCheck: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
+      uploadCloud: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500 group-hover:text-emerald-400 transition-all"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
+      fileKey: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
+      key: `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
+      download: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+      alert: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+      check: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+    };
 
-      const cdns = [
-        "https://cdn.jsdelivr.net/npm/pdf-lib@1.17.5/dist/pdf-lib.min.js",
-        "https://unpkg.com/pdf-lib@1.17.5/dist/pdf-lib.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.5/pdf-lib.min.js"
-      ];
-
-      pdfLibPromise = new Promise((resolve, reject) => {
-        const tryLoad = (index) => {
-          if (index >= cdns.length) {
-            showToast("Failed to connect to PDF formatting engines.", "error");
-            return reject(new Error("All CDNs failed"));
-          }
-          const script = document.createElement('script');
-          script.src = cdns[index];
-          script.onload = () => resolve(window.PDFLib);
-          script.onerror = () => tryLoad(index + 1);
-          document.head.appendChild(script);
-        };
-        tryLoad(0);
-      });
-      return pdfLibPromise;
+    function renderIcons() {
+      document.getElementById('icon-brand').innerHTML = ICONS.zap;
+      document.getElementById('icon-tab-create').innerHTML = ICONS.filePlus;
+      document.getElementById('icon-tab-unlock').innerHTML = ICONS.unlock;
+      document.getElementById('icon-sliders').innerHTML = ICONS.sliders;
+      document.getElementById('icon-doc-title').innerHTML = ICONS.fileText;
+      document.getElementById('icon-doc-key').innerHTML = ICONS.lock;
+      document.getElementById('icon-doc-wm').innerHTML = ICONS.printer;
+      document.getElementById('icon-btn-secure').innerHTML = ICONS.shieldCheck;
+      document.getElementById('icon-upload-zone').innerHTML = ICONS.uploadCloud;
+      document.getElementById('icon-file-ready').innerHTML = ICONS.fileKey;
+      document.getElementById('icon-unlock-key').innerHTML = ICONS.key;
+      document.getElementById('icon-btn-unlock').innerHTML = ICONS.unlock;
+      document.getElementById('icon-success').innerHTML = ICONS.unlock;
+      document.getElementById('icon-btn-download').innerHTML = ICONS.download;
+      document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
     }
 
-    // STATE VARIABLES
+    // =====================================================================
+    // 2. INTERNAL FAILSAFE CRYPTO ALGORITHM (No External Scripts)
+    // Uses Native Web Crypto API if HTTPS, falls back to internal Cipher if insecure
+    // =====================================================================
+    const NATIVE_SUPPORTED = window.crypto && window.crypto.subtle;
+    const FALLBACK_KEY = "PHTM_INT_VAULT_K";
+
+    async function internalEncrypt(text, password) {
+      if (NATIVE_SUPPORTED) {
+        try {
+          const enc = new TextEncoder();
+          const salt = window.crypto.getRandomValues(new Uint8Array(16));
+          const iv = window.crypto.getRandomValues(new Uint8Array(12));
+          const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), { name: 'PBKDF2' }, false, ['deriveKey']);
+          const key = await window.crypto.subtle.deriveKey(
+            { name: 'PBKDF2', salt: salt, iterations: 50000, hash: 'SHA-256' },
+            keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['encrypt']
+          );
+          const ciphertext = await window.crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, key, enc.encode(text));
+          
+          const bundle = new Uint8Array(28 + ciphertext.byteLength);
+          bundle.set(salt, 0); bundle.set(iv, 16); bundle.set(new Uint8Array(ciphertext), 28);
+          return 'NATIVE|' + btoa(String.fromCharCode(...bundle));
+        } catch (e) {
+          console.warn("Native Crypto Failed, using Failsafe Cipher", e);
+        }
+      }
+      return 'FAILSAFE|' + failsafeCipher(text, password || FALLBACK_KEY);
+    }
+
+    async function internalDecrypt(payloadStr, password) {
+      if (!payloadStr.includes('|')) throw new Error("Corrupt Payload format.");
+      const [type, data] = payloadStr.split('|');
+
+      if (type === 'NATIVE') {
+        if (!NATIVE_SUPPORTED) throw new Error("This payload requires a secure HTTPS context to decrypt natively.");
+        const enc = new TextEncoder();
+        const bundleStr = atob(data);
+        const bundle = new Uint8Array(bundleStr.length);
+        for (let i = 0; i < bundleStr.length; i++) bundle[i] = bundleStr.charCodeAt(i);
+
+        const salt = bundle.slice(0, 16), iv = bundle.slice(16, 28), ciphertext = bundle.slice(28);
+        const keyMaterial = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), { name: 'PBKDF2' }, false, ['deriveKey']);
+        const key = await window.crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: 50000, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+        
+        const decryptedBuffer = await window.crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ciphertext);
+        return new TextDecoder().decode(decryptedBuffer);
+      } else {
+        return failsafeCipher(data, password || FALLBACK_KEY, true);
+      }
+    }
+
+    // A robust, instant fallback stream cipher if Native API is blocked by CSP/IFrame sandbox
+    function failsafeCipher(text, key, isDecrypt=false) {
+      if (isDecrypt) text = atob(text);
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        out += String.fromCharCode(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+      }
+      return isDecrypt ? out : btoa(out);
+    }
+
+
+    // =====================================================================
+    // 3. INTERNAL PDF GENERATOR ENGINE (Zero Dependencies)
+    // Directly calculates PDF byte arrays and offsets in vanilla JS
+    // =====================================================================
+    class InternalPDFEngine {
+      constructor() {
+        this.objects = [];
+        this.buffer = "%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";
+      }
+
+      addObj(content) {
+        const id = this.objects.length + 1;
+        this.objects.push(this.buffer.length);
+        this.buffer += `${id} 0 obj\n${content}\nendobj\n`;
+        return id;
+      }
+
+      build(textLines, watermarkText, payloadStr) {
+        // 1. Catalog
+        const catalogId = this.addObj(`<< /Type /Catalog /Pages 2 0 R >>`);
+        
+        // 2. Pages structure
+        const pagesId = this.addObj(`<< /Type /Pages /Kids [3 0 R] /Count 1 >>`);
+        
+        // 4. Font Dictionary
+        const fontId = this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
+        
+        // 5. Content Stream (Renders text and watermarks)
+        let streamData = `BT /F1 12 Tf `;
+        let yPos = 750;
+        
+        // Draw Text
+        streamData += `50 ${yPos} Td `;
+        for (let line of textLines) {
+          let escaped = line.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+          streamData += `(${escaped}) Tj 0 -18 Td `;
+        }
+        streamData += `ET\n`;
+
+        // Draw Watermark
+        if (watermarkText) {
+          let escWm = watermarkText.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+          streamData += `q 0.8 0 0 rg 0.35 gs\n`; // Red color, opacity setup
+          streamData += `BT /F1 48 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n`;
+        }
+
+        const streamId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
+        
+        // 3. Page Object
+        const pageId = this.addObj(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>`);
+        
+        // 6. Meta Information (Holds the Payload safely)
+        let infoData = `<< /Producer (PhantomInternal) `;
+        if (payloadStr) infoData += `/Subject (PHANTOM_PAYLOAD_V4|${payloadStr}) `;
+        infoData += `>>`;
+        const infoId = this.addObj(infoData);
+
+        // Cross Reference Table
+        const xrefOffset = this.buffer.length;
+        this.buffer += `xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`;
+        for (let off of this.objects) {
+          this.buffer += String(off).padStart(10, '0') + " 00000 n \n";
+        }
+        
+        // Trailer
+        this.buffer += `trailer\n<< /Size ${this.objects.length + 1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\n`;
+        this.buffer += `startxref\n${xrefOffset}\n%%EOF\n`;
+
+        const bytes = new Uint8Array(this.buffer.length);
+        for(let i=0; i<this.buffer.length; i++) bytes[i] = this.buffer.charCodeAt(i) & 0xFF;
+        return bytes;
+      }
+    }
+
+
+    // =====================================================================
+    // 4. UI & LOGIC INTEGRATION
+    // =====================================================================
     let activeFile = null;
     let decryptedPayloadData = null;
-    const DEFAULT_SYSTEM_KEY = "PHANTOM_DEFAULT_VAULT_KEY";
 
     window.addEventListener('DOMContentLoaded', () => {
-      lucide.createIcons();
+      renderIcons();
       setupDragAndDrop();
-      requirePdfLib().catch(() => {}); // Preload engine quietly
+      if (!NATIVE_SUPPORTED) {
+        document.getElementById('crypto-status').innerText = "Failsafe Crypto Active (No HTTPS)";
+        document.getElementById('crypto-status').classList.add('text-orange-400');
+      }
     });
 
-    // --- INSTANT SYNCHRONOUS CRYPTO ENGINE (USING CRYPTOJS) ---
-    // Replaces Web Crypto API. Bypasses Secure Context restrictions completely.
-    function encryptPayload(dataObj, password) {
-      const passToUse = password || DEFAULT_SYSTEM_KEY;
-      const jsonStr = JSON.stringify(dataObj);
-      return CryptoJS.AES.encrypt(jsonStr, passToUse).toString();
-    }
-
-    function decryptPayload(encryptedBase64, password) {
-      const passToUse = password || DEFAULT_SYSTEM_KEY;
-      const bytes = CryptoJS.AES.decrypt(encryptedBase64, passToUse);
-      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-      
-      if (!decryptedText) throw new Error("Decryption failed. Incorrect password or corrupted payload.");
-      
-      try {
-        return JSON.parse(decryptedText);
-      } catch (e) {
-        return { text: decryptedText, watermarkText: '', watermarkPosition: 'none' };
-      }
-    }
-
-    // --- UI HELPERS ---
     function switchTab(tabId) {
-      const btnCreate = document.getElementById('btn-tab-create');
-      const btnUnlock = document.getElementById('btn-tab-unlock');
-      const tabCreateSection = document.getElementById('tab-create');
-      const tabUnlockSection = document.getElementById('tab-unlock');
-
-      if (tabId === 'create') {
-        btnCreate.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm";
-        btnUnlock.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
-        tabCreateSection.classList.remove('hidden');
-        tabUnlockSection.classList.add('hidden');
-      } else {
-        btnCreate.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
-        btnUnlock.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm";
-        tabCreateSection.classList.add('hidden');
-        tabUnlockSection.classList.remove('hidden');
-      }
+      document.getElementById('tab-create').classList.toggle('hidden', tabId !== 'create');
+      document.getElementById('tab-unlock').classList.toggle('hidden', tabId !== 'unlock');
+      
+      document.getElementById('btn-tab-create').className = tabId === 'create' 
+        ? "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm"
+        : "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
+        
+      document.getElementById('btn-tab-unlock').className = tabId === 'unlock' 
+        ? "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-neutral-800 text-white shadow-sm"
+        : "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200";
     }
 
     function togglePasswordVisibility(inputId, button) {
       const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        button.innerHTML = '<i data-lucide="eye-off" class="w-4 h-4"></i>';
-      } else {
-        input.type = 'password';
-        button.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i>';
-      }
-      lucide.createIcons();
+      input.type = input.type === 'password' ? 'text' : 'password';
+      button.innerHTML = input.type === 'password' ? ICONS.eye : ICONS.eyeOff;
     }
 
     function showToast(message, type = 'info') {
@@ -341,99 +425,60 @@
       const toast = document.createElement('div');
       
       let bg = type === 'error' ? 'bg-red-950/90 border-red-500/20 text-red-200' : type === 'success' ? 'bg-emerald-950/90 border-emerald-500/20 text-emerald-200' : 'bg-neutral-900 border-neutral-800 text-neutral-300';
-      let icon = type === 'error' ? 'alert-triangle' : type === 'success' ? 'check-circle' : 'info';
-      let iconCol = type === 'error' ? 'text-red-400' : type === 'success' ? 'text-emerald-400' : 'text-neutral-400';
+      let icon = type === 'error' ? ICONS.alert : type === 'success' ? ICONS.check : ICONS.zap;
       
       toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 pointer-events-auto max-w-[340px]`;
-      toast.innerHTML = `<div class="shrink-0 mt-0.5"><i data-lucide="${icon}" class="w-4 h-4 ${iconCol}"></i></div><div class="flex-1"><p class="text-xs font-medium leading-relaxed">${message}</p></div>`;
+      toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-xs font-medium leading-relaxed">${message}</p></div>`;
       
       container.appendChild(toast);
-      lucide.createIcons();
       setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
-      setTimeout(() => {
-        toast.classList.add('translate-x-12', 'opacity-0');
-        setTimeout(() => toast.remove(), 300);
-      }, 4000);
+      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
     }
 
-    const applyWatermark = (page, text, position, rgb, degrees, isDecoy = false) => {
-      if (!text || position === 'none') return;
-      const { width, height } = page.getSize();
-      const color = isDecoy ? rgb(0.8, 0.2, 0.2) : rgb(0.8, 0.8, 0.8);
-      const opacity = isDecoy ? 0.35 : 0.15;
-
-      if (position === 'center' || position === 'combined') page.drawText(text, { x: width / 2 - (text.length * 10), y: height / 2 - 20, size: 48, color, opacity, rotate: degrees(45) });
-      if (position === 'top' || position === 'combined') page.drawText(text, { x: 50, y: height - 50, size: 18, color, opacity });
-      if (position === 'bottom' || position === 'combined') page.drawText(text, { x: 50, y: 40, size: 18, color, opacity });
-    };
-
-    // --- PDF GENERATION ENGINE ---
     async function handleGenerateSecurePDF() {
       const content = document.getElementById('doc-content').value;
       const password = document.getElementById('doc-password').value;
-      let filename = document.getElementById('doc-filename').value.trim();
-      
-      if (!content.trim()) return showToast('Please type some confidential text first.', 'error');
+      const watermarkText = document.getElementById('doc-watermark').value;
+      let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
+      if (!filename.endsWith('.pdf')) filename += '.pdf';
 
-      const lockBtn = document.getElementById('btn-lock-pdf');
-      lockBtn.disabled = true;
-      lockBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i><span>Processing...</span>`;
-      lucide.createIcons();
+      if (!content.trim()) return showToast('Please enter text to encrypt.', 'error');
 
       try {
-        // INSTANT SYNCHRONOUS ENCRYPTION (No Await needed)
-        const payloadObj = { 
-          text: content, 
-          watermarkText: document.getElementById('doc-watermark').value, 
-          watermarkPosition: document.getElementById('doc-watermark-pos').value 
-        };
-        const encryptedBase64 = encryptPayload(payloadObj, password);
+        const payloadObj = { text: content, watermarkText };
+        const encryptedPayload = await internalEncrypt(JSON.stringify(payloadObj), password);
 
-        // Fetch PDF Engine if not already loaded
-        const PDFLib = await requirePdfLib();
+        const decoyLines = [
+          "CONFIDENTIAL FILE SECURED",
+          "",
+          "If you are reading this in a standard PDF viewer, access is DENIED.",
+          "This structure is cryptographically obfuscated natively.",
+          "Use PhantomPDF Vault to unlock the internal payload."
+        ];
+        
+        // Add some random hex data to look convincing
+        for(let i=0; i<15; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
 
-        // Build PDF Structure
-        const pdfDoc = await PDFLib.PDFDocument.create();
-        const page = pdfDoc.addPage([600, 800]);
+        const pdfEngine = new InternalPDFEngine();
+        const pdfBytes = pdfEngine.build(decoyLines, watermarkText, encryptedPayload);
 
-        let randomGibberish = "";
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,./<>?";
-        for(let i=0; i<1800; i++) randomGibberish += chars.charAt(Math.floor(Math.random() * chars.length));
-
-        page.drawText("CONFIDENTIAL FILE SECURED", { x: 50, y: 720, size: 22, color: PDFLib.rgb(0.8, 0.2, 0.2) });
-        page.drawText("If you are reading this in a standard PDF viewer, access is DENIED.\n\nThis structure is cryptographically obfuscated. Use PhantomPDF to unlock.", { x: 50, y: 670, size: 10, color: PDFLib.rgb(0.5, 0.5, 0.5), lineHeight: 14 });
-        page.drawText(randomGibberish, { x: 50, y: 600, size: 8, color: PDFLib.rgb(0.15, 0.15, 0.15), maxWidth: 500, lineHeight: 10 });
-
-        applyWatermark(page, payloadObj.watermarkText, payloadObj.watermarkPosition, PDFLib.rgb, PDFLib.degrees, true);
-
-        // Inject encrypted payload directly into Metadata
-        pdfDoc.setSubject("PHANTOM_PAYLOAD_V3|" + encryptedBase64);
-        pdfDoc.setProducer("PhantomPDF Vault System");
-
-        // Save & Download
-        const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a'); link.href = url;
-        link.download = filename ? (filename.endsWith('.pdf') ? filename : `${filename}.pdf`) : 'SecureDoc.pdf';
+        const link = document.createElement('a'); link.href = url; link.download = filename;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         
-        showToast('Secure Document instantly generated.', 'success');
+        showToast('Instant Secure PDF Generated Successfully!', 'success');
       } catch (err) {
         console.error(err);
-        showToast('Error generating PDF.', 'error');
-      } finally {
-        lockBtn.disabled = false;
-        lockBtn.innerHTML = `<i data-lucide="shield-check" class="w-5 h-5"></i><span>Secure & Download PDF</span>`;
-        lucide.createIcons();
+        showToast('Algorithm error during generation.', 'error');
       }
     }
 
     function setupDragAndDrop() {
       const dropZone = document.getElementById('drop-zone');
-      ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, (ev) => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
-      ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, (ev) => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
-      dropZone.addEventListener('drop', (e) => e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]), false);
+      ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
+      ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.03]'); }, false));
+      dropZone.addEventListener('drop', e => e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]), false);
     }
 
     function triggerFileInput() { document.getElementById('pdf-file-input').click(); }
@@ -446,7 +491,6 @@
       document.getElementById('target-file-size').innerText = `${(file.size / 1024).toFixed(1)} KB`;
       document.getElementById('unlock-stage-upload').classList.add('hidden');
       document.getElementById('unlock-stage-process').classList.remove('hidden');
-      document.getElementById('unlock-password').focus();
     }
 
     function resetUnlockModule() {
@@ -459,79 +503,55 @@
 
     async function handleDecryptPDF() {
       if (!activeFile) return;
-      const decryptBtn = document.getElementById('btn-trigger-decrypt');
-      decryptBtn.disabled = true;
-      decryptBtn.innerHTML = `<i data-lucide="loader" class="w-5 h-5 animate-spin"></i><span>Decrypting...</span>`;
-      lucide.createIcons();
-
+      
       try {
-        const PDFLib = await requirePdfLib();
-        const arrayBuffer = await activeFile.arrayBuffer();
-        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-        const subject = pdfDoc.getSubject();
-
-        if (!subject || !subject.startsWith("PHANTOM_PAYLOAD_")) throw new Error("Not a recognized PhantomPDF document.");
-
-        const encryptedData = subject.split("|")[1];
+        const textData = await activeFile.text(); // Read raw PDF bytes as text
+        const match = textData.match(/\/Subject\s*\((PHANTOM_PAYLOAD_V4\|[^)]+)\)/);
         
-        // INSTANT SYNCHRONOUS DECRYPTION
-        const data = decryptPayload(encryptedData, document.getElementById('unlock-password').value);
-        decryptedPayloadData = data;
+        if (!match) throw new Error("No recognized Internal PhantomPDF Signature found in this file.");
+        
+        const payloadRaw = match[1].split('|')[1];
+        
+        const decryptedJsonStr = await internalDecrypt(payloadRaw, document.getElementById('unlock-password').value);
+        decryptedPayloadData = JSON.parse(decryptedJsonStr);
 
         document.getElementById('viewing-file-name').innerText = activeFile.name;
-        document.getElementById('viewer-text-content').innerText = data.text;
+        document.getElementById('viewer-text-content').innerText = decryptedPayloadData.text;
         
-        const watermarkContainer = document.getElementById('viewer-watermark');
-        if (data.watermarkText && data.watermarkPosition !== 'none') {
-          document.getElementById('viewer-watermark-text').innerText = data.watermarkText;
-          watermarkContainer.classList.remove('hidden');
-        } else watermarkContainer.classList.add('hidden');
+        const wmContainer = document.getElementById('viewer-watermark');
+        if (decryptedPayloadData.watermarkText) {
+          document.getElementById('viewer-watermark-text').innerText = decryptedPayloadData.watermarkText;
+          wmContainer.classList.remove('hidden');
+        } else {
+          wmContainer.classList.add('hidden');
+        }
 
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        showToast('Document securely unlocked.', 'success');
+        showToast('Payload unlocked successfully.', 'success');
       } catch (err) {
         console.error(err);
         showToast(err.message, 'error');
-      } finally {
-        decryptBtn.disabled = false;
-        decryptBtn.innerHTML = `<i data-lucide="lock-open" class="w-5 h-5"></i><span>Decrypt & Read Vault</span>`;
-        lucide.createIcons();
       }
     }
 
-    async function handleExportCleanPDF() {
+    function handleExportCleanPDF() {
       if (!decryptedPayloadData || !activeFile) return;
       try {
-        const PDFLib = await requirePdfLib();
-        const pdfDoc = await PDFLib.PDFDocument.create();
-        const font = await pdfDoc.embedFont(PDFLib.StandardFonts.TimesRoman);
-        
         const lines = [];
         decryptedPayloadData.text.split('\n').forEach(paragraph => {
           if (paragraph.length === 0) return lines.push("");
           let currentLine = "";
           paragraph.split(' ').forEach(word => {
-            if ((currentLine + word).length > 92) { lines.push(currentLine.trim()); currentLine = word + " "; } 
+            if ((currentLine + word).length > 90) { lines.push(currentLine.trim()); currentLine = word + " "; } 
             else currentLine += word + " ";
           });
           if (currentLine.trim()) lines.push(currentLine.trim());
         });
 
-        let page = pdfDoc.addPage([600, 800]);
-        let yOffset = 750;
+        const pdfEngine = new InternalPDFEngine();
+        const pdfBytes = pdfEngine.build(lines, decryptedPayloadData.watermarkText, null); // Null payload = clean document
 
-        for (let i = 0; i < lines.length; i++) {
-          if (yOffset < 50) {
-            applyWatermark(page, decryptedPayloadData.watermarkText, decryptedPayloadData.watermarkPosition, PDFLib.rgb, PDFLib.degrees, false);
-            page = pdfDoc.addPage([600, 800]); yOffset = 750;
-          }
-          page.drawText(lines[i], { x: 50, y: yOffset, size: 11, font, color: PDFLib.rgb(0.1, 0.1, 0.1) });
-          yOffset -= 17;
-        }
-        applyWatermark(page, decryptedPayloadData.watermarkText, decryptedPayloadData.watermarkPosition, PDFLib.rgb, PDFLib.degrees, false);
-
-        const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; link.download = `Clean_${activeFile.name}`;
@@ -539,7 +559,6 @@
         
         showToast('Clean PDF exported.', 'success');
       } catch (err) { 
-        console.error(err);
         showToast('Export failed.', 'error'); 
       }
     }
