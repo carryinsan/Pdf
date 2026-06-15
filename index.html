@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantom Vault - OMEGA Architecture</title>
+  <title>Phantom Vault - Absolute Enterprise</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'], mono: ['Fira Code', 'monospace'] },
-          colors: { phantom: { 950: '#030303', 900: '#0a0a0c', 800: '#141417', 700: '#222226', 600: '#333338', emerald: '#10b981' } }
+          colors: { phantom: { 950: '#020202', 900: '#09090b', 800: '#18181b', 700: '#27272a', 600: '#3f3f46', emerald: '#10b981' } }
         }
       }
     }
   </script>
 
-  <!-- Failsafe Formatting Engines -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" id="katex-css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -26,33 +24,42 @@
 
   <style>
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #030303; }
-    ::-webkit-scrollbar-thumb { background: #222226; border-radius: 4px; border: 1px solid #030303; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; border: 2px solid #09090b; }
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
-    select, input[type="datetime-local"], input[type="text"], input[type="password"], textarea {
-      appearance: none; background-color: #030303; color: #ffffff;
-      border: 1px solid #222226; border-radius: 0.5rem; outline: none;
+    select, input[type="datetime-local"], input[type="text"], input[type="password"] {
+      appearance: none; background-color: #020202; color: #ffffff;
+      border: 1px solid #27272a; border-radius: 0.5rem; outline: none;
     }
     input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    textarea::placeholder, input::placeholder { color: #52525b; }
 
-    /* High Contrast Reading Theme */
-    .rendered-content { color: #f4f4f5; }
-    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #222226; padding-bottom: 0.5rem; line-height: 1.2; color: #10b981; }
-    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #34d399; }
-    .rendered-content h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #ffffff; }
+    .theme-light { background-color: #ffffff; color: #111827; }
+    .theme-dark { background-color: #09090b; color: #f4f4f5; border: 1px solid #27272a; }
+    .theme-sepia { background-color: #fbf0e3; color: #433422; }
+
+    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; line-height: 1.2; }
+    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; }
+    .rendered-content h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
     .rendered-content p { margin-bottom: 1.2rem; line-height: 1.8; }
-    .rendered-content strong { font-weight: 800; color: #ffffff; filter: drop-shadow(0 0 1px rgba(255,255,255,0.5)); }
-    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px #222226; }
-    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #222226; }
-    .rendered-content th { background-color: #141417; color: #10b981; }
-    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: #0a0a0c; border: 1px solid #222226; }
-    .rendered-content code { font-family: 'Fira Code', monospace; padding: 0.15rem 0.3rem; border-radius: 0.25rem; background: #141417; color: #fca5a5; }
-    .rendered-content pre code { background: transparent; color: inherit; padding: 0; }
-    .rendered-content blockquote { border-left: 4px solid #10b981; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: rgba(16,185,129,0.05); }
+    .rendered-content strong { font-weight: 800; color: inherit; filter: contrast(1.5); }
+    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px currentColor; }
+    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid currentColor; }
+    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(128,128,128,0.2); }
+    .rendered-content code { font-family: 'Fira Code', monospace; padding: 0.15rem 0.3rem; border-radius: 0.25rem; background: rgba(128,128,128,0.2); }
+    .rendered-content blockquote { border-left: 4px solid currentColor; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: rgba(128,128,128,0.1); }
     .rendered-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
     .rendered-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid #222226; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid rgba(128,128,128,0.3); }
+
+    .theme-light .rendered-content th { background-color: #f3f4f6; }
+    .theme-dark .rendered-content th { background-color: #18181b; }
+    .theme-sepia .rendered-content th { background-color: #f2e3d2; }
+
+    #inspector-content.rendered-content { color: #ffffff; }
+    #inspector-content.rendered-content h1, #inspector-content.rendered-content h2, #inspector-content.rendered-content h3 { color: #10b981; }
+    #inspector-content.rendered-content code { background-color: #18181b; color: #fca5a5; }
 
     .toc-link { transition: all 0.2s; display: block; padding: 0.35rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; border-left: 2px solid transparent; padding-left: 10px; }
     .toc-link:hover { color: #10b981; border-left-color: #10b981; background: rgba(16,185,129,0.05); }
@@ -60,16 +67,16 @@
 </head>
 <body class="bg-phantom-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
 
-  <!-- TOAST ALERTS -->
+  <!-- TOASTS -->
   <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
 
-  <!-- PANIC REDIRECT OVERLAY -->
+  <!-- PANIC DIVERTER -->
   <div id="panic-overlay" class="fixed inset-0 bg-white z-[9999] hidden items-center justify-center">
     <p class="text-black font-sans">Redirecting connection...</p>
   </div>
 
-  <!-- FULLSCREEN VIEWER (SCROLL BUG FIXED) -->
-  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-3xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
+  <!-- FULLSCREEN VIEWER -->
+  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-2xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
     <div class="flex-none flex items-center justify-between p-3 border-b border-phantom-700 bg-phantom-900 shadow-2xl z-20">
       <div class="flex items-center gap-3 ml-2">
         <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400" id="icon-fs-brand"></div>
@@ -84,12 +91,11 @@
         </div>
         <button onclick="handleExportCleanPDF()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold rounded-lg text-sm flex items-center gap-2 transition-all shadow-lg active:scale-95"><span id="icon-fs-download"></span> Export PDF</button>
         <div class="w-px h-6 bg-phantom-700 mx-1"></div>
-        <button onclick="executePanicProtocol()" title="PANIC WIPE: Instantly destroy data and redirect" class="p-2 bg-phantom-800 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors border border-phantom-700 hover:border-red-500 shadow-md"><span id="icon-skull"></span></button>
+        <button onclick="executePanicProtocol()" title="PANIC WIPE: Destroy & Divert" class="p-2 bg-phantom-800 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors border border-phantom-700 hover:border-red-500 shadow-md"><span id="icon-skull"></span></button>
         <button onclick="toggleFullscreenViewer(false)" title="Close Viewer" class="ml-1 p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-400 hover:text-white border border-phantom-700 rounded-lg transition-colors"><span id="icon-fs-close"></span></button>
       </div>
     </div>
 
-    <!-- Viewer Scroll Area -->
     <div class="flex-1 flex overflow-hidden w-full relative">
       <div class="w-64 border-r border-phantom-700 bg-phantom-900/40 hidden lg:flex flex-col p-4 overflow-y-auto shadow-inner">
         <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-4 flex items-center gap-2"><span id="icon-toc" class="w-4 h-4"></span> Data Index</h3>
@@ -110,7 +116,7 @@
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/5 flex items-center justify-center border border-emerald-500/30 shadow-lg" id="icon-brand-main"></div>
         <div>
           <span class="font-extrabold text-lg tracking-tight text-white block leading-tight">Phantom<span class="text-emerald-400">Vault</span></span>
-          <span class="text-[9px] uppercase tracking-widest text-emerald-500 font-bold block opacity-80">OMEGA Architecture</span>
+          <span class="text-[9px] uppercase tracking-widest text-emerald-500 font-bold block opacity-80">Absolute Enterprise</span>
         </div>
       </div>
       
@@ -136,11 +142,11 @@
             
             <div class="space-y-4 relative z-10">
               <div>
-                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">File Signature</label>
+                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">File Signature</label>
                 <input id="doc-filename" type="text" value="SecureReport" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 transition-colors" />
               </div>
               <div>
-                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Master Passphrase</label>
+                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Master Passphrase</label>
                 <div class="relative">
                   <input id="doc-password" type="password" placeholder="Required for all tiers" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-white focus:border-emerald-500 transition-colors" />
                   <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
@@ -156,7 +162,7 @@
             
             <div class="space-y-4">
               <div>
-                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Encryption Tier</label>
+                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Encryption Tier</label>
                 <select id="share-security-tier" onchange="toggleSecurityTierPanel()" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 transition-colors cursor-pointer">
                   <option value="1">Tier 1: Standard (Passphrase Only)</option>
                   <option value="2">Tier 2: Dual-Lock (Passphrase + PIN)</option>
@@ -167,6 +173,7 @@
               <div id="tier-2-pin-box" class="hidden space-y-1.5 p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
                 <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Set 4-Digit Secondary PIN</label>
                 <input id="doc-pin" type="text" maxlength="4" placeholder="e.g. 1928" class="w-full bg-phantom-950 border border-yellow-500/40 rounded-xl px-3 py-2.5 text-sm text-yellow-400 focus:border-yellow-400 font-mono tracking-widest text-center shadow-inner outline-none" />
+                <p class="text-[9px] text-neutral-500 leading-tight mt-2 text-center">Dead-Man Switch: If viewer inputs '0000', the RAM payload instantly self-corrupts.</p>
               </div>
 
               <hr class="border-phantom-800">
@@ -269,7 +276,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         </div>
 
         <div class="space-y-5">
-          <!-- Adaptive Instruction Text based on Security Tier -->
           <p id="unlock-instruction" class="text-xs text-neutral-400 bg-phantom-800 p-3 rounded-lg border border-phantom-700 leading-relaxed hidden"></p>
 
           <div class="space-y-2" id="unlock-pass-container">
@@ -293,6 +299,32 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           </button>
         </div>
       </div>
+
+      <div id="unlock-stage-viewer" class="space-y-5 hidden animate-in zoom-in-95 duration-300">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-phantom-900 border border-emerald-500/30 p-5 rounded-2xl shadow-xl">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/40 text-emerald-400" id="icon-success"></div>
+            <div>
+              <h2 class="font-extrabold text-white text-lg tracking-tight">Access Authorized</h2>
+              <p class="text-emerald-400/80 text-xs mt-0.5 font-mono">Target: <span id="viewing-file-name" class="text-neutral-400"></span></p>
+            </div>
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="toggleFullscreenViewer(true)" class="flex-1 md:flex-none bg-phantom-800 hover:bg-phantom-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-phantom-700 flex items-center justify-center gap-2">
+              <span id="icon-expand"></span> View Rendered
+            </button>
+            <button onclick="resetUnlockModule()" class="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all flex items-center justify-center" title="Burn RAM & Close"><span id="icon-x"></span></button>
+          </div>
+        </div>
+
+        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 min-h-[400px] max-h-[500px] shadow-inner relative overflow-y-auto" oncopy="handleClipboardTheft(event)">
+          <div class="flex items-center justify-between mb-4 pb-4 border-b border-phantom-800">
+            <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest text-white">Raw Data Inspector</span>
+            <span class="text-[10px] text-emerald-500 font-mono flex items-center gap-1"><span id="icon-shield-small" class="w-3 h-3"></span> SHIELD ACTIVE</span>
+          </div>
+          <div id="inspector-content" class="rendered-content font-serif text-sm"></div>
+        </div>
+      </div>
     </section>
 
     <!-- TAB 3: IAM MANAGER -->
@@ -311,6 +343,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Keyring -->
         <div class="bg-phantom-900 border border-phantom-800 rounded-2xl flex flex-col shadow-2xl h-[600px]">
           <div class="p-5 border-b border-phantom-800 flex items-center justify-between bg-phantom-950 rounded-t-2xl">
             <h3 class="font-bold text-white text-sm flex items-center gap-2"><span id="icon-keyring" class="w-4 h-4 text-emerald-400"></span> Authority Keyring</h3>
@@ -319,6 +352,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <div class="flex-1 overflow-y-auto p-3 space-y-3 bg-phantom-900" id="keyring-list"></div>
         </div>
 
+        <!-- Issue Code -->
         <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-center relative overflow-hidden group">
           <div class="text-center mb-6">
             <div class="w-16 h-16 bg-phantom-950 border border-phantom-700 rounded-2xl mx-auto flex items-center justify-center text-emerald-400 shadow-inner mb-4" id="icon-mint"></div>
@@ -389,7 +423,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     // =====================================================================
     // 1. GLOBAL STRICT STATE & ICONS (Fixes "Not Defined" Bugs)
     // =====================================================================
-    window.PhantomState = {
+    window.VaultState = {
       images: [],
       activeFile: null,
       decryptedData: null,
@@ -427,7 +461,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       iam: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
       copy: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
       toc: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
-      skull: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>`
+      skull: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>`,
+      checkSmall: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
     };
 
     function renderIcons() {
@@ -442,7 +477,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         'icon-print': 'print', 'icon-link-gen': 'link', 'icon-pdf-dl': 'download', 'icon-iam-header': 'iam',
         'icon-keyring': 'key', 'icon-mint': 'zap', 'icon-close-modal': 'x', 'icon-share-success': 'check',
         'icon-copy': 'copy', 'icon-toc': 'toc', 'icon-lock-small': 'lock', 'icon-copy-key': 'copy',
-        'icon-copy-url': 'copy', 'icon-skull': 'skull', 'icon-check-small': 'check'
+        'icon-copy-url': 'copy', 'icon-skull': 'skull', 'icon-check-small': 'checkSmall'
       };
       for (const [id, key] of Object.entries(mappings)) {
         const el = document.getElementById(id);
@@ -456,33 +491,28 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     // =====================================================================
     async function generateHardwareMatrix() {
       try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.fillStyle = "#f60";
-        ctx.fillRect(125,1,62,20); ctx.fillStyle = "#069"; ctx.fillText("VaultMatrix", 2, 15);
-        const canvasHash = canvas.toDataURL();
-        const entropy = [navigator.userAgent, screen.colorDepth, screen.width, screen.height, new Date().getTimezoneOffset(), navigator.hardwareConcurrency, canvasHash].join('||');
+        const entropy = [
+          navigator.userAgent, screen.colorDepth, screen.width, screen.height,
+          navigator.hardwareConcurrency || 2, navigator.deviceMemory || 4, navigator.platform || "Unknown"
+        ].join('||');
         const buffer = new TextEncoder().encode(entropy);
         const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
-        window.PhantomState.hardwareID = id;
+        window.VaultState.hardwareID = id;
       } catch (e) {
-        window.PhantomState.hardwareID = "E7B4C8D2"; // Safe fallback
+        window.VaultState.hardwareID = "E7B4C8D2"; // Safe fallback
       }
-      document.getElementById('viewer-device-id').innerText = window.PhantomState.hardwareID;
-      document.getElementById('creator-device-id').innerText = window.PhantomState.hardwareID;
+      document.getElementById('viewer-device-id').innerText = window.VaultState.hardwareID;
+      document.getElementById('creator-device-id').innerText = window.VaultState.hardwareID;
     }
 
     // =====================================================================
-    // 3. FAILSAFE COPY ENGINE
+    // 3. TRIPLE-FAILSAFE COPY ENGINE
     // =====================================================================
     async function executeClipboardCopy(text) {
       if (!text) return false;
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch (err) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (err) {
         try {
           const el = document.createElement('textarea');
           el.value = text; el.setAttribute('readonly', ''); el.style.position = 'absolute'; el.style.left = '-9999px';
@@ -494,20 +524,20 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function copyDeviceID() {
-      executeClipboardCopy(window.PhantomState.hardwareID).then(success => { if(success) showToast("Hardware ID copied.", "success"); });
+      executeClipboardCopy(window.VaultState.hardwareID).then(success => { if(success) showToast("Hardware ID copied.", "success"); });
     }
     function copyShareUrl() {
       const url = document.getElementById('share-url-output').value;
       executeClipboardCopy(url).then(success => {
-        if (success) showToast("Secure Link copied completely.", "success");
-        else showToast("Clipboard blocked. Select all text manually.", "error");
+        if (success) showToast("Secure Link copied perfectly.", "success");
+        else showToast("Clipboard blocked. Select text manually.", "error");
       });
     }
     function copyMintedAccessCode() {
       const keyBuffer = document.getElementById('minted-code-output').value;
       executeClipboardCopy(keyBuffer).then(success => {
         if (success) showToast("Access Code copied perfectly (0 characters lost).", "success");
-        else showToast("Clipboard blocked. Select all text manually.", "error");
+        else showToast("Clipboard blocked. Select text manually.", "error");
       });
     }
 
@@ -568,23 +598,23 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function triggerAutoSave() {
       const text = document.getElementById('doc-content').value;
-      localStorage.setItem('pv_draft_omega', text);
+      localStorage.setItem('pv_draft_abs', text);
       const status = document.getElementById('save-status');
       status.style.opacity = '1'; clearTimeout(window.saveTimer);
       window.saveTimer = setTimeout(() => status.style.opacity = '0', 2000);
     }
     
     function loadDraft() { 
-      const saved = localStorage.getItem('pv_draft_omega'); 
+      const saved = localStorage.getItem('pv_draft_abs'); 
       if(saved) document.getElementById('doc-content').value = saved; 
     }
 
     function updateMetrics() {
       const txt = document.getElementById('doc-content').value || "";
       let bytes = new TextEncoder().encode(txt).length;
-      window.PhantomState.images.forEach(img => { bytes += Math.round((img.dataURL.length * 3) / 4); });
+      window.VaultState.images.forEach(img => { bytes += Math.round((img.dataURL.length * 3) / 4); });
       let kb = (bytes / 1024).toFixed(2);
-      document.getElementById('metrics-counter').innerText = `${kb} KB PAYLOAD`;
+      document.getElementById('metrics-counter').innerText = `${kb} BYTES DETECTED`;
     }
 
     function handleClipboardTheft(e) {
@@ -597,7 +627,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function executePanicProtocol() {
       document.getElementById('panic-overlay').style.display = 'flex';
-      window.PhantomState = {}; // Wipe RAM
+      window.VaultState = {}; // Wipe RAM
       document.body.innerHTML = ''; // Wipe DOM
       window.location.replace('https://en.wikipedia.org/wiki/Special:Random'); // Divert
     }
@@ -699,7 +729,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           
           const dataURL = canvas.toDataURL('image/jpeg', 0.8); 
           const id = 'img_' + Date.now();
-          window.PhantomState.images.push({ id, dataURL, w: width, h: height });
+          window.VaultState.images.push({ id, dataURL, w: width, h: height });
           renderImageStrip();
           updateMetrics();
         };
@@ -710,16 +740,16 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function removeImage(id) {
-      window.PhantomState.images = window.PhantomState.images.filter(img => img.id !== id);
+      window.VaultState.images = window.VaultState.images.filter(img => img.id !== id);
       renderImageStrip();
       updateMetrics();
     }
 
     function renderImageStrip() {
       const container = document.getElementById('image-preview-container');
-      if (window.PhantomState.images.length === 0) { container.classList.add('hidden'); return; }
+      if (window.VaultState.images.length === 0) { container.classList.add('hidden'); return; }
       container.classList.remove('hidden');
-      container.innerHTML = window.PhantomState.images.map(img => `
+      container.innerHTML = window.VaultState.images.map(img => `
         <div class="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-phantom-700 group">
           <img src="${img.dataURL}" class="w-full h-full object-cover" />
           <button onclick="removeImage('${img.id}')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-red-400 hover:text-red-300">
@@ -732,7 +762,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     // =====================================================================
     // 6. CRYPTO ENGINE (Byte-Exact, Universal Master)
     // =====================================================================
-    const DEFAULT_CIPHER_KEY = "PHTM_V10_OMEGA";
+    const DEFAULT_CIPHER_KEY = "PHTM_V10_ABS";
 
     function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
     function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
@@ -785,12 +815,28 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       throw new Error("Payload corrupt.");
     }
 
+    // LOOP-BASED BASE64 to prevent Call Stack Overflows on huge payloads
+    function bufferToBase64(buf) {
+      let binary = '';
+      const bytes = new Uint8Array(buf);
+      const len = bytes.byteLength;
+      for (let i = 0; i < len; i++) { binary += String.fromCharCode(bytes[i]); }
+      return window.btoa(binary);
+    }
+
+    function base64ToBuffer(b64) {
+      const binary = window.atob(b64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) { bytes[i] = binary.charCodeAt(i); }
+      return bytes.buffer;
+    }
+
     async function compressToURL(hexStr) {
       if(!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); 
       try {
         const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
         const buffer = await new Response(stream).arrayBuffer();
-        return btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        return bufferToBase64(buffer).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       } catch(e) { return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
     }
 
@@ -798,7 +844,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
       if(!window.DecompressionStream) return atob(b64); 
       try {
-        const buffer = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+        const buffer = base64ToBuffer(b64);
         const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
         return await new Response(stream).text();
       } catch(e) { return atob(b64); }
@@ -806,7 +852,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     async function generateAccessCode(vaultKey, viewerHardwareId) { return await internalEncrypt(vaultKey, viewerHardwareId); }
     async function resolveAccessCode(accessCode) {
-      try { return await internalDecrypt(accessCode, window.PhantomState.hardwareID); } 
+      try { return await internalDecrypt(accessCode, window.VaultState.hardwareID); } 
       catch(e) { throw new Error("Matrix mismatch."); }
     }
 
@@ -814,13 +860,13 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     // 7. LOCAL AUTHORITY KEYRING
     // =====================================================================
     function saveToKeyring(docId, title, vaultKey, tier, pinVal) {
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_abs') || '[]');
       ring.push({ id: docId, title, key: vaultKey, tier, pin: pinVal, date: new Date().toLocaleDateString() });
-      localStorage.setItem('pv_iam_keyring_omega', JSON.stringify(ring));
+      localStorage.setItem('pv_iam_keyring_abs', JSON.stringify(ring));
     }
 
     function renderKeyring() {
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_abs') || '[]');
       document.getElementById('keyring-count').innerText = `${ring.length} Keys`;
       const list = document.getElementById('keyring-list');
       if(ring.length === 0) { list.innerHTML = '<div class="text-center p-8 text-neutral-500 text-sm">Keyring empty.</div>'; return; }
@@ -857,7 +903,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const viewerId = document.getElementById('iam-viewer-id').value.toUpperCase().trim();
       if(!docId || !viewerId) return showToast("Select document and enter Viewer ID.", "error");
 
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_abs') || '[]');
       const doc = ring.find(d => d.id === docId);
       if(!doc) return showToast("Key missing from local ring.", "error");
 
@@ -872,63 +918,65 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     // =====================================================================
     // 8. ERRORLESS FAILSAFE PDF ENGINE (Fixes Blank Pages & Overflows)
     // =====================================================================
-    class FailsafePDF {
-      constructor() {
-        this.buffer = new Uint8Array(0);
-        this.objects = [];
-        this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
-      }
-      append(str) {
-        let bytes = new TextEncoder().encode(str);
-        let newBuf = new Uint8Array(this.buffer.length + bytes.length);
-        newBuf.set(this.buffer); newBuf.set(bytes, this.buffer.length);
-        this.buffer = newBuf;
-      }
-      addObj(str) {
-        let id = this.objects.length + 1;
-        this.objects.push(this.buffer.length);
-        this.append(`${id} 0 obj\n${str}\nendobj\n`);
-        return id;
-      }
-      build(textLines, payloadHex) {
-        let cat = 1, pgs = 2, font = 3;
-        let kids = [];
-        let pages = [];
-        let linesPerPage = 35;
-        
-        for(let i=0; i<textLines.length; i+=linesPerPage) pages.push(textLines.slice(i, i+linesPerPage));
-        if(pages.length === 0) pages.push([""]);
+    class ReliablePDF {
+        constructor() {
+            this.buffer = "";
+            this.objects = [];
+            this.offsets = [];
+            this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+        }
+        append(str) { this.buffer += str; }
+        addObj(content) {
+            const id = this.objects.length + 1;
+            this.objects.push(id);
+            this.offsets.push(this.buffer.length);
+            this.append(`${id} 0 obj\n${content}\nendobj\n`);
+            return id;
+        }
+        build(lines, payloadHex) {
+            let pgsId = 2, fontId = 3;
+            let pageIds = [];
+            let currentObjId = 3;
+            
+            for(let i=0; i<lines.length; i++) {
+                pageIds.push(`${currentObjId + 1} 0 R`);
+                currentObjId += 2;
+            }
+            if(pageIds.length === 0) { pageIds.push(`${currentObjId + 1} 0 R`); }
 
-        let currentObjId = 3;
-        pages.forEach(() => { kids.push(`${currentObjId+1} 0 R`); currentObjId += 2; });
+            const catId = this.addObj(`<< /Type /Catalog /Pages ${pgsId} 0 R >>`);
+            this.addObj(`<< /Type /Pages /Kids [${pageIds.join(' ')}] /Count ${pageIds.length} >>`);
+            this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
 
-        this.addObj(`<< /Type /Catalog /Pages ${pgs} 0 R >>`);
-        this.addObj(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`);
-        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
+            let pagesToRender = lines.length > 0 ? lines : [["Empty Document"]];
+            
+            for(let pLines of pagesToRender) {
+                let stream = "BT /F1 12 Tf 50 750 Td 18 TL\n";
+                for(let line of pLines) {
+                    let safeLine = (line || "").replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
+                    stream += `(${safeLine}) Tj T*\n`;
+                }
+                stream += "ET\n";
+                const streamId = this.addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+                this.addObj(`<< /Type /Page /Parent ${pgsId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontId} 0 R >> >> /Contents ${streamId} 0 R >>`);
+            }
 
-        pages.forEach(pageLines => {
-          let streamData = "BT /F1 12 Tf 50 750 Td 18 TL\n";
-          pageLines.forEach(line => {
-            let esc = (line||"").replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
-            streamData += `(${esc}) Tj T*\n`;
-          });
-          streamData += "ET\n";
-          let sId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
-          this.addObj(`<< /Type /Page /Parent ${pgs} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${sId} 0 R >>`);
-        });
+            let infoStr = `<< /Producer (PhantomVault Absolute) `;
+            if (payloadHex) infoStr += `/PhantomPayload <${payloadHex}> `;
+            infoStr += `>>`;
+            const infoId = this.addObj(infoStr);
 
-        let infoStr = `<< /Producer (PhantomVault OMEGA) `;
-        if (payloadHex) infoStr += `/PhantomPayload <${payloadHex}> `;
-        infoStr += `>>`;
-        let infoId = this.addObj(infoStr);
+            const xrefOffset = this.buffer.length;
+            this.append(`xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`);
+            for(let i=0; i<this.objects.length; i++) {
+                this.append(String(this.offsets[i]).padStart(10, '0') + " 00000 n \n");
+            }
+            this.append(`trailer\n<< /Size ${this.objects.length + 1} /Root ${catId} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
 
-        let xrefOffset = this.buffer.length;
-        this.append(`xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`);
-        this.objects.forEach(off => { this.append(String(off).padStart(10, '0') + " 00000 n \n"); });
-        this.append(`trailer\n<< /Size ${this.objects.length + 1} /Root ${cat} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
-
-        return this.buffer;
-      }
+            const bytes = new Uint8Array(this.buffer.length);
+            for(let i=0; i<this.buffer.length; i++) { bytes[i] = this.buffer.charCodeAt(i) & 0xFF; }
+            return bytes;
+        }
     }
 
     // =====================================================================
@@ -944,7 +992,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const tier = document.getElementById('share-security-tier').value;
       const pinVal = document.getElementById('doc-pin').value.trim();
 
-      if (!content.trim() && window.PhantomState.images.length === 0) return showToast('Add elements to secure.', 'error');
+      if (!content.trim() && window.VaultState.images.length === 0) return showToast('Add elements to secure.', 'error');
       if (!password && mode === 'pdf') password = "PHANTOM_DEFAULT"; 
       if (tier === "2" && (!pinVal || pinVal.length !== 4)) return showToast('Secondary PIN must be 4 digits.', 'error');
 
@@ -962,7 +1010,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           password = Array.from(rand).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        const payloadMain = { rawText: content, watermarkText, images: window.PhantomState.images, expiry: expiryTS, tier: tier };
+        const payloadMain = { rawText: content, watermarkText, images: window.VaultState.images, expiry: expiryTS, tier: tier };
         if (tier === "2") payloadMain.pinHash = bytesToHex(new TextEncoder().encode(pinVal));
 
         const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
@@ -978,11 +1026,14 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             combinedHex = hexMain + "FFFFAAAA" + hexDecoy; 
           }
 
-          const pdfEngine = new FailsafePDF();
+          const pdfEngine = new ReliablePDF();
           let decoyLines = ["CONFIDENTIAL VAULT SECURED", "", "If you are reading this in a standard viewer, access is DENIED.", "Use PhantomPDF Vault to decrypt the exact byte matrix.", ""];
-          for(let i=0; i<20; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
+          for(let i=0; i<15; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
           
-          const pdfBytes = pdfEngine.build(decoyLines, combinedHex);
+          let pages = []; let linesPerPage = 35;
+          for(let i=0; i<decoyLines.length; i+=linesPerPage) pages.push(decoyLines.slice(i, i+linesPerPage));
+
+          const pdfBytes = pdfEngine.build(pages, combinedHex);
 
           const blob = new Blob([pdfBytes], { type: 'application/pdf' });
           const url = URL.createObjectURL(blob);
@@ -991,7 +1042,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           showToast('Secure PDF Built!', 'success');
         
         } else if (mode === 'link') {
-          if (hexMain.length > 30000) {
+          if (hexMain.length > 500000) {
              throw new Error("Payload too massive for URL compression. Please export as PDF instead.");
           }
           const compressed64 = await compressToURL(hexMain);
@@ -1028,8 +1079,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function processFileEntity(file) {
       if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) return showToast('Invalid file format.', 'error');
-      window.PhantomState.activeFile = file; 
-      window.PhantomState.urlPayloadHex = null;
+      window.VaultState.activeFile = file; 
+      window.VaultState.urlPayloadHex = null;
       document.getElementById('target-file-name').innerText = file.name;
       
       const reader = new FileReader();
@@ -1038,8 +1089,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         const match = text.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
         if (match) {
           try {
-            const rawHex = match[1];
-            const firstChunk = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA")[0] : rawHex;
             document.getElementById('unlock-instruction').innerText = "Encrypted Document. Enter Password.";
             document.getElementById('unlock-instruction').classList.remove('hidden');
             document.getElementById('unlock-pin-box').classList.add('hidden');
@@ -1053,9 +1102,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function resetUnlockModule() {
-      window.PhantomState.activeFile = null; 
-      window.PhantomState.decryptedData = null; 
-      window.PhantomState.urlPayloadHex = null;
+      window.VaultState.activeFile = null; 
+      window.VaultState.decryptedData = null; 
+      window.VaultState.urlPayloadHex = null;
       document.getElementById('unlock-password').value = ""; document.getElementById('unlock-pin').value = "";
       document.getElementById('unlock-pin-box').classList.add('hidden');
       document.getElementById('unlock-instruction').classList.add('hidden');
@@ -1077,9 +1126,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       try {
         let rawHex = null; let isDecoy = false;
         
-        if (window.PhantomState.urlPayloadHex) rawHex = window.PhantomState.urlPayloadHex;
-        else if (window.PhantomState.activeFile) {
-          const textData = await window.PhantomState.activeFile.text(); 
+        if (window.VaultState.urlPayloadHex) rawHex = window.VaultState.urlPayloadHex;
+        else if (window.VaultState.activeFile) {
+          const textData = await window.VaultState.activeFile.text(); 
           const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
           if (!match) throw new Error("File missing Phantom Cryptographic Payload.");
           rawHex = match[1];
@@ -1099,10 +1148,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         }
 
         if(!decryptedJsonStr) throw new Error("Invalid Vault Key.");
-        window.PhantomState.decryptedData = JSON.parse(decryptedJsonStr);
-        const data = window.PhantomState.decryptedData;
+        window.VaultState.decryptedData = JSON.parse(decryptedJsonStr);
+        const data = window.VaultState.decryptedData;
 
-        // Security Tier 2 Check (PIN)
         if (data.tier === "2" && !isDecoy) {
           const pinInput = document.getElementById('unlock-pin').value.trim();
           if(!pinInput) {
@@ -1121,7 +1169,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           resetUnlockModule(); throw new Error("SECURITY FAILURE: Exploded payload expired.");
         }
 
-        const viewName = (window.PhantomState.activeFile ? window.PhantomState.activeFile.name : "Secure Link Payload") + (isDecoy ? " (Decoy)" : "");
+        const viewName = (window.VaultState.activeFile ? window.VaultState.activeFile.name : "Secure Link Payload") + (isDecoy ? " (Decoy)" : "");
         document.getElementById('fs-filename').innerText = viewName;
         
         const htmlContent = buildViewerHTML(data.rawText, data.images);
@@ -1136,16 +1184,16 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        window.PhantomState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
+        window.VaultState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
         showToast(isDecoy ? 'Decoy Vault Layer active.' : 'Main Vault Decrypted.', 'success');
 
       } catch (err) {
         if(err.message.includes("Tier-2")) { showToast(err.message, 'warning'); } 
         else {
-          window.PhantomState.bruteForceCount++;
+          window.VaultState.bruteForceCount++;
           const warn = document.getElementById('brute-force-warn'); warn.classList.remove('hidden');
-          document.getElementById('bf-count').innerText = 3 - window.PhantomState.bruteForceCount;
-          if(window.PhantomState.bruteForceCount >= 3) {
+          document.getElementById('bf-count').innerText = 3 - window.VaultState.bruteForceCount;
+          if(window.VaultState.bruteForceCount >= 3) {
             resetUnlockModule();
             showToast("SECURITY BRUTE OUT-TRIGGER. Lockout in progress.", "error");
             setTimeout(() => location.reload(), 2000);
@@ -1155,13 +1203,13 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function handleExportCleanPDF() {
-      if (!window.PhantomState.decryptedData) return;
+      if (!window.VaultState.decryptedData) return;
       try {
-        const pdfEngine = new FailsafePDF();
+        const pdfEngine = new ReliablePDF();
         
-        // Simple lines wrapper for exact-byte clean PDF export
         const lines = [];
-        window.PhantomState.decryptedData.rawText.split('\n').forEach(paragraph => {
+        const rawText = window.VaultState.decryptedData.rawText || "";
+        rawText.split('\n').forEach(paragraph => {
           if (paragraph.length === 0) return lines.push("");
           let currentLine = "";
           paragraph.split(' ').forEach(word => {
@@ -1171,11 +1219,14 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           if (currentLine.trim()) lines.push(currentLine.trim());
         });
 
-        const pdfBytes = pdfEngine.build(lines, null);
+        let pages = []; let linesPerPage = 35;
+        for(let i=0; i<lines.length; i+=linesPerPage) pages.push(lines.slice(i, i+linesPerPage));
+
+        const pdfBytes = pdfEngine.build(pages, null);
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a'); link.href = url; 
-        link.download = `Clean_${window.PhantomState.activeFile?window.PhantomState.activeFile.name:'Export'}.pdf`;
+        link.download = `Clean_${window.VaultState.activeFile?window.VaultState.activeFile.name:'Export'}.pdf`;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
         showToast('Clean PDF exported securely.', 'success');
       } catch (err) { showToast('PDF Export failed.', 'error'); console.error(err); }
@@ -1185,9 +1236,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       renderIcons(); loadDraft(); setupDragAndDrop();
       await generateHardwareMatrix();
       
-      if(window.location.hash.includes('&v=')) {
+      if(window.location.hash.startsWith('#v=')) {
         switchTab('unlock');
-        
         const params = new URLSearchParams(window.location.hash.substring(1));
         const tier = params.get('t');
         const compressed = params.get('v');
@@ -1206,7 +1256,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         }
 
         try {
-          window.PhantomState.urlPayloadHex = await decompressFromURL(compressed);
+          window.VaultState.urlPayloadHex = await decompressFromURL(compressed);
         } catch(e) { showToast("Cargo Link corrupted.", "error"); }
       }
     };
