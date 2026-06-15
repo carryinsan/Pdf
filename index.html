@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phantom Vault - Zenith Architecture</title>
+  <title>Phantom Vault - OMEGA Architecture</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,462 +12,392 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'], mono: ['Fira Code', 'monospace'] },
-          colors: { phantom: { 950: '#020202', 900: '#09090b', 800: '#18181b', 700: '#27272a', 600: '#3f3f46', emerald: '#10b981' } }
+          colors: { phantom: { 950: '#030303', 900: '#0a0a0c', 800: '#141417', 700: '#222226', 600: '#333338', emerald: '#10b981' } }
         }
       }
     }
   </script>
-  <!-- Offline-Failsafe Markdown & KaTeX Parsers -->
+
+  <!-- Failsafe Formatting Engines -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" id="katex-css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
   <style>
-    /* Robust Scrollbars */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; border: 2px solid #09090b; }
+    ::-webkit-scrollbar-track { background: #030303; }
+    ::-webkit-scrollbar-thumb { background: #222226; border-radius: 4px; border: 1px solid #030303; }
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
-    /* High Contrast Inputs */
     select, input[type="datetime-local"], input[type="text"], input[type="password"], textarea {
-      appearance: none; background-color: #020202; color: #ffffff;
-      border: 1px solid #27272a; border-radius: 0.5rem; outline: none;
+      appearance: none; background-color: #030303; color: #ffffff;
+      border: 1px solid #222226; border-radius: 0.5rem; outline: none;
     }
     input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
-    textarea::placeholder, input::placeholder { color: #52525b; }
-    /* Cinematic Reading Themes */
-    .theme-light { background-color: #ffffff; color: #111827; }
-    .theme-dark { background-color: #09090b; color: #f4f4f5; border: 1px solid #27272a; }
-    .theme-sepia { background-color: #fbf0e3; color: #433422; }
-    /* Universal Typography Base */
-    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; line-height: 1.2; }
-    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; }
-    .rendered-content h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+
+    /* High Contrast Reading Theme */
+    .rendered-content { color: #f4f4f5; }
+    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid #222226; padding-bottom: 0.5rem; line-height: 1.2; color: #10b981; }
+    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; color: #34d399; }
+    .rendered-content h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #ffffff; }
     .rendered-content p { margin-bottom: 1.2rem; line-height: 1.8; }
-    .rendered-content strong { font-weight: 800; color: inherit; filter: contrast(1.5); }
-    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px currentColor; }
-    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid currentColor; }
-    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(128,128,128,0.2); }
-    .rendered-content code { font-family: 'Fira Code', monospace; padding: 0.15rem 0.3rem; border-radius: 0.25rem; background: rgba(128,128,128,0.2); }
-    .rendered-content blockquote { border-left: 4px solid currentColor; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: rgba(128,128,128,0.1); }
+    .rendered-content strong { font-weight: 800; color: #ffffff; filter: drop-shadow(0 0 1px rgba(255,255,255,0.5)); }
+    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px #222226; }
+    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #222226; }
+    .rendered-content th { background-color: #141417; color: #10b981; }
+    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: #0a0a0c; border: 1px solid #222226; }
+    .rendered-content code { font-family: 'Fira Code', monospace; padding: 0.15rem 0.3rem; border-radius: 0.25rem; background: #141417; color: #fca5a5; }
+    .rendered-content pre code { background: transparent; color: inherit; padding: 0; }
+    .rendered-content blockquote { border-left: 4px solid #10b981; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: rgba(16,185,129,0.05); }
     .rendered-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
     .rendered-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid rgba(128,128,128,0.3); }
-    .theme-light .rendered-content th { background-color: #f3f4f6; }
-    .theme-dark .rendered-content th { background-color: #18181b; }
-    .theme-sepia .rendered-content th { background-color: #f2e3d2; }
-    /* High Contrast Inspector */
-    #inspector-content.rendered-content { color: #ffffff; }
-    #inspector-content.rendered-content h1, #inspector-content.rendered-content h2, #inspector-content.rendered-content h3 { color: #10b981; }
-    #inspector-content.rendered-content code { background-color: #18181b; color: #fca5a5; }
-    .toc-link { transition: all 0.2s; display: block; padding: 0.35rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; }
-    .toc-link:hover { color: #10b981; transform: translateX(4px); }
+    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid #222226; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); }
+
+    .toc-link { transition: all 0.2s; display: block; padding: 0.35rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; border-left: 2px solid transparent; padding-left: 10px; }
+    .toc-link:hover { color: #10b981; border-left-color: #10b981; background: rgba(16,185,129,0.05); }
   </style>
 </head>
-<body class="bg-phantom-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative">
+<body class="bg-phantom-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
+
   <!-- TOAST ALERTS -->
   <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- PANIC REDIRECT OVERLAY -->
+  <div id="panic-overlay" class="fixed inset-0 bg-white z-[9999] hidden items-center justify-center">
+    <p class="text-black font-sans">Redirecting connection...</p>
+  </div>
+
   <!-- FULLSCREEN VIEWER (SCROLL BUG FIXED) -->
-  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-2xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
-    <div class="flex-none flex items-center justify-between p-3 border-b border-phantom-700 bg-phantom-900 shadow-xl z-20">
+  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-3xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
+    <div class="flex-none flex items-center justify-between p-3 border-b border-phantom-700 bg-phantom-900 shadow-2xl z-20">
       <div class="flex items-center gap-3 ml-2">
         <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400" id="icon-fs-brand"></div>
         <div>
-          <h2 class="font-bold text-white tracking-tight leading-tight text-sm">Decrypted Vault</h2>
-          <p class="text-[10px] text-emerald-500 font-mono uppercase" id="fs-filename">Document.pdf</p>
+          <h2 class="font-bold text-white tracking-tight leading-tight text-sm">Decrypted Terminal</h2>
+          <p class="text-[10px] text-emerald-500 font-mono uppercase tracking-widest" id="fs-filename">Target.pdf</p>
         </div>
       </div>
       <div class="flex items-center gap-2 mr-2">
-        <div class="hidden md:flex px-3 py-1.5 bg-phantom-800 border border-phantom-700 rounded-lg text-xs font-mono text-neutral-400 items-center gap-2 cursor-help" title="Anti-Copy Decoy Protocol Active">
-          <span id="icon-shield" class="w-3 h-3 text-emerald-500"></span> Shield Active
+        <div class="hidden md:flex px-3 py-1.5 bg-phantom-800 border border-phantom-700 rounded-lg text-xs font-mono text-emerald-400 items-center gap-2 cursor-help shadow-inner">
+          <span id="icon-shield" class="w-3 h-3 text-emerald-500"></span> Memory Encrypted
         </div>
-        <button onclick="cycleTheme()" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700"><span id="icon-theme"></span></button>
-        <button onclick="printPayload()" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700"><span id="icon-print"></span></button>
-        <button onclick="handleExportCleanPDF()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold rounded-lg text-sm flex items-center gap-2 transition-all"><span id="icon-fs-download"></span> Export PDF</button>
-        <button onclick="toggleFullscreenViewer(false)" class="ml-2 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors"><span id="icon-fs-close"></span></button>
+        <button onclick="handleExportCleanPDF()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold rounded-lg text-sm flex items-center gap-2 transition-all shadow-lg active:scale-95"><span id="icon-fs-download"></span> Export PDF</button>
+        <div class="w-px h-6 bg-phantom-700 mx-1"></div>
+        <button onclick="executePanicProtocol()" title="PANIC WIPE: Instantly destroy data and redirect" class="p-2 bg-phantom-800 hover:bg-red-500 text-red-500 hover:text-white rounded-lg transition-colors border border-phantom-700 hover:border-red-500 shadow-md"><span id="icon-skull"></span></button>
+        <button onclick="toggleFullscreenViewer(false)" title="Close Viewer" class="ml-1 p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-400 hover:text-white border border-phantom-700 rounded-lg transition-colors"><span id="icon-fs-close"></span></button>
       </div>
     </div>
+
     <!-- Viewer Scroll Area -->
-    <div class="flex-1 flex overflow-hidden w-full">
-      <div class="w-64 border-r border-phantom-700 bg-phantom-900/50 hidden lg:flex flex-col p-4 overflow-y-auto">
-        <h3 class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-4 flex items-center gap-2"><span id="icon-toc" class="w-4 h-4"></span> Matrix Index</h3>
+    <div class="flex-1 flex overflow-hidden w-full relative">
+      <div class="w-64 border-r border-phantom-700 bg-phantom-900/40 hidden lg:flex flex-col p-4 overflow-y-auto shadow-inner">
+        <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-4 flex items-center gap-2"><span id="icon-toc" class="w-4 h-4"></span> Data Index</h3>
         <div id="toc-container" class="space-y-1"></div>
       </div>
       <div class="flex-1 overflow-y-auto p-4 md:p-8" id="reader-scroll-area">
-        <div id="theme-container" class="theme-dark w-full max-w-4xl mx-auto h-max min-h-full rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-16 relative transition-colors duration-300" oncopy="handleClipboardTheft(event)">
-          <div id="fs-watermark" class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] select-none overflow-hidden z-0 hidden">
-            <span id="fs-watermark-text" class="text-7xl md:text-9xl font-black transform -rotate-45 block whitespace-nowrap text-center w-full">RESTRICTED</span>
-          </div>
+        <div class="w-full max-w-4xl mx-auto h-max min-h-full rounded-2xl shadow-[0_0_80px_rgba(0,0,0,0.8)] p-6 md:p-14 relative bg-phantom-900 border border-phantom-800" oncopy="handleClipboardTheft(event)">
           <div id="fs-content" class="rendered-content relative z-10 font-serif text-base md:text-lg"></div>
         </div>
       </div>
     </div>
   </div>
+
   <!-- MAIN APP HEADER -->
-  <header class="border-b border-phantom-700 bg-phantom-900/50 backdrop-blur-md sticky top-0 z-40">
+  <header class="border-b border-phantom-700 bg-phantom-900/80 backdrop-blur-lg sticky top-0 z-40 shadow-md">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/5 flex items-center justify-center border border-emerald-500/30 shadow-lg" id="icon-brand-main"></div>
         <div>
           <span class="font-extrabold text-lg tracking-tight text-white block leading-tight">Phantom<span class="text-emerald-400">Vault</span></span>
-          <span class="text-[9px] uppercase tracking-widest text-emerald-500 font-bold block opacity-80">Zenith Architecture</span>
+          <span class="text-[9px] uppercase tracking-widest text-emerald-500 font-bold block opacity-80">OMEGA Architecture</span>
         </div>
       </div>
       
-      <div class="flex bg-phantom-950 p-1.5 rounded-xl border border-phantom-700 shadow-inner overflow-x-auto max-w-full">
-        <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-white shadow-sm whitespace-nowrap"><span id="icon-tab-create"></span> Encrypt</button>
-        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-unlock"></span> Decrypt</button>
-        <div class="w-px h-6 bg-phantom-700 mx-1 self-center"></div>
-        <button onclick="switchTab('iam')" id="btn-tab-iam" class="px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-400 hover:text-emerald-300 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-iam"></span> Access Manager</button>
+      <div class="flex bg-phantom-950 p-1 rounded-xl border border-phantom-700 shadow-inner overflow-x-auto max-w-full hide-scrollbar">
+        <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-white shadow-sm whitespace-nowrap"><span id="icon-tab-create"></span> Encrypt</button>
+        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-unlock"></span> Decrypt</button>
+        <div class="w-px h-6 bg-phantom-800 mx-1 self-center"></div>
+        <button onclick="switchTab('iam')" id="btn-tab-iam" class="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-500 hover:text-emerald-400 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-iam"></span> IAM Keys</button>
       </div>
     </div>
   </header>
+
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
+
     <!-- TAB 1: ENCRYPT SECTION -->
     <section id="tab-create" class="space-y-6 block animate-in fade-in duration-500">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <!-- Crypto Parameters -->
-        <div class="lg:col-span-4 space-y-4">
-          <div class="bg-phantom-900 border border-phantom-700 rounded-2xl p-5 shadow-2xl">
-            <h2 class="font-bold text-white flex items-center gap-2 border-b border-phantom-700 pb-3 mb-4"><span id="icon-sliders"></span> Core Parameters</h2>
+        <div class="lg:col-span-4 space-y-5">
+          <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
+            <h2 class="font-bold text-white flex items-center gap-2 border-b border-phantom-800 pb-3 mb-4"><span id="icon-sliders"></span> Payload Parameters</h2>
             
-            <div class="space-y-4">
+            <div class="space-y-4 relative z-10">
               <div>
-                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5 text-white">Document Title</label>
-                <input id="doc-filename" type="text" value="SecureReport" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
+                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">File Signature</label>
+                <input id="doc-filename" type="text" value="SecureReport" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 transition-colors" />
               </div>
               <div>
-                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5 text-white">Primary Passphrase</label>
+                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Master Passphrase</label>
                 <div class="relative">
-                  <input id="doc-password" type="password" placeholder="Master Key (Required)" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl pl-3 pr-10 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
-                  <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
+                  <input id="doc-password" type="password" placeholder="Required for all tiers" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-white focus:border-emerald-500 transition-colors" />
+                  <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
                 </div>
-              </div>
-              <div>
-                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5 text-white">Decoy Watermark</label>
-                <input id="doc-watermark" type="text" placeholder="CONFIDENTIAL" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
               </div>
             </div>
           </div>
-          <!-- Advanced Security Tiers -->
+
+          <!-- Security Matrix -->
           <div class="bg-phantom-900 border border-emerald-500/30 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent"></div>
-            <h2 class="font-bold text-emerald-400 flex items-center gap-2 border-b border-phantom-700 pb-3 mb-4"><span id="icon-shield-adv"></span> Invisible Security Matrix</h2>
+            <h2 class="font-bold text-emerald-400 flex items-center gap-2 border-b border-phantom-800 pb-3 mb-4"><span id="icon-shield-adv"></span> Security Matrix</h2>
             
             <div class="space-y-4">
               <div>
-                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5 text-white">Link Security Tier</label>
-                <select id="share-security-tier" onchange="toggleSecurityTierPanel()" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors">
-                  <option value="1">Tier 1: Low-friction (Password Only)</option>
-                  <option value="2">Tier 2: Moderate protection (Pass + PIN)</option>
+                <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1.5 text-white">Encryption Tier</label>
+                <select id="share-security-tier" onchange="toggleSecurityTierPanel()" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 transition-colors cursor-pointer">
+                  <option value="1">Tier 1: Standard (Passphrase Only)</option>
+                  <option value="2">Tier 2: Dual-Lock (Passphrase + PIN)</option>
                   <option value="3" selected>Tier 3: Device-Locked (Z-SACP)</option>
                 </select>
               </div>
-              <div id="tier-2-pin-box" class="hidden space-y-1.5">
-                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block text-white">Secondary 4-Digit PIN</label>
-                <input id="doc-pin" type="text" maxlength="4" placeholder="e.g. 1928" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-3 py-2.5 text-sm text-emerald-400 focus:border-emerald-500 font-mono tracking-widest text-center" />
-                <p class="text-[9px] text-neutral-500 leading-tight">Secret Dead-Man Switch: If viewer enters '0000', the payload deliberately self-corrupts.</p>
+
+              <div id="tier-2-pin-box" class="hidden space-y-1.5 p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
+                <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Set 4-Digit Secondary PIN</label>
+                <input id="doc-pin" type="text" maxlength="4" placeholder="e.g. 1928" class="w-full bg-phantom-950 border border-yellow-500/40 rounded-xl px-3 py-2.5 text-sm text-yellow-400 focus:border-yellow-400 font-mono tracking-widest text-center shadow-inner outline-none" />
               </div>
+
+              <hr class="border-phantom-800">
+
               <div>
                 <label class="flex items-center justify-between cursor-pointer group">
-                  <span class="text-xs font-bold text-neutral-300 group-hover:text-white transition-colors">Self-Destruct Time-Bomb</span>
-                  <input type="checkbox" id="enable-expiry" onchange="document.getElementById('expiry-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-950 border-phantom-700 rounded">
+                  <span class="text-xs font-bold text-neutral-300 group-hover:text-white transition-colors">Self-Destruct Expiry</span>
+                  <input type="checkbox" id="enable-expiry" onchange="document.getElementById('expiry-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-950 border-phantom-700 rounded cursor-pointer">
                 </label>
-                <div id="expiry-box" class="hidden mt-2">
-                  <input type="datetime-local" id="doc-expiry" class="w-full px-3 py-2 text-sm bg-phantom-950 text-white" />
+                <div id="expiry-box" class="hidden mt-3">
+                  <input type="datetime-local" id="doc-expiry" class="w-full px-3 py-2.5 text-sm bg-phantom-950 border border-phantom-700 text-white rounded-xl" />
                 </div>
               </div>
-              <hr class="border-phantom-700">
+
               <div>
                 <label class="flex items-center justify-between cursor-pointer group">
                   <span class="text-xs font-bold text-neutral-300 group-hover:text-white transition-colors">Dual-Vault Decoy (PDF Only)</span>
-                  <input type="checkbox" id="enable-decoy" onchange="document.getElementById('decoy-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-950 border-phantom-700 rounded">
+                  <input type="checkbox" id="enable-decoy" onchange="document.getElementById('decoy-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-950 border-phantom-700 rounded cursor-pointer">
                 </label>
-                <div id="decoy-box" class="hidden mt-3 space-y-3 p-3 bg-phantom-950 rounded-xl border border-phantom-700">
-                  <input id="decoy-password" type="password" placeholder="Decoy Passphrase" class="w-full bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500" />
-                  <textarea id="decoy-content" placeholder="Type fake, plausible text here..." class="w-full h-20 bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:border-emerald-500"></textarea>
+                <div id="decoy-box" class="hidden mt-3 space-y-3 p-3 bg-phantom-950 rounded-xl border border-phantom-800 shadow-inner">
+                  <input id="decoy-password" type="password" placeholder="Decoy Passphrase" class="w-full bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2.5 text-sm text-white focus:border-emerald-500" />
+                  <textarea id="decoy-content" placeholder="Type fake, plausible text here to show if under duress..." class="w-full h-20 bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2.5 text-sm text-white resize-none focus:border-emerald-500"></textarea>
                 </div>
               </div>
             </div>
           </div>
-          <div class="flex gap-3 pt-2">
-            <button onclick="handleGenerate('pdf')" class="flex-1 bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+
+          <div class="flex gap-3 pt-1">
+            <button onclick="handleGenerate('pdf')" class="flex-1 bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg">
               <span id="icon-pdf-dl"></span> Export PDF
             </button>
-            <button onclick="handleGenerate('link')" class="flex-[1.5] bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-[0.98]" id="btn-lock-link">
-              <span id="icon-link-gen"></span> Generate Link
+            <button onclick="handleGenerate('link')" class="flex-[1.2] bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95" id="btn-lock-link">
+              <span id="icon-link-gen"></span> Generate URL Link
             </button>
           </div>
         </div>
+
         <!-- Terminal Editor -->
-        <div class="lg:col-span-8 bg-phantom-900 border border-phantom-700 rounded-2xl p-1 shadow-2xl flex flex-col h-[740px] relative">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-phantom-700/60 bg-phantom-900/40 rounded-t-2xl">
+        <div class="lg:col-span-8 bg-phantom-900 border border-phantom-800 rounded-2xl p-1 shadow-2xl flex flex-col h-[760px] relative">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-phantom-800 bg-phantom-950/40 rounded-t-2xl">
             <div class="flex items-center gap-3 text-sm font-bold text-neutral-200">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
-              Secure Cargo Editor
-              <span id="save-status" class="text-[10px] text-emerald-500 font-mono ml-2 opacity-0 transition-opacity">Saved.</span>
+              Main Cargo Terminal
             </div>
             
-            <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-phantom-800 hover:bg-phantom-700 rounded-lg text-xs font-bold text-white transition-colors border border-phantom-600 shadow-sm">
-              <span id="icon-image-plus"></span> Attach Image
-              <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="handleImageUpload(event)">
-            </label>
+            <div class="flex items-center gap-3">
+              <span id="metrics-counter" class="text-[10px] font-mono text-emerald-500/80 tracking-widest hidden md:block">0 BYTES</span>
+              <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-phantom-800 hover:bg-phantom-700 rounded-lg text-xs font-bold text-white transition-colors border border-phantom-600 shadow-sm">
+                <span id="icon-image-plus"></span> Attach Media
+                <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="handleImageUpload(event)">
+              </label>
+            </div>
           </div>
           
-          <div class="flex-1 flex flex-col p-5 overflow-hidden bg-phantom-950 rounded-b-xl">
-            <textarea id="doc-content" placeholder="# Classified Payload
-Start typing here. Your work is auto-saved.
-Einstein's Equation: $$E = mc^2$$
+          <div class="flex-1 flex flex-col p-5 overflow-hidden bg-phantom-950 rounded-b-xl shadow-inner">
+            <textarea id="doc-content" placeholder="# Classified Intelligence Payload
+Start typing here. Markdown and KaTeX math ($$E=mc^2$$) are fully supported.
 
-| Threat Level | Status |
-| :--- | :--- |
-| Network | Secure | " class="w-full flex-1 bg-transparent text-white placeholder-neutral-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base outline-none overflow-y-auto mb-4 font-mono" oninput="triggerAutoSave()"></textarea>
-
-            <div id="image-preview-container" class="flex gap-3 overflow-x-auto pb-2 min-h-[80px] hidden border-t border-phantom-700 pt-4"></div>
+The raw text and images will be packaged, hex-encoded, compressed, and encrypted via AES-256 before ever leaving your local machine memory." class="w-full flex-1 bg-transparent text-white placeholder-neutral-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base outline-none overflow-y-auto mb-4 font-mono" oninput="updateMetrics()"></textarea>
+            
+            <div id="image-preview-container" class="flex gap-3 overflow-x-auto pb-2 min-h-[80px] hidden border-t border-phantom-800 pt-4"></div>
           </div>
         </div>
       </div>
     </section>
+
     <!-- TAB 2: DECRYPT SECTION -->
     <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500">
       <div class="text-center max-w-xl mx-auto mb-8 mt-4">
         <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
-        <p class="text-neutral-400 text-sm">Input the universal key to penetrate the cryptographic layers.</p>
+        <p class="text-neutral-400 text-sm">Upload a secured PDF file or process an encrypted URL payload.</p>
       </div>
+
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
         <div id="drop-zone" class="border-2 border-dashed border-phantom-700 hover:border-emerald-500/50 bg-phantom-900/50 hover:bg-emerald-500/[0.02] rounded-3xl p-16 text-center transition-all cursor-pointer group shadow-xl relative overflow-hidden" onclick="triggerFileInput()">
           <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
           <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-950 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 text-neutral-500 group-hover:text-emerald-400 transition-all shadow-inner relative z-10" id="icon-upload-zone"></div>
           <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors relative z-10">Load Encrypted Asset</h3>
           <p class="text-neutral-500 mt-2 mb-8 relative z-10">Drag & drop your locked PDF file here</p>
-          <span class="inline-flex bg-phantom-800 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-700 relative z-10">Browse Local Files</span>
+          <span class="inline-flex bg-phantom-800 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-600 relative z-10 shadow-md">Browse Local Files</span>
         </div>
       </div>
-      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-900 border border-phantom-700 rounded-2xl p-6 shadow-2xl hidden">
+
+      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-900 border border-phantom-800 rounded-2xl p-6 shadow-2xl hidden">
         <div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-800">
-          <div class="w-14 h-14 bg-phantom-950 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
+          <div class="w-14 h-14 bg-phantom-950 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0 shadow-inner" id="icon-file-ready"></div>
           <div class="flex-1 overflow-hidden">
             <h3 id="target-file-name" class="font-bold text-white truncate text-base">Cargo Link</h3>
             <p class="text-[10px] text-emerald-400 font-mono mt-1 tracking-widest flex items-center gap-1"><span id="icon-lock-small" class="w-3 h-3"></span> SECURED CARGO DETECTED</p>
           </div>
           <button onclick="resetUnlockModule()" class="p-2 bg-phantom-950 hover:bg-red-500/20 text-neutral-500 hover:text-red-400 rounded-lg border border-phantom-700 transition-colors"><span id="icon-trash"></span></button>
         </div>
-        <div id="hw-profile-box" class="mb-5 p-3 bg-phantom-950 rounded-xl border border-phantom-800 flex items-center justify-between">
+
+        <div id="hw-profile-box" class="mb-6 p-3 bg-phantom-950 rounded-xl border border-phantom-800 flex items-center justify-between shadow-inner">
           <div>
             <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1 text-white">Your Hardware Matrix ID</p>
             <p class="text-sm font-mono text-emerald-400 tracking-wider" id="viewer-device-id">CALCULATING...</p>
           </div>
           <button onclick="copyDeviceID()" class="p-2 text-neutral-400 hover:text-white bg-phantom-800 rounded-lg transition-colors border border-phantom-700" title="Copy Hardware ID"><span id="icon-copy" class="w-4 h-4"></span></button>
         </div>
+
         <div class="space-y-5">
-          <!-- Universal Key Input (Hides the Tier from the Viewer) -->
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-white uppercase tracking-wider flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><span id="icon-unlock-key"></span> Cryptographic Key</span>
-              <span id="brute-force-warn" class="text-[10px] text-red-400 hidden font-bold">Lockout: <span id="bf-count">3</span> tries left</span>
+          <!-- Adaptive Instruction Text based on Security Tier -->
+          <p id="unlock-instruction" class="text-xs text-neutral-400 bg-phantom-800 p-3 rounded-lg border border-phantom-700 leading-relaxed hidden"></p>
+
+          <div class="space-y-2" id="unlock-pass-container">
+            <label class="text-[10px] font-bold text-white uppercase tracking-widest flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><span id="icon-unlock-key"></span> Input Key</span>
+              <span id="brute-force-warn" class="text-[10px] text-red-500 hidden font-bold">Lockout: <span id="bf-count">3</span> tries left</span>
             </label>
             <div class="relative">
-              <input id="unlock-password" type="password" placeholder="Passphrase or IAM Access Code..." class="w-full bg-phantom-950 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-white focus:border-emerald-500 transition-all shadow-inner" />
-              <button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
+              <!-- Full textarea to accommodate huge IAM access codes without truncation -->
+              <textarea id="unlock-password" placeholder="Paste Passphrase or Access Code..." class="w-full h-20 bg-phantom-950 border border-phantom-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 transition-all shadow-inner font-mono resize-none break-all outline-none"></textarea>
             </div>
           </div>
-          <!-- Secondary PIN Input (Injected Dynamically if Tier 2 is verified) -->
-          <div id="unlock-pin-box" class="hidden space-y-2 border-t border-phantom-800 pt-4 mt-2">
-            <label class="text-xs font-bold text-yellow-400 uppercase tracking-wider block">Tier-2 Lock Detected: Enter PIN</label>
-            <input id="unlock-pin" type="text" maxlength="4" placeholder="4-Digit Code" class="w-full bg-phantom-950 border border-yellow-500/30 rounded-xl px-4 py-3 text-sm text-center font-mono tracking-widest text-white focus:border-yellow-500 shadow-inner" />
+
+          <div id="unlock-pin-box" class="hidden space-y-2 border-t border-phantom-800 pt-5 mt-2">
+            <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Tier-2 Lock: Enter PIN</label>
+            <input id="unlock-pin" type="text" maxlength="4" placeholder="0000" class="w-full bg-phantom-950 border border-yellow-500/30 rounded-xl px-4 py-3 text-xl text-center font-mono tracking-widest text-white focus:border-yellow-500 shadow-inner outline-none" />
           </div>
           
-          <button id="btn-trigger-decrypt" onclick="handleDecrypt()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-            <span id="icon-btn-unlock"></span> Penetrate Vault
+          <button id="btn-trigger-decrypt" onclick="handleDecrypt()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg">
+            <span id="icon-btn-unlock"></span> Execute Decryption
           </button>
         </div>
       </div>
-      <div id="unlock-stage-viewer" class="space-y-5 hidden animate-in zoom-in-95 duration-300">
-        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-phantom-900 border border-emerald-500/30 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/40 text-emerald-400" id="icon-success"></div>
-            <div>
-              <h2 class="font-extrabold text-white text-lg tracking-tight">Access Authorized</h2>
-              <p class="text-emerald-400/80 text-xs mt-0.5 font-mono">Target: <span id="viewing-file-name" class="text-neutral-400"></span></p>
-            </div>
-          </div>
-          <div class="flex gap-2 w-full md:w-auto">
-            <button onclick="toggleFullscreenViewer(true)" class="flex-1 md:flex-none bg-phantom-800 hover:bg-phantom-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-phantom-700 flex items-center justify-center gap-2">
-              <span id="icon-expand"></span> View Rendered
-            </button>
-            <button onclick="resetUnlockModule()" class="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all flex items-center justify-center" title="Burn RAM & Close"><span id="icon-x"></span></button>
-          </div>
-        </div>
-        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 min-h-[400px] max-h-[500px] shadow-inner relative overflow-y-auto" oncopy="handleClipboardTheft(event)">
-          <div class="flex items-center justify-between mb-4 pb-4 border-b border-phantom-800">
-            <span class="text-xs font-bold text-neutral-400 uppercase tracking-widest text-white">Raw Data Inspector</span>
-            <span class="text-[10px] text-emerald-500 font-mono flex items-center gap-1"><span id="icon-shield-small" class="w-3 h-3"></span> SHIELD ACTIVE</span>
-          </div>
-          <div id="inspector-content" class="rendered-content font-serif text-sm"></div>
-        </div>
-      </div>
     </section>
+
     <!-- TAB 3: IAM MANAGER -->
     <section id="tab-iam" class="space-y-6 hidden animate-in fade-in duration-500">
-      <div class="mb-8 mt-4 flex flex-col md:flex-row items-start md:items-end justify-between border-b border-phantom-700 pb-6">
+      <div class="mb-8 mt-4 flex flex-col md:flex-row items-start md:items-end justify-between border-b border-phantom-800 pb-6">
         <div>
           <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2 flex items-center gap-3">
             <span id="icon-iam-header" class="text-emerald-500"></span> Identity Access Manager
           </h1>
-          <p class="text-neutral-400 text-sm">Issue mathematically-bound Access Codes. Zero servers required.</p>
+          <p class="text-neutral-400 text-sm">Issue mathematically-bound Access Codes for Z-SACP Tier-3 links.</p>
         </div>
         <div class="mt-4 md:mt-0 text-right">
           <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1 text-white">Your Hardware Matrix ID</p>
-          <p class="text-sm font-mono text-emerald-400 bg-phantom-900 px-3 py-1.5 rounded-lg border border-phantom-700 inline-block" id="creator-device-id">CALCULATING...</p>
+          <p class="text-sm font-mono text-emerald-400 bg-phantom-900 px-3 py-1.5 rounded-lg border border-phantom-700 inline-block shadow-inner" id="creator-device-id">CALCULATING...</p>
         </div>
       </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Keyring -->
-        <div class="bg-phantom-900 border border-phantom-700 rounded-2xl flex flex-col shadow-2xl h-[580px]">
-          <div class="p-5 border-b border-phantom-700 flex items-center justify-between bg-phantom-950 rounded-t-2xl">
+        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl flex flex-col shadow-2xl h-[600px]">
+          <div class="p-5 border-b border-phantom-800 flex items-center justify-between bg-phantom-950 rounded-t-2xl">
             <h3 class="font-bold text-white text-sm flex items-center gap-2"><span id="icon-keyring" class="w-4 h-4 text-emerald-400"></span> Authority Keyring</h3>
             <span class="text-xs bg-phantom-800 px-2 py-1 rounded text-neutral-300 font-mono border border-phantom-700" id="keyring-count">0 Keys</span>
           </div>
-          <div class="flex-1 overflow-y-auto p-3 space-y-2" id="keyring-list"></div>
+          <div class="flex-1 overflow-y-auto p-3 space-y-3 bg-phantom-900" id="keyring-list"></div>
         </div>
-        <!-- Issue Code -->
-        <div class="bg-phantom-900 border border-phantom-700 rounded-2xl p-6 shadow-2xl flex flex-col justify-center relative overflow-hidden group">
+
+        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-center relative overflow-hidden group">
           <div class="text-center mb-6">
             <div class="w-16 h-16 bg-phantom-950 border border-phantom-700 rounded-2xl mx-auto flex items-center justify-center text-emerald-400 shadow-inner mb-4" id="icon-mint"></div>
-            <h3 class="text-xl font-bold text-white">Generate Hardware Access Code</h3>
-            <p class="text-xs text-neutral-400 mt-2 max-w-sm mx-auto">Input the viewer's ID to compute a custom key that only works on their machine.</p>
+            <h3 class="text-xl font-bold text-white">Generate Hardware Code</h3>
+            <p class="text-xs text-neutral-400 mt-2 max-w-sm mx-auto">Input the viewer's ID to compute a custom decryption key that only functions on their physical machine.</p>
           </div>
+
           <div class="space-y-4 max-w-md mx-auto w-full relative z-10">
             <div>
               <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1 text-white">Target Document ID</label>
-              <input type="text" id="iam-doc-id" readonly placeholder="Choose from Keyring..." class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none" />
+              <input type="text" id="iam-doc-id" readonly placeholder="Click a Tier-3 document in the Keyring..." class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none shadow-inner" />
             </div>
             <div>
               <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1 text-white">Viewer's Matrix ID</label>
-              <input type="text" id="iam-viewer-id" placeholder="e.g., A1B2C3D4" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase focus:outline-none focus:border-emerald-500" maxlength="8" />
+              <input type="text" id="iam-viewer-id" placeholder="e.g., A1B2C3D4" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase focus:outline-none focus:border-emerald-500 shadow-inner" maxlength="8" />
             </div>
             
-            <button onclick="mintAccessCode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-3.5 px-4 rounded-xl transition-all shadow-lg active:scale-[0.98]">
-              Generate Decryption Code
+            <button onclick="mintAccessCode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl transition-all shadow-lg active:scale-95">
+              Mint Code
             </button>
-            <!-- Complete Copy-Proof Box (NO TRUNCATION) -->
-            <div id="minted-code-box" class="hidden mt-6 p-4 bg-phantom-950 border border-emerald-500/30 rounded-xl">
-              <p class="text-[10px] text-emerald-400 uppercase tracking-widest mb-2 font-bold text-center">Complete Access Code</p>
-              <div class="relative bg-[#000000] p-3 rounded-lg border border-phantom-800 mb-3 overflow-hidden">
+
+            <!-- TRUNCATION FIXED: Huge dedicated copy box -->
+            <div id="minted-code-box" class="hidden mt-6 p-5 bg-phantom-950 border border-emerald-500/30 rounded-2xl shadow-inner">
+              <p class="text-[10px] text-emerald-400 uppercase tracking-widest mb-3 font-bold text-center flex items-center justify-center gap-2"><span id="icon-check-small" class="w-3 h-3"></span> Code Successfully Minted</p>
+              <div class="relative bg-[#000000] p-3 rounded-xl border border-phantom-800 mb-4 overflow-hidden">
                 <textarea id="minted-code-output" readonly class="w-full bg-transparent text-[11px] font-mono text-emerald-300 leading-relaxed h-28 select-all resize-none outline-none break-all"></textarea>
               </div>
-              <button onclick="copyMintedAccessCode()" class="w-full bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-2 rounded-lg text-xs transition-colors flex items-center justify-center gap-2">
-                <span id="icon-copy-key"></span> Copy Entire Code Buffer
+              <button onclick="copyMintedAccessCode()" class="w-full bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-3 rounded-xl text-xs transition-colors flex items-center justify-center gap-2 shadow-md">
+                <span id="icon-copy-key"></span> Copy Full Access Code
               </button>
             </div>
           </div>
         </div>
       </div>
     </section>
+
   </main>
-  <!-- URL SHARE MODAL (Fixed Truncation) -->
+
+  <!-- URL SHARE MODAL (TRUNCATION FIXED) -->
   <div id="share-modal" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-xl z-[70] hidden flex-col items-center justify-center opacity-0 transition-opacity">
-    <div class="bg-phantom-900 border border-phantom-700 rounded-2xl p-8 max-w-lg w-full shadow-2xl relative">
-      <button onclick="closeShareModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white"><span id="icon-close-modal" class="w-5 h-5"></span></button>
-      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 mx-auto" id="icon-share-success"></div>
-      <h3 class="text-xl font-bold text-white text-center mb-2">Secure Link Generated</h3>
-      <p class="text-xs text-neutral-400 text-center mb-6">The payload is heavily compressed directly into this URL. The security tier is mathematically hidden.</p>
+    <div class="bg-phantom-900 border border-phantom-800 rounded-3xl p-8 max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative">
+      <button onclick="closeShareModal()" class="absolute top-5 right-5 text-neutral-500 hover:text-white bg-phantom-800 p-2 rounded-lg border border-phantom-700"><span id="icon-close-modal" class="w-5 h-5"></span></button>
+      <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-inner" id="icon-share-success"></div>
+      <h3 class="text-2xl font-black text-white text-center mb-2">Payload Compressed</h3>
+      <p class="text-xs text-neutral-400 text-center mb-6 leading-relaxed">The payload is safely encrypted into the URL below. The security tier requirements are completely hidden from the public string.</p>
       
-      <div class="space-y-4">
-        <!-- Textarea guarantees the user can see/scroll the whole link, no ellipsis truncation -->
-        <div class="bg-phantom-950 border border-phantom-700 p-3 rounded-xl flex flex-col gap-3">
-          <textarea id="share-url-output" readonly class="bg-transparent text-[11px] text-emerald-400 font-mono w-full outline-none break-all h-20 resize-none select-all"></textarea>
-          <button onclick="copyShareUrl()" class="w-full py-2 bg-phantom-800 hover:bg-phantom-700 text-white rounded-lg text-xs font-bold transition-colors border border-phantom-600">Copy Full Link</button>
+      <div class="space-y-5">
+        <!-- Huge dedicated textarea for the massive URL so the user can see everything -->
+        <div class="bg-phantom-950 border border-phantom-800 p-4 rounded-2xl flex flex-col gap-4 shadow-inner">
+          <textarea id="share-url-output" readonly class="bg-transparent text-[11px] text-emerald-500 font-mono w-full outline-none break-all h-24 resize-none select-all"></textarea>
+          <button onclick="copyShareUrl()" class="w-full py-3 bg-phantom-800 hover:bg-phantom-700 text-white rounded-xl text-sm font-bold transition-colors border border-phantom-700 shadow-md flex items-center justify-center gap-2"><span id="icon-copy-url"></span> Copy Entire Link</button>
         </div>
-        <div id="decoy-pin-display-box" class="hidden p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-xl text-center">
-          <p class="text-[10px] text-yellow-400 font-bold uppercase tracking-wider mb-1">Tier 2 Protection Active</p>
-          <p class="text-lg font-mono text-white font-extrabold tracking-widest" id="share-pin-val">0000</p>
-          <p class="text-[9px] text-neutral-400 mt-1">Provide this PIN along with the link.</p>
+
+        <div id="decoy-pin-display-box" class="hidden p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl text-center shadow-inner">
+          <p class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-2">Tier 2 Protection Active</p>
+          <p class="text-2xl font-mono text-white font-black tracking-widest" id="share-pin-val">0000</p>
+          <p class="text-[10px] text-yellow-500/70 mt-2">Send this PIN separately.</p>
         </div>
       </div>
       
-      <div class="text-center mt-6">
-        <button onclick="closeShareModal(); switchTab('iam');" class="text-sm font-bold text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors">Open Access Manager</button>
+      <div class="text-center mt-8">
+        <button onclick="closeShareModal(); switchTab('iam');" class="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-widest border-b border-emerald-500/30 pb-1 transition-colors">Go to IAM Manager</button>
       </div>
     </div>
   </div>
+
   <script>
     // =====================================================================
-    // 1. HARDWARE MATRIX (Device ID Fingerprinting)
+    // 1. GLOBAL STRICT STATE & ICONS (Fixes "Not Defined" Bugs)
     // =====================================================================
-    let myHardwareID = "UNKNOWN";
-    async function generateHardwareMatrix() {
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.fillStyle = "#f60";
-        ctx.fillRect(125,1,62,20); ctx.fillStyle = "#069"; ctx.fillText("VaultMatrix", 2, 15);
-        const canvasHash = canvas.toDataURL();
-        const entropy = [
-          navigator.userAgent, screen.colorDepth, screen.width, screen.height,
-          new Date().getTimezoneOffset(), navigator.hardwareConcurrency, canvasHash
-        ].join('||');
-        const buffer = new TextEncoder().encode(entropy);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
-        
-        myHardwareID = id;
-        document.getElementById('viewer-device-id').innerText = id;
-        document.getElementById('creator-device-id').innerText = id;
-      } catch (e) {
-        myHardwareID = "E7B4C8D2"; // Safe fallback
-        document.getElementById('viewer-device-id').innerText = myHardwareID;
-        document.getElementById('creator-device-id').innerText = myHardwareID;
-      }
-    }
-    // =====================================================================
-    // 2. FAILSAFE COPY ENGINE
-    // =====================================================================
-    async function executeClipboardCopy(text) {
-      if (!text) return false;
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch (err) {
-        try {
-          const el = document.createElement('textarea');
-          el.value = text;
-          el.setAttribute('readonly', '');
-          el.style.position = 'absolute';
-          el.style.left = '-9999px';
-          document.body.appendChild(el);
-          el.select();
-          const success = document.execCommand('copy');
-          document.body.removeChild(el);
-          return success;
-        } catch (e) { return false; }
-      }
-    }
-    function copyDeviceID() {
-      executeClipboardCopy(myHardwareID).then(success => {
-        if(success) showToast("Hardware ID copied.", "success");
-      });
-    }
-    function copyShareUrl() {
-      const url = document.getElementById('share-url-output').value;
-      executeClipboardCopy(url).then(success => {
-        if (success) showToast("Secure Link copied successfully.", "success");
-        else showToast("Clipboard blocked. Select all text and copy manually.", "error");
-      });
-    }
-    function copyMintedAccessCode() {
-      const keyBuffer = document.getElementById('minted-code-output').value;
-      executeClipboardCopy(keyBuffer).then(success => {
-        if (success) showToast("Access Code copied perfectly (0 characters lost).", "success");
-        else showToast("Clipboard blocked. Select all text and copy manually.", "error");
-      });
-    }
-    // =====================================================================
-    // 3. ICONS & UI SETUP
-    // =====================================================================
+    window.PhantomState = {
+      images: [],
+      activeFile: null,
+      decryptedData: null,
+      urlPayloadHex: null,
+      hardwareID: "UNKNOWN",
+      bruteForceCount: 0
+    };
+
     const ICONS = {
       zap: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
       filePlus: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
@@ -496,8 +426,10 @@ Einstein's Equation: $$E = mc^2$$
       link: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
       iam: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
       copy: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
-      toc: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`
+      toc: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
+      skull: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>`
     };
+
     function renderIcons() {
       const mappings = {
         'icon-brand-main': 'zap', 'icon-tab-create': 'filePlus', 'icon-tab-unlock': 'unlock', 'icon-tab-iam': 'iam',
@@ -505,17 +437,80 @@ Einstein's Equation: $$E = mc^2$$
         'icon-doc-wm': 'printer', 'icon-btn-secure': 'shieldCheck', 'icon-upload-zone': 'uploadCloud',
         'icon-file-ready': 'fileKey', 'icon-unlock-key': 'key', 'icon-btn-unlock': 'unlock',
         'icon-success': 'check', 'icon-fs-download': 'download', 'icon-image-plus': 'imagePlus',
-        'icon-expand': 'expand', 'icon-fs-brand': 'zap', 'icon-fs-close': 'close', 'icon-trash': 'trash', 'icon-x': 'x', 
+        'icon-fs-brand': 'zap', 'icon-fs-close': 'close', 'icon-trash': 'trash', 'icon-x': 'x', 
         'icon-shield': 'shield', 'icon-shield-adv': 'shield', 'icon-shield-small': 'shield', 'icon-theme': 'theme', 
         'icon-print': 'print', 'icon-link-gen': 'link', 'icon-pdf-dl': 'download', 'icon-iam-header': 'iam',
         'icon-keyring': 'key', 'icon-mint': 'zap', 'icon-close-modal': 'x', 'icon-share-success': 'check',
-        'icon-copy': 'copy', 'icon-toc': 'toc', 'icon-lock-small': 'lock', 'icon-copy-key': 'copy'
+        'icon-copy': 'copy', 'icon-toc': 'toc', 'icon-lock-small': 'lock', 'icon-copy-key': 'copy',
+        'icon-copy-url': 'copy', 'icon-skull': 'skull', 'icon-check-small': 'check'
       };
       for (const [id, key] of Object.entries(mappings)) {
-        if(document.getElementById(id)) document.getElementById(id).innerHTML = ICONS[key];
+        const el = document.getElementById(id);
+        if(el) el.innerHTML = ICONS[key];
       }
       document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
     }
+
+    // =====================================================================
+    // 2. HARDWARE MATRIX (Device ID Fingerprinting)
+    // =====================================================================
+    async function generateHardwareMatrix() {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.fillStyle = "#f60";
+        ctx.fillRect(125,1,62,20); ctx.fillStyle = "#069"; ctx.fillText("VaultMatrix", 2, 15);
+        const canvasHash = canvas.toDataURL();
+        const entropy = [navigator.userAgent, screen.colorDepth, screen.width, screen.height, new Date().getTimezoneOffset(), navigator.hardwareConcurrency, canvasHash].join('||');
+        const buffer = new TextEncoder().encode(entropy);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
+        window.PhantomState.hardwareID = id;
+      } catch (e) {
+        window.PhantomState.hardwareID = "E7B4C8D2"; // Safe fallback
+      }
+      document.getElementById('viewer-device-id').innerText = window.PhantomState.hardwareID;
+      document.getElementById('creator-device-id').innerText = window.PhantomState.hardwareID;
+    }
+
+    // =====================================================================
+    // 3. FAILSAFE COPY ENGINE
+    // =====================================================================
+    async function executeClipboardCopy(text) {
+      if (!text) return false;
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        try {
+          const el = document.createElement('textarea');
+          el.value = text; el.setAttribute('readonly', ''); el.style.position = 'absolute'; el.style.left = '-9999px';
+          document.body.appendChild(el); el.select();
+          const success = document.execCommand('copy');
+          document.body.removeChild(el); return success;
+        } catch (e) { return false; }
+      }
+    }
+
+    function copyDeviceID() {
+      executeClipboardCopy(window.PhantomState.hardwareID).then(success => { if(success) showToast("Hardware ID copied.", "success"); });
+    }
+    function copyShareUrl() {
+      const url = document.getElementById('share-url-output').value;
+      executeClipboardCopy(url).then(success => {
+        if (success) showToast("Secure Link copied completely.", "success");
+        else showToast("Clipboard blocked. Select all text manually.", "error");
+      });
+    }
+    function copyMintedAccessCode() {
+      const keyBuffer = document.getElementById('minted-code-output').value;
+      executeClipboardCopy(keyBuffer).then(success => {
+        if (success) showToast("Access Code copied perfectly (0 characters lost).", "success");
+        else showToast("Clipboard blocked. Select all text manually.", "error");
+      });
+    }
+
     // =====================================================================
     // 4. UI TAB & VISIBILITY LOGIC
     // =====================================================================
@@ -528,24 +523,26 @@ Einstein's Equation: $$E = mc^2$$
       tabs.forEach(t => {
         const btn = document.getElementById(`btn-tab-${t}`);
         if(t === tabId) {
-          if(t==='iam') btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-emerald-400 shadow-sm whitespace-nowrap";
-          else btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-white shadow-sm whitespace-nowrap";
+          if(t==='iam') btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-emerald-400 shadow-sm whitespace-nowrap";
+          else btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-white shadow-sm whitespace-nowrap";
         } else {
-          if(t==='iam') btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-400/60 hover:text-emerald-300 hover:bg-phantom-800 whitespace-nowrap";
-          else btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap";
+          if(t==='iam') btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-500 hover:text-emerald-400 hover:bg-phantom-800 whitespace-nowrap";
+          else btn.className = "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap";
         }
       });
       if(tabId === 'iam') renderKeyring();
     }
+
     function togglePasswordVisibility(inputId, btn) {
       const inp = document.getElementById(inputId);
       inp.type = inp.type === 'password' ? 'text' : 'password';
       btn.innerHTML = inp.type === 'password' ? `<span class="btn-eye-icon">${ICONS.eye}</span>` : `<span class="btn-eye-icon">${ICONS.eyeOff}</span>`;
     }
+
     function showToast(message, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      let bg = type === 'error' ? 'bg-red-950/90 border-red-500/30 text-red-200' : (type === 'warning' ? 'bg-yellow-950/90 border-yellow-500/30 text-yellow-300' : 'bg-phantom-800 border-phantom-600 text-emerald-300');
+      let bg = type === 'error' ? 'bg-red-950/90 border-red-500/50 text-red-200' : (type === 'warning' ? 'bg-yellow-950/90 border-yellow-500/50 text-yellow-300' : 'bg-phantom-800 border-emerald-500/50 text-emerald-300');
       let icon = type === 'error' ? ICONS.alert : (type === 'warning' ? ICONS.alert : ICONS.check);
       toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 max-w-[340px] z-[100]`;
       toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-sm font-bold leading-relaxed tracking-wide">${message}</p></div>`;
@@ -553,29 +550,43 @@ Einstein's Equation: $$E = mc^2$$
       setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
       setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
     }
+
     function toggleSecurityTierPanel() {
       const tier = document.getElementById('share-security-tier').value;
       const pinBox = document.getElementById('tier-2-pin-box');
       if (tier === "2") pinBox.classList.remove('hidden');
       else pinBox.classList.add('hidden');
     }
-    let currentThemeIndex = 0;
-    const themes = ['theme-dark', 'theme-sepia', 'theme-light'];
+
+    let currentThemeIndex = 0; const themes = ['theme-dark', 'theme-sepia', 'theme-light'];
     function cycleTheme() {
       const container = document.getElementById('theme-container');
       container.classList.remove(themes[currentThemeIndex]);
       currentThemeIndex = (currentThemeIndex + 1) % themes.length;
       container.classList.add(themes[currentThemeIndex]);
     }
+
     function triggerAutoSave() {
       const text = document.getElementById('doc-content').value;
-      localStorage.setItem('pv_draft_v3', text);
+      localStorage.setItem('pv_draft_omega', text);
       const status = document.getElementById('save-status');
-      status.style.opacity = '1';
-      clearTimeout(window.saveTimer);
+      status.style.opacity = '1'; clearTimeout(window.saveTimer);
       window.saveTimer = setTimeout(() => status.style.opacity = '0', 2000);
     }
-    function loadDraft() { const saved = localStorage.getItem('pv_draft_v3'); if(saved) document.getElementById('doc-content').value = saved; }
+    
+    function loadDraft() { 
+      const saved = localStorage.getItem('pv_draft_omega'); 
+      if(saved) document.getElementById('doc-content').value = saved; 
+    }
+
+    function updateMetrics() {
+      const txt = document.getElementById('doc-content').value || "";
+      let bytes = new TextEncoder().encode(txt).length;
+      window.PhantomState.images.forEach(img => { bytes += Math.round((img.dataURL.length * 3) / 4); });
+      let kb = (bytes / 1024).toFixed(2);
+      document.getElementById('metrics-counter').innerText = `${kb} KB PAYLOAD`;
+    }
+
     function handleClipboardTheft(e) {
       e.preventDefault();
       const warning = "PHANTOM VAULT ANTI-COPY PROTOCOL: Unauthorized clipboard duplication prevented.";
@@ -583,6 +594,14 @@ Einstein's Equation: $$E = mc^2$$
       else window.clipboardData.setData('Text', warning);
       showToast("Clipboard theft intercepted.", "error");
     }
+
+    function executePanicProtocol() {
+      document.getElementById('panic-overlay').style.display = 'flex';
+      window.PhantomState = {}; // Wipe RAM
+      document.body.innerHTML = ''; // Wipe DOM
+      window.location.replace('https://en.wikipedia.org/wiki/Special:Random'); // Divert
+    }
+
     // =====================================================================
     // 5. PARSERS & RENDERING (MARKDOWN, MATH, TOC)
     // =====================================================================
@@ -607,6 +626,7 @@ Einstein's Equation: $$E = mc^2$$
       }
       return blocks;
     }
+
     function buildViewerHTML(text, images) {
       let html = '';
       if (typeof marked !== 'undefined' && marked.parse) html = marked.parse(text || "");
@@ -624,12 +644,13 @@ Einstein's Equation: $$E = mc^2$$
         }
       }
       if (images && images.length > 0) {
-        html += `<div class="mt-8 pt-8 border-t border-neutral-300">`;
+        html += `<div class="mt-8 pt-8 border-t border-phantom-700">`;
         for(let img of images) html += `<img src="${img.dataURL}" alt="Secure Media" />`;
         html += `</div>`;
       }
       return html;
     }
+
     function applyMathFormatting(elementId) {
       const el = document.getElementById(elementId);
       if (typeof renderMathInElement !== 'undefined') {
@@ -637,13 +658,16 @@ Einstein's Equation: $$E = mc^2$$
         catch (e) {}
       }
     }
+
     function escapeHTML(str) { return (str || "").replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])); }
+
     function generateTOC() {
       const contentDiv = document.getElementById('fs-content');
       const tocContainer = document.getElementById('toc-container');
       tocContainer.innerHTML = '';
       const headers = contentDiv.querySelectorAll('h1, h2, h3');
       if(headers.length === 0) { tocContainer.innerHTML = '<p class="text-neutral-500 text-xs italic">No index items.</p>'; return; }
+
       headers.forEach((h, i) => {
         h.id = 'heading-' + i;
         const link = document.createElement('a');
@@ -654,12 +678,65 @@ Einstein's Equation: $$E = mc^2$$
         tocContainer.appendChild(link);
       });
     }
+
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) return showToast('Image too large (Max 5MB).', 'error');
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width, height = img.height;
+          const MAX_W = 800;
+          if (width > MAX_W) { height = Math.round(height * (MAX_W / width)); width = MAX_W; }
+          canvas.width = width; canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,width,height);
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const dataURL = canvas.toDataURL('image/jpeg', 0.8); 
+          const id = 'img_' + Date.now();
+          window.PhantomState.images.push({ id, dataURL, w: width, h: height });
+          renderImageStrip();
+          updateMetrics();
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+      e.target.value = '';
+    }
+
+    function removeImage(id) {
+      window.PhantomState.images = window.PhantomState.images.filter(img => img.id !== id);
+      renderImageStrip();
+      updateMetrics();
+    }
+
+    function renderImageStrip() {
+      const container = document.getElementById('image-preview-container');
+      if (window.PhantomState.images.length === 0) { container.classList.add('hidden'); return; }
+      container.classList.remove('hidden');
+      container.innerHTML = window.PhantomState.images.map(img => `
+        <div class="relative w-20 h-20 shrink-0 rounded-lg overflow-hidden border border-phantom-700 group">
+          <img src="${img.dataURL}" class="w-full h-full object-cover" />
+          <button onclick="removeImage('${img.id}')" class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-red-400 hover:text-red-300">
+            ${ICONS.trash}
+          </button>
+        </div>
+      `).join('');
+    }
+
     // =====================================================================
     // 6. CRYPTO ENGINE (Byte-Exact, Universal Master)
     // =====================================================================
-    const DEFAULT_CIPHER_KEY = "PHTM_V9_ZENITH";
+    const DEFAULT_CIPHER_KEY = "PHTM_V10_OMEGA";
+
     function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
     function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
+
     async function internalEncrypt(jsonString, password) {
       const enc = new TextEncoder();
       const payloadBytes = enc.encode(jsonString);
@@ -684,10 +761,12 @@ Einstein's Equation: $$E = mc^2$$
       for(let i=0; i<payloadBytes.length; i++) finalBytes[i+1] = payloadBytes[i] ^ keyBytes[i % keyBytes.length];
       return bytesToHex(finalBytes);
     }
+
     async function internalDecrypt(hex, password) {
       const bytes = hexToBytes(hex);
       const type = bytes[0];
       const encryptionPass = password || DEFAULT_CIPHER_KEY;
+
       if (type === 1) {
         const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
         const enc = new TextEncoder();
@@ -705,6 +784,7 @@ Einstein's Equation: $$E = mc^2$$
       }
       throw new Error("Payload corrupt.");
     }
+
     async function compressToURL(hexStr) {
       if(!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); 
       try {
@@ -713,6 +793,7 @@ Einstein's Equation: $$E = mc^2$$
         return btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
       } catch(e) { return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
     }
+
     async function decompressFromURL(b64) {
       b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
       if(!window.DecompressionStream) return atob(b64); 
@@ -722,21 +803,24 @@ Einstein's Equation: $$E = mc^2$$
         return await new Response(stream).text();
       } catch(e) { return atob(b64); }
     }
+
     async function generateAccessCode(vaultKey, viewerHardwareId) { return await internalEncrypt(vaultKey, viewerHardwareId); }
     async function resolveAccessCode(accessCode) {
-      try { return await internalDecrypt(accessCode, myHardwareID); } 
+      try { return await internalDecrypt(accessCode, window.PhantomState.hardwareID); } 
       catch(e) { throw new Error("Matrix mismatch."); }
     }
+
     // =====================================================================
-    // 7. KEYRING & IAM (Zero Server)
+    // 7. LOCAL AUTHORITY KEYRING
     // =====================================================================
     function saveToKeyring(docId, title, vaultKey, tier, pinVal) {
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring') || '[]');
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
       ring.push({ id: docId, title, key: vaultKey, tier, pin: pinVal, date: new Date().toLocaleDateString() });
-      localStorage.setItem('pv_iam_keyring', JSON.stringify(ring));
+      localStorage.setItem('pv_iam_keyring_omega', JSON.stringify(ring));
     }
+
     function renderKeyring() {
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring') || '[]');
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
       document.getElementById('keyring-count').innerText = `${ring.length} Keys`;
       const list = document.getElementById('keyring-list');
       if(ring.length === 0) { list.innerHTML = '<div class="text-center p-8 text-neutral-500 text-sm">Keyring empty.</div>'; return; }
@@ -744,7 +828,7 @@ Einstein's Equation: $$E = mc^2$$
       list.innerHTML = ring.reverse().map(doc => {
         let tierLabel = doc.tier === "1" ? "Tier 1: Low" : doc.tier === "2" ? `Tier 2: PIN [${doc.pin}]` : "Tier 3: Device-Locked";
         return `
-          <div class="p-4 bg-phantom-950 border border-phantom-700 rounded-xl hover:border-emerald-500/50 cursor-pointer transition-all" onclick="selectDocForIAM('${doc.id}', '${doc.tier}')">
+          <div class="p-4 bg-phantom-950 border border-phantom-800 rounded-xl hover:border-emerald-500/50 cursor-pointer transition-all shadow-inner" onclick="selectDocForIAM('${doc.id}', '${doc.tier}')">
             <div class="flex justify-between items-start mb-1">
               <h4 class="text-sm font-bold text-white truncate pr-2">${doc.title}</h4>
               <span class="text-[9px] text-neutral-500 font-mono">${doc.date}</span>
@@ -757,6 +841,7 @@ Einstein's Equation: $$E = mc^2$$
         `;
       }).join('');
     }
+
     function selectDocForIAM(id, tier) {
       if (tier !== "3") {
         showToast("Link does not require a Hardware Access Code (Tier 1 or 2).", "info");
@@ -764,15 +849,18 @@ Einstein's Equation: $$E = mc^2$$
       }
       document.getElementById('iam-doc-id').value = id;
       document.getElementById('iam-viewer-id').focus();
-      showToast("Document key loaded. Input the Viewer Matrix ID.", "success");
+      showToast("Document selected. Input the Viewer Matrix ID.", "success");
     }
+
     async function mintAccessCode() {
       const docId = document.getElementById('iam-doc-id').value;
       const viewerId = document.getElementById('iam-viewer-id').value.toUpperCase().trim();
       if(!docId || !viewerId) return showToast("Select document and enter Viewer ID.", "error");
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring') || '[]');
+
+      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_omega') || '[]');
       const doc = ring.find(d => d.id === docId);
       if(!doc) return showToast("Key missing from local ring.", "error");
+
       try {
         const accessCode = await generateAccessCode(doc.key, viewerId);
         document.getElementById('minted-code-output').value = accessCode;
@@ -780,49 +868,69 @@ Einstein's Equation: $$E = mc^2$$
         showToast("Hardware bound Access Code generated.", "success");
       } catch(e) { showToast("Code compilation failed.", "error"); }
     }
+
     // =====================================================================
-    // 8. PDF ENGINE
+    // 8. ERRORLESS FAILSAFE PDF ENGINE (Fixes Blank Pages & Overflows)
     // =====================================================================
-    class AdvancedPDFEngine {
-      constructor() { this.chunks=[]; this.objects=[]; this.byteLength=0; this.encoder=new TextEncoder(); this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"); }
-      append(str) { const bytes = this.encoder.encode(str); this.chunks.push(bytes); const offset = this.byteLength; this.byteLength += bytes.length; return offset; }
-      addObj(contentStr) { const id = this.objects.length + 1; this.objects.push(this.byteLength); this.append(`${id} 0 obj\n${contentStr}\nendobj\n`); return id; }
-      buildFormatted(rawText, watermark, combinedHexPayload) {
-        const catalogId = 1, pagesId = 2, fontRegId = 3, fontBoldId = 4;
-        let pagesData = []; let currentPage = { stream: `BT\n50 750 Td\n`, y: 750 };
-        const nextLine = (pts) => { currentPage.y-=pts; if(currentPage.y<50){ currentPage.stream+=`ET\n`; pagesData.push(currentPage); currentPage={stream:`BT\n50 750 Td\n`, y:750}; } else currentPage.stream+=`0 -${pts} Td\n`; };
-        const escapePdfStr = (str) => (str||"").replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^ -~]/g,'?');
+    class FailsafePDF {
+      constructor() {
+        this.buffer = new Uint8Array(0);
+        this.objects = [];
+        this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n");
+      }
+      append(str) {
+        let bytes = new TextEncoder().encode(str);
+        let newBuf = new Uint8Array(this.buffer.length + bytes.length);
+        newBuf.set(this.buffer); newBuf.set(bytes, this.buffer.length);
+        this.buffer = newBuf;
+      }
+      addObj(str) {
+        let id = this.objects.length + 1;
+        this.objects.push(this.buffer.length);
+        this.append(`${id} 0 obj\n${str}\nendobj\n`);
+        return id;
+      }
+      build(textLines, payloadHex) {
+        let cat = 1, pgs = 2, font = 3;
+        let kids = [];
+        let pages = [];
+        let linesPerPage = 35;
         
-        const blocks = failsafeParseToBlocks(rawText);
-        for(let block of blocks) {
-          if(block.type==='h1'){ currentPage.stream+=`/F2 24 Tf\n`; nextLine(30); currentPage.stream+=`(${escapePdfStr(block.text)}) Tj\n`; nextLine(10); }
-          else if(block.type==='h2'){ currentPage.stream+=`/F2 18 Tf\n`; nextLine(24); currentPage.stream+=`(${escapePdfStr(block.text)}) Tj\n`; nextLine(8); }
-          else if(block.type==='space'){ nextLine(14); }
-          else if(block.type==='p'){
-            nextLine(18); let cLen=0; 
-            for(let seg of block.segments){
-              currentPage.stream+=seg.b?`/F2 12 Tf\n`:`/F1 12 Tf\n`;
-              for(let w of seg.t.split(' ')){ if(cLen+w.length>90){ nextLine(16); cLen=0; } currentPage.stream+=`(${escapePdfStr(w+' ')}) Tj\n`; cLen+=w.length+1; }
-            }
-          }
-        }
-        currentPage.stream+=`ET\n`; pagesData.push(currentPage);
-        if(watermark){ let esc=escapePdfStr(watermark); for(let p of pagesData) p.stream+=`q 0.8 0 0 rg 0.15 gs\nBT /F2 64 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${esc}) Tj ET Q\n`; }
-        let kidsArray=[]; let currObjId=5; for(let i=0;i<pagesData.length;i++){ kidsArray.push(`${currObjId+1} 0 R`); currObjId += 2; }
-        this.addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`); this.addObj(`<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pagesData.length} >>`);
-        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`); this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
-        for(let p of pagesData){ const sId=this.addObj(`<< /Length ${p.stream.length} >>\nstream\n${p.stream}\nendstream`); this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontRegId} 0 R /F2 ${fontBoldId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${sId} 0 R >>`); }
-        
-        let infoStr = `<< /Producer (PhantomVault Zenith) `;
-        if(combinedHexPayload) infoStr += `/PhantomPayload <${combinedHexPayload}> `;
+        for(let i=0; i<textLines.length; i+=linesPerPage) pages.push(textLines.slice(i, i+linesPerPage));
+        if(pages.length === 0) pages.push([""]);
+
+        let currentObjId = 3;
+        pages.forEach(() => { kids.push(`${currentObjId+1} 0 R`); currentObjId += 2; });
+
+        this.addObj(`<< /Type /Catalog /Pages ${pgs} 0 R >>`);
+        this.addObj(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${pages.length} >>`);
+        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`);
+
+        pages.forEach(pageLines => {
+          let streamData = "BT /F1 12 Tf 50 750 Td 18 TL\n";
+          pageLines.forEach(line => {
+            let esc = (line||"").replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)').replace(/[^ -~]/g, '?');
+            streamData += `(${esc}) Tj T*\n`;
+          });
+          streamData += "ET\n";
+          let sId = this.addObj(`<< /Length ${streamData.length} >>\nstream\n${streamData}\nendstream`);
+          this.addObj(`<< /Type /Page /Parent ${pgs} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${sId} 0 R >>`);
+        });
+
+        let infoStr = `<< /Producer (PhantomVault OMEGA) `;
+        if (payloadHex) infoStr += `/PhantomPayload <${payloadHex}> `;
         infoStr += `>>`;
-        this.addObj(infoStr);
-        const xrefOffset=this.byteLength; this.append(`xref\n0 ${this.objects.length+1}\n0000000000 65535 f \n`);
-        for(let off of this.objects) this.append(String(off).padStart(10,'0')+" 00000 n \n");
-        this.append(`trailer\n<< /Size ${this.objects.length+1} /Root ${catalogId} 0 R /Info ${this.objects.length} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
-        const fBuf=new Uint8Array(this.byteLength); let off=0; for(let c of this.chunks){ fBuf.set(c,off); off+=c.length; } return fBuf;
+        let infoId = this.addObj(infoStr);
+
+        let xrefOffset = this.buffer.length;
+        this.append(`xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n`);
+        this.objects.forEach(off => { this.append(String(off).padStart(10, '0') + " 00000 n \n"); });
+        this.append(`trailer\n<< /Size ${this.objects.length + 1} /Root ${cat} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+
+        return this.buffer;
       }
     }
+
     // =====================================================================
     // 9. ENCRYPT & DECRYPT FLOWS
     // =====================================================================
@@ -832,25 +940,33 @@ Einstein's Equation: $$E = mc^2$$
       const watermarkText = document.getElementById('doc-watermark').value;
       let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
       if (!filename.endsWith('.pdf')) filename += '.pdf';
+
       const tier = document.getElementById('share-security-tier').value;
       const pinVal = document.getElementById('doc-pin').value.trim();
-      if (!content.trim() && uploadedImages.length === 0) return showToast('Add elements to secure.', 'error');
-      if (!password && mode === 'pdf') password = "PHANTOM_DEFAULT"; // Lazy default
+
+      if (!content.trim() && window.PhantomState.images.length === 0) return showToast('Add elements to secure.', 'error');
+      if (!password && mode === 'pdf') password = "PHANTOM_DEFAULT"; 
       if (tier === "2" && (!pinVal || pinVal.length !== 4)) return showToast('Secondary PIN must be 4 digits.', 'error');
+
       const btnId = mode === 'pdf' ? 'btn-lock-pdf' : 'btn-lock-link';
       const btn = document.getElementById(btnId);
       const originalHtml = btn.innerHTML;
       btn.disabled = true; btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+
       const expiryInput = document.getElementById('doc-expiry').value;
       const expiryTS = expiryInput && document.getElementById('enable-expiry').checked ? new Date(expiryInput).getTime() : null;
+
       try {
         if(mode === 'link' && !password) {
           const rand = window.crypto.getRandomValues(new Uint8Array(16));
           password = Array.from(rand).map(b => b.toString(16).padStart(2, '0')).join('');
         }
-        const payloadMain = { rawText: content, watermarkText, images: uploadedImages, expiry: expiryTS, tier: tier };
+
+        const payloadMain = { rawText: content, watermarkText, images: window.PhantomState.images, expiry: expiryTS, tier: tier };
         if (tier === "2") payloadMain.pinHash = bytesToHex(new TextEncoder().encode(pinVal));
+
         const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
+
         if (mode === 'pdf') {
           let combinedHex = hexMain;
           if(document.getElementById('enable-decoy').checked) {
@@ -861,9 +977,13 @@ Einstein's Equation: $$E = mc^2$$
             const hexDecoy = await internalEncrypt(JSON.stringify(payloadDecoy), decoyPass);
             combinedHex = hexMain + "FFFFAAAA" + hexDecoy; 
           }
-          const pdfEngine = new AdvancedPDFEngine();
-          const decoyStr = "CONFIDENTIAL VAULT SECURED\n\nIf you are reading this in a standard viewer, access is DENIED.\nThis multimedia structure is cryptographically obfuscated.\nUse PhantomPDF Vault to decrypt the exact byte matrix.\n\n" + Math.random().toString(16).substring(2).repeat(30).toUpperCase();
-          const pdfBytes = pdfEngine.buildFormatted(decoyStr, watermarkText, combinedHex);
+
+          const pdfEngine = new FailsafePDF();
+          let decoyLines = ["CONFIDENTIAL VAULT SECURED", "", "If you are reading this in a standard viewer, access is DENIED.", "Use PhantomPDF Vault to decrypt the exact byte matrix.", ""];
+          for(let i=0; i<20; i++) decoyLines.push(Math.random().toString(16).substring(2).repeat(6).toUpperCase());
+          
+          const pdfBytes = pdfEngine.build(decoyLines, combinedHex);
+
           const blob = new Blob([pdfBytes], { type: 'application/pdf' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a'); a.href = url; a.download = filename;
@@ -871,9 +991,11 @@ Einstein's Equation: $$E = mc^2$$
           showToast('Secure PDF Built!', 'success');
         
         } else if (mode === 'link') {
+          if (hexMain.length > 30000) {
+             throw new Error("Payload too massive for URL compression. Please export as PDF instead.");
+          }
           const compressed64 = await compressToURL(hexMain);
-          // HIDING TIER: URL only contains `#v=`. Security is blind.
-          const shareUrl = window.location.origin + window.location.pathname + '#v=' + compressed64;
+          const shareUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
           
           const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
           saveToKeyring(docId, filename, password, tier, pinVal);
@@ -882,18 +1004,19 @@ Einstein's Equation: $$E = mc^2$$
           const pinDisplay = document.getElementById('decoy-pin-display-box');
           if (tier === "2") { document.getElementById('share-pin-val').innerText = pinVal; pinDisplay.classList.remove('hidden'); }
           else { pinDisplay.classList.add('hidden'); }
+
           document.getElementById('share-modal').classList.remove('hidden');
           setTimeout(() => document.getElementById('share-modal').classList.remove('opacity-0'), 10);
         }
       } catch (err) { console.error(err); showToast(err.message || 'Encryption failed.', 'error'); }
       finally { btn.disabled = false; btn.innerHTML = originalHtml; }
     }
+
     function closeShareModal() {
       document.getElementById('share-modal').classList.add('opacity-0');
       setTimeout(() => document.getElementById('share-modal').classList.add('hidden'), 300);
     }
-    let urlPayloadHex = null;
-    let bruteForceCount = 0;
+
     function triggerFileInput() { document.getElementById('pdf-file-input').click(); }
     function handleFileSelect(event) { event.target.files[0] && processFileEntity(event.target.files[0]); }
     function setupDragAndDrop() {
@@ -902,42 +1025,71 @@ Einstein's Equation: $$E = mc^2$$
       ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
       dropZone.addEventListener('drop', e => { e.preventDefault(); e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]); }, false);
     }
+
     function processFileEntity(file) {
       if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) return showToast('Invalid file format.', 'error');
-      activeFile = file; urlPayloadHex = null;
+      window.PhantomState.activeFile = file; 
+      window.PhantomState.urlPayloadHex = null;
       document.getElementById('target-file-name').innerText = file.name;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const match = text.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
+        if (match) {
+          try {
+            const rawHex = match[1];
+            const firstChunk = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA")[0] : rawHex;
+            document.getElementById('unlock-instruction').innerText = "Encrypted Document. Enter Password.";
+            document.getElementById('unlock-instruction').classList.remove('hidden');
+            document.getElementById('unlock-pin-box').classList.add('hidden');
+          } catch(err) {}
+        }
+      };
+      reader.readAsText(file.slice(0, 5000));
+
       document.getElementById('unlock-stage-upload').classList.add('hidden');
       document.getElementById('unlock-stage-process').classList.remove('hidden');
     }
+
     function resetUnlockModule() {
-      activeFile = null; decryptedPayloadData = null; urlPayloadHex = null;
+      window.PhantomState.activeFile = null; 
+      window.PhantomState.decryptedData = null; 
+      window.PhantomState.urlPayloadHex = null;
       document.getElementById('unlock-password').value = ""; document.getElementById('unlock-pin').value = "";
       document.getElementById('unlock-pin-box').classList.add('hidden');
-      document.getElementById('unlock-stage-process').classList.add('hidden'); document.getElementById('unlock-stage-viewer').classList.add('hidden');
-      document.getElementById('unlock-stage-upload').classList.remove('hidden'); toggleFullscreenViewer(false);
+      document.getElementById('unlock-instruction').classList.add('hidden');
+      document.getElementById('unlock-stage-process').classList.add('hidden'); 
+      document.getElementById('unlock-stage-viewer').classList.add('hidden');
+      document.getElementById('unlock-stage-upload').classList.remove('hidden'); 
+      toggleFullscreenViewer(false);
       document.getElementById('fs-content').innerHTML = ''; document.getElementById('inspector-content').innerHTML = '';
-      if(window.location.hash.includes('#v=')) window.history.replaceState(null, null, ' ');
+      if(window.location.hash.includes('&v=')) window.history.replaceState(null, null, ' ');
     }
+
     async function handleDecrypt() {
       const decryptBtn = document.getElementById('btn-trigger-decrypt');
       const passInput = document.getElementById('unlock-password').value.trim();
       if(!passInput) return showToast("Master key or Access Code required.", "error");
+
       decryptBtn.disabled = true; decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+
       try {
         let rawHex = null; let isDecoy = false;
         
-        if (urlPayloadHex) rawHex = urlPayloadHex;
-        else if (activeFile) {
-          const textData = await activeFile.text(); 
+        if (window.PhantomState.urlPayloadHex) rawHex = window.PhantomState.urlPayloadHex;
+        else if (window.PhantomState.activeFile) {
+          const textData = await window.PhantomState.activeFile.text(); 
           const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
           if (!match) throw new Error("File missing Phantom Cryptographic Payload.");
           rawHex = match[1];
         } else throw new Error("No payload loaded.");
+
         let payloads = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA") : [rawHex];
         
-        // Intelligent Universal Keys: Try input as Master Key, THEN try input as Access Code
         let candidates = [passInput];
         try { const resolved = await resolveAccessCode(passInput); if(resolved) candidates.push(resolved); } catch(e) {}
+
         let decryptedJsonStr = null;
         for (let key of candidates) {
           try { decryptedJsonStr = await internalDecrypt(payloads[0], key); break; } catch(e) {}
@@ -945,88 +1097,116 @@ Einstein's Equation: $$E = mc^2$$
             try { decryptedJsonStr = await internalDecrypt(payloads[1], key); isDecoy = true; break; } catch(e) {}
           }
         }
+
         if(!decryptedJsonStr) throw new Error("Invalid Vault Key.");
-        decryptedPayloadData = JSON.parse(decryptedJsonStr);
+        window.PhantomState.decryptedData = JSON.parse(decryptedJsonStr);
+        const data = window.PhantomState.decryptedData;
+
         // Security Tier 2 Check (PIN)
-        if (decryptedPayloadData.tier === "2" && !isDecoy) {
+        if (data.tier === "2" && !isDecoy) {
           const pinInput = document.getElementById('unlock-pin').value.trim();
           if(!pinInput) {
             document.getElementById('unlock-pin-box').classList.remove('hidden');
             throw new Error("Tier-2 Lock Detected. Enter 4-Digit PIN.");
           }
-          // Dead-Man Switch (Burn PIN)
           if(pinInput === "0000") {
              resetUnlockModule();
              document.body.innerHTML = "<div style='height:100vh; display:flex; align-items:center; justify-content:center; background:red; color:white; font-family:monospace; font-weight:bold; font-size:2rem;'>DATA CORRUPTED / DESTROYED</div>";
              return;
           }
-          if (bytesToHex(new TextEncoder().encode(pinInput)) !== decryptedPayloadData.pinHash) {
-            throw new Error("Incorrect 2FA PIN.");
-          }
+          if (bytesToHex(new TextEncoder().encode(pinInput)) !== data.pinHash) throw new Error("Incorrect 2FA PIN.");
         }
-        if(decryptedPayloadData.expiry && Date.now() > decryptedPayloadData.expiry) {
+
+        if(data.expiry && Date.now() > data.expiry) {
           resetUnlockModule(); throw new Error("SECURITY FAILURE: Exploded payload expired.");
         }
-        document.getElementById('viewing-file-name').innerText = (activeFile ? activeFile.name : "Secure Link Payload") + (isDecoy ? " (Decoy)" : "");
-        document.getElementById('fs-filename').innerText = activeFile ? activeFile.name : "SecureURL.phtm";
+
+        const viewName = (window.PhantomState.activeFile ? window.PhantomState.activeFile.name : "Secure Link Payload") + (isDecoy ? " (Decoy)" : "");
+        document.getElementById('fs-filename').innerText = viewName;
         
-        const htmlContent = buildViewerHTML(decryptedPayloadData.rawText, decryptedPayloadData.images);
+        const htmlContent = buildViewerHTML(data.rawText, data.images);
         document.getElementById('inspector-content').innerHTML = htmlContent;
         document.getElementById('fs-content').innerHTML = htmlContent;
         
         applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
+
         const wmFS = document.getElementById('fs-watermark');
-        if (decryptedPayloadData.watermarkText) { document.getElementById('fs-watermark-text').innerText = decryptedPayloadData.watermarkText; wmFS.classList.remove('hidden'); } 
+        if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
         else wmFS.classList.add('hidden');
+
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
+        window.PhantomState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
         showToast(isDecoy ? 'Decoy Vault Layer active.' : 'Main Vault Decrypted.', 'success');
+
       } catch (err) {
         if(err.message.includes("Tier-2")) { showToast(err.message, 'warning'); } 
         else {
-          bruteForceCount++;
+          window.PhantomState.bruteForceCount++;
           const warn = document.getElementById('brute-force-warn'); warn.classList.remove('hidden');
-          document.getElementById('bf-count').innerText = 3 - bruteForceCount;
-          if(bruteForceCount >= 3) {
-            urlPayloadHex = null; activeFile = null;
+          document.getElementById('bf-count').innerText = 3 - window.PhantomState.bruteForceCount;
+          if(window.PhantomState.bruteForceCount >= 3) {
+            resetUnlockModule();
             showToast("SECURITY BRUTE OUT-TRIGGER. Lockout in progress.", "error");
             setTimeout(() => location.reload(), 2000);
           } else showToast(err.message, 'error');
         }
       } finally { decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Penetrate Vault`; }
     }
-    function printPayload() {
-      if(!decryptedPayloadData) return;
-      const printWindow = window.open('', '_blank'); const cssLink = document.getElementById('katex-css').href;
-      printWindow.document.write(`<html><head><title>Secure Print</title><link rel="stylesheet" href="${cssLink}"><style>body{font-family:Georgia,serif;line-height:1.6;color:#000;max-width:800px;margin:0 auto;padding:2rem;}h1,h2,h3{border-bottom:1px solid #ccc;padding-bottom:0.5rem;}img{max-width:100%;}table{width:100%;border-collapse:collapse;}th,td{border:1px solid #ccc;padding:8px;}pre,code{font-family:monospace;background:#f4f4f4;padding:2px 4px;}@media print{button{display:none;}}</style></head><body onload="window.print(); window.close();">${document.getElementById('fs-content').innerHTML}</body></html>`);
-      printWindow.document.close();
-    }
+
     function handleExportCleanPDF() {
-      if (!decryptedPayloadData) return;
+      if (!window.PhantomState.decryptedData) return;
       try {
-        const pdfEngine = new AdvancedPDFEngine();
-        const pdfBytes = pdfEngine.buildFormatted(decryptedPayloadData.rawText || "", decryptedPayloadData.watermarkText, null);
+        const pdfEngine = new FailsafePDF();
+        
+        // Simple lines wrapper for exact-byte clean PDF export
+        const lines = [];
+        window.PhantomState.decryptedData.rawText.split('\n').forEach(paragraph => {
+          if (paragraph.length === 0) return lines.push("");
+          let currentLine = "";
+          paragraph.split(' ').forEach(word => {
+            if ((currentLine + word).length > 85) { lines.push(currentLine.trim()); currentLine = word + " "; } 
+            else currentLine += word + " ";
+          });
+          if (currentLine.trim()) lines.push(currentLine.trim());
+        });
+
+        const pdfBytes = pdfEngine.build(lines, null);
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
-        const link = document.createElement('a'); link.href = url; link.download = `Clean_${activeFile?activeFile.name:'Export'}.pdf`;
+        const link = document.createElement('a'); link.href = url; 
+        link.download = `Clean_${window.PhantomState.activeFile?window.PhantomState.activeFile.name:'Export'}.pdf`;
         document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
-        showToast('Clean PDF exported.', 'success');
-      } catch (err) { showToast('PDF Export failed.', 'error'); }
+        showToast('Clean PDF exported securely.', 'success');
+      } catch (err) { showToast('PDF Export failed.', 'error'); console.error(err); }
     }
+
     window.onload = async () => { 
       renderIcons(); loadDraft(); setupDragAndDrop();
       await generateHardwareMatrix();
       
-      // Auto-load Dynamic Sharing links
-      if(window.location.hash.startsWith('#v=')) {
+      if(window.location.hash.includes('&v=')) {
         switchTab('unlock');
-        const compressed = window.location.hash.substring(3);
-        document.getElementById('target-file-name').innerText = "Encrypted URL Cargo";
+        
+        const params = new URLSearchParams(window.location.hash.substring(1));
+        const tier = params.get('t');
+        const compressed = params.get('v');
+
+        document.getElementById('target-file-name').innerText = "Decentralized URL Cargo Link";
         document.getElementById('unlock-stage-upload').classList.add('hidden');
         document.getElementById('unlock-stage-process').classList.remove('hidden');
+        
+        document.getElementById('unlock-instruction').classList.remove('hidden');
+        if (tier === "3") {
+          document.getElementById('unlock-instruction').innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
+        } else if (tier === "2") {
+          document.getElementById('unlock-instruction').innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
+        } else {
+          document.getElementById('unlock-instruction').innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
+        }
+
         try {
-          urlPayloadHex = await decompressFromURL(compressed);
+          window.PhantomState.urlPayloadHex = await decompressFromURL(compressed);
         } catch(e) { showToast("Cargo Link corrupted.", "error"); }
       }
     };
