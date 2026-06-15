@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PhantomPDF Vault - Pinnacle MFA Edition</title>
+  <title>Phantom Vault - Enterprise IAM Edition</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,164 +11,94 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { 
-            sans: ['Inter', 'system-ui', 'sans-serif'], 
-            serif: ['Georgia', 'Cambria', 'serif'], 
-            mono: ['Fira Code', 'monospace'] 
-          },
-          colors: { 
-            phantom: { 900: '#0a0a0a', 800: '#171717', 700: '#262626', emerald: '#10b981' } 
-          }
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'], mono: ['Fira Code', 'monospace'] },
+          colors: { phantom: { 900: '#050505', 800: '#111111', 700: '#1f1f1f', emerald: '#10b981' } }
         }
       }
     }
   </script>
 
-  <!-- Viewer Formatting Engines (Markdown, Math, Syntax Highlighting) -->
+  <!-- Viewer Formatting Engines -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <link rel="stylesheet" id="katex-css" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-  
-  <!-- Syntax Highlighting -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
   <style>
-    :root {
-      --scrollbar-bg: transparent;
-      --scrollbar-thumb: #3f3f46;
-      --scrollbar-hover: #10b981;
-    }
-
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
-    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
     select, input[type="datetime-local"] {
-      appearance: none; background-color: #0a0a0a; color: #f3f4f6;
-      border: 1px solid #262626; border-radius: 0.5rem; outline: none;
+      appearance: none; background-color: #050505; color: #f3f4f6;
+      border: 1px solid #1f1f1f; border-radius: 0.5rem; outline: none;
     }
     input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-    /* Theme Dynamics - Fixed Contrast Bug */
-    .theme-light { --bg-color: #ffffff; --text-color: #111827; --border-color: #e5e7eb; --accent-bg: #f3f4f6; }
-    .theme-dark { --bg-color: #18181b; --text-color: #f4f4f5; --border-color: #3f3f46; --accent-bg: #27272a; }
-    .theme-sepia { --bg-color: #fef3c7; --text-color: #064e3b; --border-color: #fcd34d; --accent-bg: #fde68a; }
+    /* Viewer Theme Dynamics */
+    .theme-light { background-color: #ffffff; color: #111827; }
+    .theme-dark { background-color: #111111; color: #f4f4f5; border: 1px solid #1f1f1f; }
+    .theme-sepia { background-color: #fdf6e3; color: #064e3b; }
 
-    #theme-container, .rendered-content {
-      background-color: var(--bg-color) !important;
-      color: var(--text-color) !important;
-    }
-
-    /* Universal Typography Base */
-    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; line-height: 1.2; }
-    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; }
+    .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; line-height: 1.2; opacity: 0.9; }
+    .rendered-content h2 { font-size: 1.6rem; font-weight: 700; margin-top: 1.75rem; margin-bottom: 0.75rem; opacity: 0.9; }
     .rendered-content h3 { font-size: 1.3rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
     .rendered-content p { margin-bottom: 1.2rem; line-height: 1.8; }
-    .rendered-content strong { font-weight: 700; color: inherit; filter: brightness(1.2); }
-    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px var(--border-color); }
-    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-    .rendered-content th { background-color: var(--accent-bg); }
-    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: #0d1117 !important; border: 1px solid var(--border-color); color: #c9d1d9 !important; }
+    .rendered-content strong { font-weight: 700; color: inherit; filter: brightness(0.7); }
+    .rendered-content table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.9em; box-shadow: 0 0 0 1px currentColor; opacity: 0.85; }
+    .rendered-content th, .rendered-content td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid currentColor; }
+    .rendered-content pre { padding: 1.25rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.5rem 0; font-family: 'Fira Code', monospace; font-size: 0.875rem; background: rgba(0,0,0,0.1); border: 1px solid rgba(128,128,128,0.2); }
     .rendered-content code { font-family: 'Fira Code', monospace; padding: 0.15rem 0.3rem; border-radius: 0.25rem; background: rgba(128,128,128,0.15); }
-    .rendered-content pre code { background: transparent; padding: 0; }
-    .rendered-content blockquote { border-left: 4px solid var(--border-color); padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: var(--accent-bg); }
+    .rendered-content blockquote { border-left: 4px solid currentColor; padding: 1rem 1.5rem; margin: 1.5rem 0; font-style: italic; background: rgba(128,128,128,0.05); }
     .rendered-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
     .rendered-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; }
-    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid var(--border-color); }
+    .rendered-content img { max-width: 100%; border-radius: 0.5rem; margin: 1.5rem auto; display: block; border: 1px solid rgba(128,128,128,0.2); }
 
-    /* Strict Inspector Override to Dark */
-    #inspector-content { --bg-color: transparent !important; --text-color: #f4f4f5 !important; --border-color: #3f3f46 !important; }
+    .theme-light .rendered-content th { background-color: #f3f4f6; }
+    .theme-dark .rendered-content th { background-color: #1f1f1f; }
+    .theme-sepia .rendered-content th { background-color: #fef08a; }
+
+    #inspector-content.rendered-content { color: #e5e7eb; }
+    #inspector-content.rendered-content h1, #inspector-content.rendered-content h2, #inspector-content.rendered-content h3 { color: #ffffff; }
 
     .toc-link { transition: all 0.2s; display: block; padding: 0.25rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; }
     .toc-link:hover { color: #10b981; transform: translateX(4px); }
-
-    /* Panic Mode Overlay */
-    #panic-overlay { display: none; position: fixed; inset: 0; background: #ffffff; z-index: 99999; align-items: center; justify-content: center; color: #000; font-family: monospace; flex-direction: column; }
-    .panic-active #panic-overlay { display: flex; }
-    .panic-active body > *:not(#panic-overlay) { display: none !important; }
-    
-    /* Focus Mode Transitions */
-    .focus-mode-active #tab-create > div > div:first-child, .focus-mode-active header { display: none !important; }
-    .focus-mode-active #tab-create > div { display: block; }
-    .focus-mode-active #tab-create .lg\\:col-span-8 { height: 95vh !important; }
-
-    /* Strength Meter */
-    .strength-bar { height: 4px; border-radius: 2px; transition: all 0.3s ease; width: 0%; background: #ef4444; }
   </style>
 </head>
-<body class="bg-phantom-900 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 transition-all duration-300">
-
-  <!-- PANIC OVERLAY (Feature 1) -->
-  <div id="panic-overlay">
-    <h1 class="text-4xl font-bold mb-4">404</h1>
-    <p>Connection Refused. Server dropped the matrix.</p>
-  </div>
+<body class="bg-phantom-900 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative">
 
   <!-- TOASTS -->
   <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
 
   <!-- FULLSCREEN CINEMATIC VIEWER -->
-  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-900/95 backdrop-blur-xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
-    
-    <!-- Viewer Header -->
-    <div class="flex-none flex items-center justify-between p-3 border-b border-phantom-700 bg-phantom-900 shadow-xl z-20">
+  <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-900/95 backdrop-blur-2xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
+    <div class="flex-none flex items-center justify-between p-3 border-b border-phantom-700 bg-phantom-900/80 shadow-xl z-20">
       <div class="flex items-center gap-3 ml-2">
         <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400" id="icon-fs-brand"></div>
         <div>
-          <h2 class="font-bold text-white tracking-tight leading-tight text-sm">Decrypted Vault</h2>
+          <h2 class="font-bold text-white tracking-tight leading-tight text-sm">Hardware-Bound Vault</h2>
           <p class="text-[10px] text-emerald-500 font-mono uppercase" id="fs-filename">Document.pdf</p>
         </div>
       </div>
       <div class="flex items-center gap-2 mr-2">
-        <!-- Feature 4: Additional Exports -->
-        <div class="relative group">
-          <button class="px-3 py-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700 text-xs font-bold flex items-center gap-2">
-            <span id="icon-code"></span> Export Source
-          </button>
-          <div class="absolute right-0 mt-2 w-32 bg-phantom-800 border border-phantom-700 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50 overflow-hidden">
-            <button onclick="exportData('md')" class="w-full text-left px-4 py-2 text-xs text-neutral-300 hover:bg-phantom-700 hover:text-white">Markdown (.md)</button>
-            <button onclick="exportData('html')" class="w-full text-left px-4 py-2 text-xs text-neutral-300 hover:bg-phantom-700 hover:text-white border-t border-phantom-700">HTML (.html)</button>
-          </div>
+        <div class="hidden md:flex px-3 py-1.5 bg-phantom-800 border border-phantom-700 rounded-lg text-xs font-mono text-neutral-400 items-center gap-2 mr-2 cursor-help" title="Anti-Copy Decoy Protocol Active">
+          <span id="icon-shield" class="w-3 h-3 text-emerald-500"></span> Clipboard Secured
         </div>
-
-        <button onclick="cycleTheme()" title="Toggle Theme" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700">
-          <span id="icon-theme"></span>
-        </button>
-        <button onclick="printPayload()" title="Secure Print" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700">
-          <span id="icon-print"></span>
-        </button>
-        <button onclick="handleExportCleanPDF()" title="Export Standard PDF" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold rounded-lg text-sm flex items-center gap-2 transition-all">
-          <span id="icon-fs-download"></span> Export PDF
-        </button>
-        <button onclick="toggleFullscreenViewer(false)" title="Burn & Close" class="ml-2 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors">
-          <span id="icon-fs-close"></span>
-        </button>
+        <button onclick="cycleTheme()" title="Toggle Theme" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700"><span id="icon-theme"></span></button>
+        <button onclick="printPayload()" title="Secure Print" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-neutral-300 rounded-lg transition-colors border border-phantom-700"><span id="icon-print"></span></button>
+        <button onclick="handleExportCleanPDF()" title="Export Standard PDF" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold rounded-lg text-sm flex items-center gap-2 transition-all"><span id="icon-fs-download"></span> Export</button>
+        <button onclick="toggleFullscreenViewer(false)" title="Burn & Close" class="ml-2 p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors"><span id="icon-fs-close"></span></button>
       </div>
     </div>
 
-    <!-- Viewer Body (Split Layout: TOC + Content) -->
-    <div class="flex-1 flex overflow-hidden relative">
-      <!-- Feature 2: Auto-Lock Indicator -->
-      <div id="lock-timer-indicator" class="absolute bottom-4 left-4 text-[10px] text-emerald-500/50 font-mono z-50 pointer-events-none">
-        Vault active. EscX3 to Panic.
-      </div>
-
-      <!-- Dynamic TOC Sidebar -->
-      <div class="w-64 border-r border-phantom-700 bg-phantom-800/50 hidden md:flex flex-col p-4 overflow-y-auto">
-        <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-4">Table of Contents</h3>
+    <div class="flex-1 flex overflow-hidden">
+      <div class="w-64 border-r border-phantom-700 bg-phantom-800/30 hidden lg:flex flex-col p-4 overflow-y-auto">
+        <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-4 flex items-center gap-2"><span id="icon-toc" class="w-4 h-4"></span> Matrix Index</h3>
         <div id="toc-container" class="space-y-1"></div>
-        
-        <!-- Major Upgrade 2: File Attachments Sidebar -->
-        <h3 class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-2 mt-8 hidden" id="vault-files-header">Attached Files</h3>
-        <div id="vault-files-container" class="space-y-2"></div>
       </div>
-
-      <!-- Scrollable Reading Area -->
       <div class="flex-1 overflow-y-auto p-4 md:p-8" id="reader-scroll-area">
-        <div id="theme-container" class="theme-dark w-full max-w-4xl mx-auto h-max min-h-full rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-16 relative transition-colors duration-300">
+        <div id="theme-container" class="theme-dark w-full max-w-4xl mx-auto h-max min-h-full rounded-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] p-8 md:p-16 relative transition-colors duration-300" oncopy="handleClipboardTheft(event)">
           <div id="fs-watermark" class="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.03] select-none overflow-hidden z-0 hidden">
             <span id="fs-watermark-text" class="text-7xl md:text-9xl font-black transform -rotate-45 block whitespace-nowrap text-center w-full">RESTRICTED</span>
           </div>
@@ -179,35 +109,32 @@
   </div>
 
   <!-- HEADER -->
-  <header class="border-b border-phantom-700 bg-phantom-800/50 backdrop-blur-md sticky top-0 z-40 transition-all duration-300">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+  <header class="border-b border-phantom-700 bg-phantom-800/30 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/5 flex items-center justify-center border border-emerald-500/30 shadow-lg shadow-emerald-500/10" id="icon-brand-main"></div>
         <div>
-          <span class="font-extrabold text-lg tracking-tight text-white block leading-tight">PhantomPDF <span class="text-emerald-400">Vault</span></span>
-          <span class="text-[10px] uppercase tracking-wider text-emerald-500 font-bold block bg-emerald-500/10 px-1.5 py-0.5 rounded inline-block mt-0.5">Pinnacle MFA Architecture</span>
+          <span class="font-extrabold text-lg tracking-tight text-white block leading-tight">Phantom<span class="text-emerald-400">Vault</span></span>
+          <span class="text-[9px] uppercase tracking-widest text-emerald-500 font-bold block opacity-80">Enterprise IAM Protocol</span>
         </div>
       </div>
       
-      <div class="flex bg-phantom-900 p-1.5 rounded-xl border border-phantom-700 items-center">
-        <button onclick="switchTab('create')" id="btn-tab-create" class="px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm">
-          <span id="icon-tab-create"></span> Create
-        </button>
-        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800">
-          <span id="icon-tab-unlock"></span> Unlock
-        </button>
+      <div class="flex bg-phantom-900 p-1.5 rounded-xl border border-phantom-700 shadow-inner overflow-x-auto max-w-full">
+        <button onclick="switchTab('create')" id="btn-tab-create" class="px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm whitespace-nowrap"><span id="icon-tab-create"></span> Encrypt</button>
+        <button onclick="switchTab('unlock')" id="btn-tab-unlock" class="px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-unlock"></span> Decrypt</button>
+        <div class="w-px h-6 bg-phantom-700 mx-1 self-center"></div>
+        <button onclick="switchTab('iam')" id="btn-tab-iam" class="px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-400 hover:text-emerald-300 hover:bg-phantom-800 whitespace-nowrap"><span id="icon-tab-iam"></span> Access Manager</button>
       </div>
     </div>
   </header>
 
   <!-- MAIN APP -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 relative">
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
 
     <!-- TAB 1: CREATE SECTION -->
-    <section id="tab-create" class="space-y-6 block animate-in fade-in duration-500 slide-in-from-bottom-4">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 transition-all duration-500">
+    <section id="tab-create" class="space-y-6 block animate-in fade-in duration-500">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <!-- Left Setup Panel -->
         <div class="lg:col-span-4 space-y-4">
           <div class="bg-phantom-800 border border-phantom-700 rounded-2xl p-5 shadow-2xl">
             <h2 class="font-bold text-white flex items-center gap-2 border-b border-phantom-700 pb-3 mb-4"><span id="icon-sliders"></span> Core Parameters</h2>
@@ -217,18 +144,11 @@
                 <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5">Document Title</label>
                 <input id="doc-filename" type="text" value="SecureReport" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
               </div>
-              <div>
-                <div class="flex justify-between items-end mb-1.5">
-                  <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block">Primary Passphrase</label>
-                  <button onclick="generateStrongPassword()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-mono">Auto-Gen Key</button>
-                </div>
+              <div id="password-container">
+                <label class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider block mb-1.5">Primary Passphrase (For PDF)</label>
                 <div class="relative">
-                  <input id="doc-password" type="password" oninput="checkPasswordStrength(this.value)" placeholder="AES-256 Master Key" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-3 pr-10 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
+                  <input id="doc-password" type="password" placeholder="Leave blank to auto-generate" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-3 pr-10 py-2.5 text-sm text-white focus:border-emerald-500 transition-colors" />
                   <button type="button" onclick="togglePasswordVisibility('doc-password', this)" class="absolute right-3 top-3 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
-                </div>
-                <!-- Feature 5: Password Strength -->
-                <div class="w-full bg-phantom-900 h-1 mt-2 rounded-full overflow-hidden border border-phantom-700">
-                  <div id="pwd-strength-bar" class="strength-bar"></div>
                 </div>
               </div>
               <div>
@@ -238,61 +158,49 @@
             </div>
           </div>
 
-          <!-- Major Upgrade: Advanced MFA & Deniability Panel -->
           <div class="bg-phantom-800 border border-emerald-500/20 rounded-2xl p-5 shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-transparent"></div>
-            <h2 class="font-bold text-emerald-400 flex items-center gap-2 border-b border-phantom-700 pb-3 mb-4"><span id="icon-shield"></span> Advanced Protocols</h2>
+            <h2 class="font-bold text-emerald-400 flex items-center gap-2 border-b border-phantom-700 pb-3 mb-4"><span id="icon-shield-adv"></span> Advanced Protocols</h2>
             
             <div class="space-y-4">
-              <!-- Feature 1: Time Bomb -->
               <div>
                 <label class="flex items-center justify-between cursor-pointer group">
                   <span class="text-sm font-bold text-neutral-300 group-hover:text-white transition-colors">Self-Destruct Expiry</span>
                   <input type="checkbox" id="enable-expiry" onchange="document.getElementById('expiry-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-900 border-phantom-700 rounded">
                 </label>
                 <div id="expiry-box" class="hidden mt-2">
-                  <input type="datetime-local" id="doc-expiry" class="w-full px-3 py-2 text-sm bg-phantom-900" />
+                  <input type="datetime-local" id="doc-expiry" class="w-full px-3 py-2 text-sm bg-phantom-900 text-white" />
                   <p class="text-[10px] text-neutral-500 mt-1">Payload permanently corrupts after this time.</p>
                 </div>
               </div>
 
               <hr class="border-phantom-700">
 
-              <!-- Major Upgrade 1: WebAuthn Device Biometrics / PIN -->
-              <div>
-                <label class="flex items-center justify-between cursor-pointer group" title="Require Biometrics or System PIN">
-                  <div class="flex flex-col">
-                    <span class="text-sm font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1"><span id="icon-fingerprint"></span> Device Biometrics/PIN</span>
-                  </div>
-                  <input type="checkbox" id="enable-webauthn" class="w-4 h-4 accent-emerald-500 bg-phantom-900 border-phantom-700 rounded">
-                </label>
-                <p class="text-[10px] text-neutral-500 mt-1">Locks decryption exclusively to this device's Windows Hello, TouchID, FaceID, or PIN.</p>
-              </div>
-
-              <hr class="border-phantom-700">
-
-              <!-- Legacy Feature: Dual Vault -->
               <div>
                 <label class="flex items-center justify-between cursor-pointer group">
-                  <span class="text-sm font-bold text-neutral-300 group-hover:text-white transition-colors">Dual-Vault Decoy</span>
+                  <span class="text-sm font-bold text-neutral-300 group-hover:text-white transition-colors">Dual-Vault Decoy (PDF Only)</span>
                   <input type="checkbox" id="enable-decoy" onchange="document.getElementById('decoy-box').classList.toggle('hidden', !this.checked)" class="w-4 h-4 accent-emerald-500 bg-phantom-900 border-phantom-700 rounded">
                 </label>
                 <div id="decoy-box" class="hidden mt-3 space-y-3 p-3 bg-phantom-900/50 rounded-xl border border-phantom-700">
-                  <p class="text-[10px] text-emerald-400 leading-tight">Embeds a completely separate fake document. Type the Decoy Passphrase to unlock this fake text under duress.</p>
+                  <p class="text-[10px] text-emerald-400 leading-tight">Type the Decoy Passphrase to unlock this fake text under duress.</p>
                   <input id="decoy-password" type="password" placeholder="Decoy Passphrase" class="w-full bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500" />
-                  <textarea id="decoy-content" placeholder="Type fake, plausible text here..." class="w-full h-24 bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:border-emerald-500"></textarea>
+                  <textarea id="decoy-content" placeholder="Type fake, plausible text here..." class="w-full h-20 bg-phantom-900 border border-phantom-700 rounded-lg px-3 py-2 text-sm text-white resize-none focus:border-emerald-500"></textarea>
                 </div>
               </div>
             </div>
           </div>
 
-          <button id="btn-lock-pdf" onclick="handleGenerateSecurePDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2.5 transition-all shadow-lg active:scale-[0.98]">
-            <span id="icon-btn-secure"></span> Encrypt Payload
-          </button>
+          <div class="flex gap-3 pt-2">
+            <button id="btn-lock-pdf" onclick="handleGenerate('pdf')" class="flex-1 bg-phantom-700 hover:bg-phantom-600 border border-phantom-600 text-white font-bold py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+              <span id="icon-pdf-dl"></span> Export PDF
+            </button>
+            <button id="btn-lock-link" onclick="handleGenerate('link')" class="flex-[1.5] bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-3.5 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-[0.98]">
+              <span id="icon-link-gen"></span> Generate Secure Link
+            </button>
+          </div>
         </div>
 
-        <!-- Right Terminal -->
-        <div class="lg:col-span-8 bg-phantom-800 border border-phantom-700 rounded-2xl p-1 shadow-2xl flex flex-col h-[700px] relative transition-all duration-500">
+        <div class="lg:col-span-8 bg-phantom-800 border border-phantom-700 rounded-2xl p-1 shadow-2xl flex flex-col h-[700px] relative">
           <div class="flex items-center justify-between px-5 py-4 border-b border-phantom-700/60 bg-phantom-800/40 rounded-t-2xl">
             <div class="flex items-center gap-3 text-sm font-bold text-neutral-200">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
@@ -300,759 +208,788 @@
               <span id="save-status" class="text-[10px] text-emerald-500 font-mono ml-2 opacity-0 transition-opacity">Auto-saved.</span>
             </div>
             
-            <div class="flex items-center gap-2">
-              <!-- Feature 6: Dictation -->
-              <button onclick="toggleDictation()" id="btn-dictate" title="Voice Dictation" class="p-2 bg-phantom-700 hover:bg-phantom-600 rounded-lg text-xs font-bold text-neutral-300 hover:text-emerald-400 transition-colors border border-phantom-600">
-                <span id="icon-mic"></span>
-              </button>
-              
-              <!-- Feature 4: Focus Mode -->
-              <button onclick="toggleFocusMode()" title="Zen Mode" class="p-2 bg-phantom-700 hover:bg-phantom-600 rounded-lg text-xs font-bold text-neutral-300 hover:text-emerald-400 transition-colors border border-phantom-600">
-                <span id="icon-maximize"></span>
-              </button>
-
-              <!-- Major Upgrade 2: File Vault Attachments -->
-              <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-phantom-700 hover:bg-phantom-600 rounded-lg text-xs font-bold text-white transition-colors border border-phantom-600">
-                <span id="icon-file-plus"></span> Attach Files
-                <input type="file" id="file-upload-input" multiple class="hidden" onchange="handleFileUpload(event)">
-              </label>
-            </div>
+            <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 bg-phantom-700 hover:bg-phantom-600 rounded-lg text-xs font-bold text-white transition-colors border border-phantom-600 shadow-sm">
+              <span id="icon-image-plus"></span> Attach Image
+              <input type="file" id="image-upload-input" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="handleImageUpload(event)">
+            </label>
           </div>
           
           <div class="flex-1 flex flex-col p-5 overflow-hidden">
             <textarea id="doc-content" placeholder="# AI Output / Secret Data
 Start typing here. Your work is auto-saved locally.
 
-Use Markdown to structure your data:
-```javascript
-// The vault now supports Syntax Highlighting
-const encrypt = (data) => console.log('Secured.');
+Features:
+- Markdown Formatting
+- KaTeX Math: $$ E = mc^2 $$
+- Zero-Server Link Sharing
 
-```
-Math equations are supported: 
-.
-Attach ANY files (Images, PDFs, ZIPs) to embed them into the encrypted matrix." class="w-full flex-1 bg-transparent text-white placeholder-neutral-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base outline-none overflow-y-auto mb-4" oninput="triggerAutoSave()"></textarea>
-<div id="file-preview-container" class="flex gap-3 overflow-x-auto pb-2 min-h-[80px] hidden border-t border-phantom-700 pt-4 custom-scrollbar"></div>
-</div>
-</div>
-</div>
-</section>
-<!-- TAB 2: UNLOCK SECTION -->
-<section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500 slide-in-from-bottom-4">
-<div class="text-center max-w-xl mx-auto mb-8 mt-4">
-<h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
-<p class="text-neutral-400 text-sm">Upload a locked PhantomPDF to securely parse the payload.</p>
-<!-- Feature 8: Audit Log Display -->
-<p id="audit-log-display" class="text-[10px] text-emerald-500 font-mono mt-3 hidden"></p>
-</div>
-<div id="unlock-stage-upload" class="max-w-2xl mx-auto">
-<div id="drop-zone" class="border-2 border-dashed border-phantom-700 hover:border-emerald-500/50 bg-phantom-800/30 hover:bg-emerald-500/[0.02] rounded-3xl p-16 text-center transition-all cursor-pointer group shadow-xl" onclick="triggerFileInput()">
-<input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
-<div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-900 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 text-neutral-500 group-hover:text-emerald-400 transition-all shadow-inner" id="icon-upload-zone"></div>
-<h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors">Initialize Pipeline</h3>
-<p class="text-neutral-500 mt-2 mb-8">Drag & drop your locked PDF file here</p>
-<span class="inline-flex bg-phantom-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-600">Browse Local Files</span>
-</div>
-</div>
-<div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-800 border border-phantom-700 rounded-2xl p-6 shadow-2xl hidden">
-<div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-700">
-<div class="w-14 h-14 bg-phantom-900 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
-<div class="flex-1 overflow-hidden">
-<h3 id="target-file-name" class="font-bold text-white truncate text-base">SecureDocument.pdf</h3>
-<p class="text-xs text-emerald-400/80 font-mono mt-1" id="target-file-status">ENCRYPTED MATRIX</p>
-</div>
-<button onclick="resetUnlockModule()" class="p-2 bg-phantom-900 hover:bg-red-500/20 text-neutral-500 hover:text-red-400 rounded-lg border border-phantom-700"><span id="icon-trash"></span></button>
-</div>
-<div class="space-y-5">
-<div class="space-y-2" id="password-input-group">
-<label class="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center gap-1.5"><span id="icon-unlock-key"></span> Input Passphrase</label>
-<div class="relative">
-<input id="unlock-password" type="password" placeholder="Passphrase (Main or Decoy)..." class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-white focus:border-emerald-500 transition-all shadow-inner" />
-<button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
-</div>
-</div>
-<button id="btn-trigger-decrypt" onclick="handleDecryptPDF()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
-<span id="icon-btn-unlock"></span> Decrypt File
-</button>
-</div>
-</div>
-<div id="unlock-stage-viewer" class="space-y-5 hidden animate-in zoom-in-95 duration-300">
-<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-phantom-800 border border-emerald-500/30 p-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.05)]">
-<div class="flex items-center gap-4">
-<div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/40 text-emerald-400" id="icon-success"></div>
-<div>
-<h2 class="font-extrabold text-white text-lg tracking-tight">Access Granted</h2>
-<p class="text-emerald-400/80 text-xs mt-0.5 font-mono">Decrypted: <span id="viewing-file-name" class="text-neutral-400"></span></p>
-</div>
-</div>
-<div class="flex gap-2 w-full md:w-auto">
-<button onclick="toggleFullscreenViewer(true)" class="flex-1 md:flex-none bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-bold px-5 py-2.5 rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg">
-<span id="icon-expand"></span> View Decrypted Matrix
-</button>
-<button onclick="resetUnlockModule()" class="px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all flex items-center justify-center font-bold text-sm" title="Burn & Close"><span id="icon-x"></span> Lock & Burn</button>
-</div>
-</div>
-<div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 min-h-[400px] max-h-[500px] shadow-inner relative overflow-y-auto">
-<div class="flex items-center justify-between mb-4 pb-4 border-b border-phantom-800">
-<span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Raw Data Inspector</span>
-<span class="text-[10px] text-neutral-600 font-mono px-2 py-1 bg-phantom-800 rounded">Read-Only Secure Buffer</span>
-</div>
-<div id="inspector-content" class="rendered-content font-serif text-sm"></div>
-</div>
-</div>
-</section>
-</main>
-<script>
-// =====================================================================
-// 1. ICONS & UI SETUP
-// =====================================================================
-const ICONS = {
-zap: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>,
-filePlus: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>,
-unlock: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>,
-sliders: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>,
-fileText: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
-lock: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>,
-printer: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>,
-eye: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
-eyeOff: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
-shieldCheck: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>,
-uploadCloud: <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>,
-fileKey: <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>,
-key: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>,
-download: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
-alert: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-check: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
-filePlusSmall: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>,
-expand: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
-close: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-trash: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>,
-x: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
-shield: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-theme: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>,
-print: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>,
-mic: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>,
-maximize: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>,
-fingerprint: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10"/><path d="M5 12c0-3.87 3.13-7 7-7s7 3.13 7 7"/><path d="M8 12c0-2.21 1.79-4 4-4s4 1.79 4 4"/><path d="M11 12a1 1 0 1 0 2 0 1 1 0 1 0-2 0"/></svg>,
-code: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-};
-function renderIcons() {
-const mappings = {
-'icon-brand-main': 'zap', 'icon-tab-create': 'filePlus', 'icon-tab-unlock': 'unlock',
-'icon-sliders': 'sliders', 'icon-btn-secure': 'shieldCheck', 'icon-upload-zone': 'uploadCloud',
-'icon-file-ready': 'fileKey', 'icon-unlock-key': 'key', 'icon-btn-unlock': 'unlock',
-'icon-success': 'check', 'icon-fs-download': 'download', 'icon-file-plus': 'filePlusSmall',
-'icon-expand': 'expand', 'icon-fs-brand': 'zap', 'icon-fs-close': 'close',
-'icon-trash': 'trash', 'icon-x': 'x', 'icon-shield': 'shield',
-'icon-theme': 'theme', 'icon-print': 'print', 'icon-mic': 'mic',
-'icon-maximize': 'maximize', 'icon-fingerprint': 'fingerprint', 'icon-code': 'code'
-};
-for (const [id, key] of Object.entries(mappings)) {
-if(document.getElementById(id)) document.getElementById(id).innerHTML = ICONS[key];
-}
-document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
-}
-// Toast Notification System
-function showToast(msg, type='info') {
-const c = document.getElementById('toast-container');
-const el = document.createElement('div');
-const bg = type==='error' ? 'bg-red-500/90 border-red-400' : (type==='success' ? 'bg-emerald-500/90 border-emerald-400' : 'bg-phantom-800 border-phantom-600');
-el.className = p-4 rounded-xl shadow-2xl border backdrop-blur text-white text-sm font-bold flex items-center gap-3 transform translate-x-full transition-transform duration-300 ${bg};
-el.innerHTML = type==='error' ? ICONS.alert + msg : (type==='success' ? ICONS.check + msg : msg);
-c.appendChild(el);
-requestAnimationFrame(() => el.style.transform = 'translateX(0)');
-setTimeout(() => {
-el.style.transform = 'translateX(120%)';
-setTimeout(() => el.remove(), 300);
-}, 3500);
-}
-// =====================================================================
-// 2. NEW FEATURES PIPELINES
-// =====================================================================
-// Global State
-let vaultFiles = [];
-let activeFile = null;
-let decryptedPayloadData = null;
-let currentThemeIndex = 1;
-const themes = ['theme-light', 'theme-dark', 'theme-sepia'];
-let webAuthnRequiredId = null;
-// Feature 1: Panic Button (Shift + Esc)
-window.addEventListener('keydown', (e) => {
-if (e.shiftKey && e.key === 'Escape') {
-document.body.classList.add('panic-active');
-document.title = "404 Not Found";
-resetUnlockModule();
-}
-if (e.key === 'Escape') {
-window.escCount = (window.escCount || 0) + 1;
-if(window.escCount >= 3) { document.body.classList.add('panic-active'); resetUnlockModule(); }
-setTimeout(() => window.escCount = 0, 1000);
-}
-});
-// Feature 2: Inactivity Auto-Lock
-let inactivityTimer;
-function resetInactivity() {
-clearTimeout(inactivityTimer);
-inactivityTimer = setTimeout(() => {
-if(decryptedPayloadData) {
-resetUnlockModule();
-showToast('Vault auto-locked due to inactivity.', 'error');
-}
-}, 5 * 60 * 1000); // 5 minutes
-}
-['mousemove', 'keydown', 'click', 'scroll'].forEach(evt => window.addEventListener(evt, resetInactivity));
-// Feature 3: Voice Dictation
-let isDictating = false;
-let recognition = null;
-function toggleDictation() {
-if(isDictating && recognition) { recognition.stop(); return; }
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if(!SpeechRecognition) return showToast('Dictation not supported in your browser.', 'error');
-recognition = new SpeechRecognition();
-recognition.continuous = true;
-recognition.interimResults = true;
-const btn = document.getElementById('btn-dictate');
-btn.classList.add('text-red-400', 'animate-pulse');
-showToast('Dictation active. Speak now.', 'info');
-isDictating = true;
-recognition.onresult = (e) => {
-let transcript = '';
-for (let i = e.resultIndex; i < e.results.length; ++i) transcript += e.results[i][0].transcript;
-if(e.results[e.results.length-1].isFinal) {
-const doc = document.getElementById('doc-content');
-doc.value += (doc.value.endsWith(' ') || doc.value.length === 0 ? '' : ' ') + transcript;
-triggerAutoSave();
-}
-};
-recognition.onend = () => {
-btn.classList.remove('text-red-400', 'animate-pulse');
-isDictating = false;
-};
-recognition.start();
-}
-// Feature 4: Focus Mode
-function toggleFocusMode() {
-document.body.classList.toggle('focus-mode-active');
-if(document.body.classList.contains('focus-mode-active')) showToast('Zen Mode Active. Press Esc to exit.', 'info');
-}
-window.addEventListener('keydown', (e) => { if (e.key === 'Escape') document.body.classList.remove('focus-mode-active'); });
-// Feature 5: Password Generator & Strength
-function checkPasswordStrength(pw) {
-let strength = 0;
-if(pw.length > 7) strength += 25;
-if(pw.length > 12) strength += 25;
-if(/[A-Z]/.test(pw) && /[a-z]/.test(pw)) strength += 25;
-if(/[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) strength += 25;
-const bar = document.getElementById('pwd-strength-bar');
-bar.style.width = strength + '%';
-if(strength < 50) bar.style.backgroundColor = '#ef4444';
-else if(strength < 100) bar.style.backgroundColor = '#eab308';
-else bar.style.backgroundColor = '#10b981';
-}
-function generateStrongPassword() {
-const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
-let pw = "";
-const randArr = new Uint32Array(20);
-window.crypto.getRandomValues(randArr);
-for(let i=0; i<20; i++) pw += chars[randArr[i] % chars.length];
-const field = document.getElementById('doc-password');
-field.value = pw; field.type = 'text';
-checkPasswordStrength(pw);
-showToast('Strong Master Key generated. Save it!', 'success');
-setTimeout(() => field.type = 'password', 5000);
-}
-// Feature 6: Audit Log
-function logAccess(filename, success) {
-const logs = JSON.parse(localStorage.getItem('phantom_audit_logs') || '{}');
-logs[filename] = { time: new Date().toLocaleString(), success };
-localStorage.setItem('phantom_audit_logs', JSON.stringify(logs));
-}
-function getAuditLog(filename) {
-const logs = JSON.parse(localStorage.getItem('phantom_audit_logs') || '{}');
-return logs[filename];
-}
-// Feature 7: Export to MD / HTML
-function exportData(format) {
-if(!decryptedPayloadData) return;
-let content = decryptedPayloadData.rawText;
-let mime = 'text/plain';
-if(format === 'html') {
-content = buildViewerHTML(content, []);
-mime = 'text/html';
-}
-const blob = new Blob([content], { type: mime });
-const url = URL.createObjectURL(blob);
-const link = document.createElement('a'); link.href = url; link.download = Vault_Export.${format};
-document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
-showToast(Exported as .${format}, 'success');
-}
-// =====================================================================
-// 3. MAJOR UPGRADE 2: FILE ATTACHMENTS (Vault Files)
-// =====================================================================
-function handleFileUpload(e) {
-const files = e.target.files;
-if (!files.length) return;
-Array.from(files).forEach(file => {
-if (file.size > 15 * 1024 * 1024) return showToast(File ${file.name} too large (Max 15MB/file)., 'error');
-const reader = new FileReader();
-reader.onload = (event) => {
-const id = 'file_' + Date.now() + Math.floor(Math.random()*1000);
-vaultFiles.push({
-id,
-name: file.name,
-type: file.type || 'application/octet-stream',
-size: file.size,
-dataURL: event.target.result
-});
-renderFileStrip();
-};
-reader.readAsDataURL(file);
-});
-e.target.value = '';
-}
-function removeVaultFile(id) {
-vaultFiles = vaultFiles.filter(f => f.id !== id);
-renderFileStrip();
-}
-function renderFileStrip() {
-const container = document.getElementById('file-preview-container');
-if (vaultFiles.length === 0) { container.classList.add('hidden'); return; }
-container.classList.remove('hidden');
-container.innerHTML = vaultFiles.map(f => {
-const isImg = f.type.startsWith('image/');
-return <div class="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden border border-phantom-700 group bg-phantom-900 flex flex-col items-center justify-center text-center p-1"> ${isImg ?<img src="${f.dataURL}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" />:<span class="text-emerald-500 mb-1">${ICONS.fileText}</span>} <span class="text-[9px] font-mono text-neutral-300 z-10 break-all truncate w-full px-1">${f.name}</span> <span class="text-[8px] text-neutral-500 z-10">${(f.size/1024).toFixed(1)}kb</span> <button onclick="removeVaultFile('${f.id}')" class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-red-400 hover:text-red-300 z-20"> ${ICONS.trash} </button> </div> }).join('');
-}
-function renderVaultFilesSidebar(files) {
-const header = document.getElementById('vault-files-header');
-const container = document.getElementById('vault-files-container');
-container.innerHTML = '';
-if(!files || files.length === 0) { header.classList.add('hidden'); return; }
-header.classList.remove('hidden');
-files.forEach(f => {
-const btn = document.createElement('button');
-btn.className = "w-full flex items-center gap-2 p-2 bg-phantom-900 border border-phantom-700 hover:border-emerald-500/50 rounded-lg text-left transition-all group";
-btn.innerHTML = <div class="text-emerald-500 group-hover:text-emerald-400">${ICONS.download}</div> <div class="flex-1 overflow-hidden"> <div class="text-[10px] text-white truncate font-bold">${f.name}</div> <div class="text-[9px] text-neutral-500 font-mono">${(f.size/1024).toFixed(1)} KB</div> </div>;
-btn.onclick = () => {
-const a = document.createElement('a');
-a.href = f.dataURL; a.download = f.name;
-document.body.appendChild(a); a.click(); document.body.removeChild(a);
-};
-container.appendChild(btn);
-});
-}
-// =====================================================================
-// 4. CORE PIPELINES (Auto-Save, Theme, TOC, Parsers)
-// =====================================================================
-function triggerAutoSave() {
-localStorage.setItem('phantom_vault_draft', document.getElementById('doc-content').value);
-const status = document.getElementById('save-status');
-status.style.opacity = '1';
-clearTimeout(window.saveTimer);
-window.saveTimer = setTimeout(() => status.style.opacity = '0', 2000);
-}
-function loadDraft() {
-const saved = localStorage.getItem('phantom_vault_draft');
-if(saved) document.getElementById('doc-content').value = saved;
-}
-function cycleTheme() {
-const container = document.getElementById('theme-container');
-container.classList.remove(themes[currentThemeIndex]);
-currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-container.classList.add(themes[currentThemeIndex]);
-}
-function generateTOC() {
-const contentDiv = document.getElementById('fs-content');
-const tocContainer = document.getElementById('toc-container');
-tocContainer.innerHTML = '';
-const headers = contentDiv.querySelectorAll('h1, h2, h3');
-if(headers.length === 0) {
-tocContainer.innerHTML = '<p class="text-neutral-600 text-xs italic">No headers found.</p>';
-return;
-}
-headers.forEach((h, i) => {
-const id = 'heading-' + i; h.id = id;
-const link = document.createElement('a'); link.href = '#' + id; link.className = 'toc-link'; link.innerText = h.innerText;
-if(h.tagName === 'H2') link.style.paddingLeft = '1rem';
-if(h.tagName === 'H3') link.style.paddingLeft = '2rem';
-link.onclick = (e) => { e.preventDefault(); document.getElementById('reader-scroll-area').scrollTo({ top: h.offsetTop - 20, behavior: 'smooth' }); };
-tocContainer.appendChild(link);
-});
-}
-function buildViewerHTML(text, files) {
-let html = '';
-if (typeof marked !== 'undefined') {
-marked.setOptions({
-highlight: function(code, lang) {
-const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-return hljs.highlight(code, { language }).value;
-}
-});
-html = marked.parse(text);
-} else { html = <p>${text.replace(/\n/g, '<br>')}</p>; }
-if (files && files.length > 0) {
-const images = files.filter(f => f.type.startsWith('image/'));
-if(images.length > 0) {
-html += <div class="mt-8 pt-8 border-t border-phantom-700">;
-for(let img of images) html += <figure><img src="${img.dataURL}" alt="${img.name}" /><figcaption class="text-center text-xs text-neutral-500 mt-2">${img.name}</figcaption></figure>;
-html += </div>;
-}
-}
-return html;
-}
-function applyMathFormatting(elementId) {
-const el = document.getElementById(elementId);
-if (typeof renderMathInElement !== 'undefined') {
-try {
-renderMathInElement(el, { delimiters: [ {left: '
-', display: true}, {left: '', right: '', display: false} ], throwOnError: false });
-} catch (e) { console.warn("Math rendering fallback active."); }
-}
-}
-// =====================================================================
-// 5. CRYPTO ENGINE & WEBAUTHN (BIOMETRICS/PIN FIXED)
-// =====================================================================
-function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
-function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
-const FALLBACK_KEY = "PHTM_V8_MSTR";
-// MAJOR UPGRADE 1: Fixed WebAuthn (Device Biometrics / PIN)
-async function createWebAuthnCredential() {
-if(!window.PublicKeyCredential) throw new Error("Biometrics/PIN not supported by this browser.");
-const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
-const rpConfig = { name: "PhantomVault Local" };
-// Safely apply hostname if valid (fixes errors in iframes/file URIs)
-if (window.location.hostname) rpConfig.id = window.location.hostname;
-try {
-const cred = await navigator.credentials.create({
-publicKey: {
-challenge: challenge,
-rp: rpConfig,
-user: { id: userId, name: "vault_owner", displayName: "Vault Owner" },
-pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
-authenticatorSelection: {
-authenticatorAttachment: "platform", // strictly Biometric/PIN (no YubiKey forced)
-userVerification: "required"
-},
-timeout: 60000
-}
-});
-if(!cred) throw new Error("Verification cancelled.");
-return { rawIdHex: bytesToHex(new Uint8Array(cred.rawId)) };
-} catch (err) {
-throw new Error("Biometric/PIN setup failed. Please check device settings or browser permissions. (" + err.message + ")");
-}
-}
-async function assertWebAuthnCredential(rawIdHex) {
-if(!window.PublicKeyCredential) throw new Error("Biometrics/PIN not supported by this browser.");
-const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
-const rawIdBytes = hexToBytes(rawIdHex);
-try {
-const assertion = await navigator.credentials.get({
-publicKey: {
-challenge: challenge,
-allowCredentials: [{ id: rawIdBytes, type: 'public-key' }],
-userVerification: "required",
-timeout: 60000
-}
-});
-if (!assertion) throw new Error("Verification cancelled.");
-return true;
-} catch (err) {
-throw new Error("Biometric/PIN verification failed. (" + err.message + ")");
-}
-}
-async function internalEncrypt(jsonString, password) {
-const enc = new TextEncoder();
-const payloadBytes = enc.encode(jsonString);
-if (window.crypto && window.crypto.subtle) {
-const salt = window.crypto.getRandomValues(new Uint8Array(16));
-const iv = window.crypto.getRandomValues(new Uint8Array(12));
-const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
-const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:100000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
-const cipherBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, payloadBytes);
-const finalBytes = new Uint8Array(29 + cipherBuffer.byteLength);
-finalBytes[0] = 1; finalBytes.set(salt, 1); finalBytes.set(iv, 17); finalBytes.set(new Uint8Array(cipherBuffer), 29);
-return bytesToHex(finalBytes);
-}
-throw new Error("Secure Crypto API not available.");
-}
-async function internalDecrypt(hex, password) {
-const bytes = hexToBytes(hex);
-if (bytes[0] === 1) {
-const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
-const enc = new TextEncoder();
-const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password || FALLBACK_KEY), {name:'PBKDF2'}, false, ['deriveKey']);
-const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:100000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
-const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
-return new TextDecoder().decode(decrypted);
-}
-throw new Error("Corrupted payload structure.");
-}
-// =====================================================================
-// 6. NATIVE PDF GENERATOR
-// =====================================================================
-class AdvancedPDFEngine {
-constructor() { this.chunks = []; this.objects = []; this.byteLength = 0; this.encoder = new TextEncoder(); this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"); }
-append(str) { const bytes = this.encoder.encode(str); this.chunks.push(bytes); const offset = this.byteLength; this.byteLength += bytes.length; return offset; }
-addObj(contentStr) { const id = this.objects.length + 1; this.objects.push(this.byteLength); this.append(${id} 0 obj\n${contentStr}\nendobj\n); return id; }
-buildFormatted(rawText, watermark, combinedHexPayload, mfaCredId) {
-const PAGE_WIDTH = 600, PAGE_HEIGHT = 800, MARGIN_X = 50, MARGIN_Y = 50;
-const catalogId = 1, pagesId = 2, fontRegId = 3, fontBoldId = 4;
-let pagesData = []; let currentPage = { stream: BT\n${MARGIN_X} ${PAGE_HEIGHT - MARGIN_Y} Td\n, y: PAGE_HEIGHT - MARGIN_Y };
-const nextLine = (points) => {
-currentPage.y -= points;
-if(currentPage.y < MARGIN_Y) {
-currentPage.stream += ET\n; pagesData.push(currentPage);
-currentPage = { stream: BT\n${MARGIN_X} ${PAGE_HEIGHT - MARGIN_Y} Td\n, y: PAGE_HEIGHT - MARGIN_Y };
-} else currentPage.stream += 0 -${points} Td\n;
-};
-const escapePdfStr = (str) => str.replace(/\/g, '\\').replace(/(/g, '\(').replace(/)/g, '\)').replace(/[^ -~]/g, '?');
-const lines = rawText.split('\n');
-for(let line of lines) {
-if(line.startsWith('# ')) { currentPage.stream += /F2 24 Tf\n; nextLine(30); currentPage.stream += (${escapePdfStr(line.substring(2))}) Tj\n; nextLine(10); }
-else if(line.trim()==='') { nextLine(14); }
-else {
-nextLine(16); currentPage.stream += /F1 12 Tf\n;
-let words = line.split(' '); let currentLineLen = 0;
-for(let w of words) {
-if(currentLineLen + w.length > 90) { nextLine(16); currentLineLen = 0; }
-currentPage.stream += (${escapePdfStr(w + ' ')}) Tj\n; currentLineLen += w.length + 1;
-}
-}
-}
-currentPage.stream += ET\n; pagesData.push(currentPage);
-if(watermark) {
-let escWm = escapePdfStr(watermark);
-for(let p of pagesData) p.stream += q 0.8 0 0 rg 0.15 gs\nBT /F2 64 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${escWm}) Tj ET Q\n;
-}
-let kidsArray = []; let currObjId = 5;
-for(let i=0; i<pagesData.length; i++) { kidsArray.push(${currObjId+1} 0 R); currObjId += 2; }
-this.addObj(<< /Type /Catalog /Pages ${pagesId} 0 R >>);
-this.addObj(<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pagesData.length} >>);
-this.addObj(<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>);
-this.addObj(<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>);
-for(let p of pagesData) {
-const streamId = this.addObj(<< /Length ${p.stream.length} >>\nstream\n${p.stream}\nendstream);
-this.addObj(<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}] /Resources << /Font << /F1 ${fontRegId} 0 R /F2 ${fontBoldId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${streamId} 0 R >>);
-}
-let infoStr = << /Producer (PhantomVault Pinnacle) ;
-if(combinedHexPayload) infoStr += /PhantomPayload <${combinedHexPayload}> ;
-if(mfaCredId) infoStr += /WebAuthnId <${mfaCredId}> ;
-infoStr += >>;
-const infoId = this.addObj(infoStr);
-const xrefOffset = this.byteLength;
-this.append(xref\n0 ${this.objects.length + 1}\n0000000000 65535 f \n);
-for (let off of this.objects) this.append(String(off).padStart(10, '0') + " 00000 n \n");
-this.append(trailer\n<< /Size ${this.objects.length + 1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n);
-const finalBuffer = new Uint8Array(this.byteLength);
-let offset = 0; for (let chunk of this.chunks) { finalBuffer.set(chunk, offset); offset += chunk.length; }
-return finalBuffer;
-}
-}
-// =====================================================================
-// 7. APP CONTROLLERS (Encryption & Decryption Logic)
-// =====================================================================
-function switchTab(tabId) {
-document.getElementById('tab-create').classList.toggle('hidden', tabId !== 'create');
-document.getElementById('tab-unlock').classList.toggle('hidden', tabId !== 'unlock');
-const actCls = "px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm";
-const inactCls = "px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800";
-document.getElementById('btn-tab-create').className = tabId === 'create' ? actCls : inactCls;
-document.getElementById('btn-tab-unlock').className = tabId === 'unlock' ? actCls : inactCls;
-}
-function togglePasswordVisibility(id, btn) {
-const el = document.getElementById(id);
-if(el.type === 'password') { el.type = 'text'; btn.innerHTML = ICONS.eyeOff; }
-else { el.type = 'password'; btn.innerHTML = ICONS.eye; }
-}
-async function handleGenerateSecurePDF() {
-const content = document.getElementById('doc-content').value;
-const basePassword = document.getElementById('doc-password').value;
-const watermarkText = document.getElementById('doc-watermark').value;
-let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
-if (!filename.endsWith('.pdf')) filename += '.pdf';
-const expiryInput = document.getElementById('doc-expiry').value;
-const expiryTS = expiryInput && document.getElementById('enable-expiry').checked ? new Date(expiryInput).getTime() : null;
-const useWebAuthn = document.getElementById('enable-webauthn').checked;
-if (!content.trim() && vaultFiles.length === 0) return showToast('Add text or files to encrypt.', 'error');
-if (!basePassword) return showToast('Master Key required.', 'error');
-const lockBtn = document.getElementById('btn-lock-pdf');
-lockBtn.disabled = true;
-lockBtn.innerHTML = <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Compiling Matrix...;
-try {
-let finalMasterKey = basePassword;
-let mfaCredId = null;
-if (useWebAuthn) {
-showToast('Awaiting Device Biometrics / PIN...', 'info');
-const authData = await createWebAuthnCredential();
-mfaCredId = authData.rawIdHex;
-finalMasterKey = basePassword + mfaCredId;
-}
-const payloadMain = { rawText: content, watermarkText, files: vaultFiles, expiry: expiryTS };
-const hexMain = await internalEncrypt(JSON.stringify(payloadMain), finalMasterKey);
-let combinedHex = hexMain;
-if(document.getElementById('enable-decoy').checked) {
-const decoyPass = document.getElementById('decoy-password').value;
-const decoyText = document.getElementById('decoy-content').value;
-if(!decoyPass || !decoyText) throw new Error("Decoy parameters incomplete.");
-const payloadDecoy = { rawText: decoyText, watermarkText: "DECOY ACTIVE", files: [], expiry: null };
-let decoyMasterKey = decoyPass;
-if(useWebAuthn) decoyMasterKey = decoyPass + mfaCredId;
-const hexDecoy = await internalEncrypt(JSON.stringify(payloadDecoy), decoyMasterKey);
-combinedHex = hexMain + "FFFFAAAA" + hexDecoy;
-}
-const pdfEngine = new AdvancedPDFEngine();
-const decoyStr = "CONFIDENTIAL VAULT SECURED\n\nIf you are reading this in a standard viewer, access is DENIED.\nThis multimedia structure is cryptographically obfuscated.\nUse PhantomPDF Vault to decrypt the exact byte matrix.\n\n" + Math.random().toString(16).substring(2).repeat(30).toUpperCase();
-const pdfBytes = pdfEngine.buildFormatted(decoyStr, watermarkText, combinedHex, mfaCredId);
-const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-const url = URL.createObjectURL(blob);
-const link = document.createElement('a'); link.href = url; link.download = filename;
-document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
-showToast('Secure Vault PDF Built & Downloaded!', 'success');
-} catch (err) {
-console.error(err);
-showToast(err.message || 'Encryption failed.', 'error');
-}
-finally {
-// Always release the UI lock
-lockBtn.disabled = false;
-lockBtn.innerHTML = <span id="icon-btn-secure">${ICONS.shieldCheck}</span> Encrypt Payload;
-}
-}
-// --- DECRYPTION PIPELINE ---
-function setupDragAndDrop() {
-const dropZone = document.getElementById('drop-zone');
-['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
-['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
-dropZone.addEventListener('drop', e => e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]), false);
-}
-function triggerFileInput() { document.getElementById('pdf-file-input').click(); }
-function handleFileSelect(event) { event.target.files[0] && processFileEntity(event.target.files[0]); }
-async function processFileEntity(file) {
-if (file.type !== "application/pdf" && !file.name.endsWith('.pdf')) return showToast('Invalid file format.', 'error');
-activeFile = file;
-document.getElementById('target-file-name').innerText = file.name;
-// Feature 8: Check Audit Logs
-const lastAccess = getAuditLog(file.name);
-const auditDiv = document.getElementById('audit-log-display');
-if(lastAccess) {
-auditDiv.innerHTML = Last Unlock Attempt: ${lastAccess.time} [${lastAccess.success ? 'SUCCESS' : 'FAILED'}];
-auditDiv.classList.remove('hidden');
-} else { auditDiv.classList.add('hidden'); }
-// Read PDF metadata to check for WebAuthn requirement
-const textData = await file.text();
-const mfaMatch = textData.match(//WebAuthnId\s*<([0-9a-fA-F]+)>/);
-webAuthnRequiredId = mfaMatch ? mfaMatch[1] : null;
-if(webAuthnRequiredId) {
-document.getElementById('target-file-status').innerHTML = <span class="text-emerald-400">ENCRYPTED + DEVICE BIOMETRICS REQUIRED</span>;
-} else {
-document.getElementById('target-file-status').innerText = 'ENCRYPTED MATRIX';
-}
-document.getElementById('unlock-stage-upload').classList.add('hidden');
-document.getElementById('unlock-stage-process').classList.remove('hidden');
-}
-function resetUnlockModule() {
-activeFile = null; decryptedPayloadData = null; webAuthnRequiredId = null;
-document.getElementById('unlock-password').value = "";
-document.getElementById('unlock-stage-process').classList.add('hidden');
-document.getElementById('unlock-stage-viewer').classList.add('hidden');
-document.getElementById('unlock-stage-upload').classList.remove('hidden');
-toggleFullscreenViewer(false);
-document.getElementById('fs-content').innerHTML = '';
-document.getElementById('inspector-content').innerHTML = '';
-document.getElementById('vault-files-container').innerHTML = '';
-}
-async function handleDecryptPDF() {
-if (!activeFile) return;
-const decryptBtn = document.getElementById('btn-trigger-decrypt');
-const basePass = document.getElementById('unlock-password').value;
-decryptBtn.disabled = true;
-decryptBtn.innerHTML = <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Penetrating Vault...;
-try {
-let finalPass = basePass;
-// MFA Device Biometrics / PIN Verification
-if (webAuthnRequiredId) {
-showToast('Awaiting Device Biometrics / PIN...', 'info');
-await assertWebAuthnCredential(webAuthnRequiredId);
-finalPass = basePass + webAuthnRequiredId;
-}
-const textData = await activeFile.text();
-const match = textData.match(//PhantomPayload\s*<([0-9a-fA-F]+)>/);
-if (!match) throw new Error("No recognized Phantom Payload found.");
-const rawHex = match[1];
-let payloads = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA") : [rawHex];
-let decryptedJsonStr = null;
-let isDecoy = false;
-try { decryptedJsonStr = await internalDecrypt(payloads[0], finalPass); }
-catch (e1) {
-if(payloads[1]) {
-try { decryptedJsonStr = await internalDecrypt(payloads[1], finalPass); isDecoy = true; }
-catch (e2) { throw new Error("Invalid Passphrase or Authentication."); }
-} else throw new Error("Invalid Passphrase or Authentication.");
-}
-decryptedPayloadData = JSON.parse(decryptedJsonStr);
-// Feature 1: Time-Bomb Expiry Logic
-if(decryptedPayloadData.expiry && Date.now() > decryptedPayloadData.expiry) {
-throw new Error("FATAL: This payload has expired and permanently self-destructed.");
-}
-logAccess(activeFile.name, true);
-document.getElementById('viewing-file-name').innerText = activeFile.name + (isDecoy ? " (Decoy)" : "");
-document.getElementById('fs-filename').innerText = activeFile.name;
-const htmlContent = buildViewerHTML(decryptedPayloadData.rawText || "", decryptedPayloadData.files);
-document.getElementById('inspector-content').innerHTML = htmlContent;
-document.getElementById('fs-content').innerHTML = htmlContent;
-renderVaultFilesSidebar(decryptedPayloadData.files);
-applyMathFormatting('inspector-content');
-applyMathFormatting('fs-content');
-generateTOC();
-const wmFS = document.getElementById('fs-watermark');
-if (decryptedPayloadData.watermarkText) {
-document.getElementById('fs-watermark-text').innerText = decryptedPayloadData.watermarkText;
-wmFS.classList.remove('hidden');
-} else wmFS.classList.add('hidden');
-document.getElementById('unlock-stage-process').classList.add('hidden');
-document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-showToast(isDecoy ? 'Decoy Vault Opened.' : 'Main Vault Unlocked.', 'success');
-document.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
-} catch (err) {
-logAccess(activeFile.name, false);
-showToast(err.message, 'error');
-if(err.message.includes("FATAL")) resetUnlockModule();
-} finally {
-decryptBtn.disabled = false;
-decryptBtn.innerHTML = <span id="icon-btn-unlock">${ICONS.unlock}</span> Decrypt File;
-}
-}
-function toggleFullscreenViewer(show) {
-const viewer = document.getElementById('fullscreen-viewer');
-if (show) {
-viewer.classList.remove('hidden');
-setTimeout(() => viewer.classList.remove('opacity-0'), 10);
-document.body.style.overflow = 'hidden';
-} else {
-viewer.classList.add('opacity-0');
-setTimeout(() => viewer.classList.add('hidden'), 300);
-document.body.style.overflow = 'auto';
-}
-}
-function handleExportCleanPDF() {
-if (!decryptedPayloadData || !activeFile) return;
-showToast('Printing payload directly due to formatting restrictions.', 'info');
-printPayload();
-}
-function printPayload() {
-if(!decryptedPayloadData) return;
-const printWindow = window.open('', '_blank');
-const cssLink = document.getElementById('katex-css').href;
-const hljsCss = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css";
-printWindow.document.write(<html><head><title>Print Secure Payload</title> <link rel="stylesheet" href="${cssLink}"> <link rel="stylesheet" href="${hljsCss}"> <style> body { font-family: Georgia, serif; line-height: 1.6; color: #000; max-width: 800px; margin: 0 auto; padding: 2rem; } h1, h2, h3 { border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; } img { max-width: 100%; height: auto; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ccc; padding: 8px; } pre { background: #f4f4f4; padding: 10px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; } code { font-family: monospace; } @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } } </style> </head><body onload="setTimeout(() => { window.print(); window.close(); }, 500);"> ${document.getElementById('fs-content').innerHTML} </body></html>);
-printWindow.document.close();
-}
-window.onload = () => {
-renderIcons();
-loadDraft();
-setupDragAndDrop();
-};
-</script>
+Confidential payloads are secured via Z-SACP (Zero-Server Access Control Protocol)." class="w-full flex-1 bg-transparent text-white placeholder-neutral-600 resize-none focus:outline-none leading-relaxed text-sm md:text-base outline-none overflow-y-auto mb-4 font-mono" oninput="triggerAutoSave()"></textarea>
+            
+            <div id="image-preview-container" class="flex gap-3 overflow-x-auto pb-2 min-h-[80px] hidden border-t border-phantom-700 pt-4"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: UNLOCK SECTION -->
+    <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500">
+      <div class="text-center max-w-xl mx-auto mb-8 mt-4">
+        <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
+        <p class="text-neutral-400 text-sm">Upload a locked PhantomPDF or process an encrypted URL payload.</p>
+      </div>
+
+      <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
+        <div id="drop-zone" class="border-2 border-dashed border-phantom-700 hover:border-emerald-500/50 bg-phantom-800/30 hover:bg-emerald-500/[0.02] rounded-3xl p-16 text-center transition-all cursor-pointer group shadow-xl relative overflow-hidden" onclick="triggerFileInput()">
+          <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
+          <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-900 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 text-neutral-500 group-hover:text-emerald-400 transition-all shadow-inner relative z-10" id="icon-upload-zone"></div>
+          <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors relative z-10">Initialize Pipeline</h3>
+          <p class="text-neutral-500 mt-2 mb-8 relative z-10">Drag & drop your locked PDF file here</p>
+          <span class="inline-flex bg-phantom-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-600 relative z-10">Browse Local Files</span>
+        </div>
+      </div>
+
+      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-800 border border-phantom-700 rounded-2xl p-6 shadow-2xl hidden">
+        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-700">
+          <div class="w-14 h-14 bg-phantom-900 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0" id="icon-file-ready"></div>
+          <div class="flex-1 overflow-hidden">
+            <h3 id="target-file-name" class="font-bold text-white truncate text-base">SecureDocument.pdf</h3>
+            <p class="text-[10px] text-emerald-400/80 font-mono mt-1 tracking-widest flex items-center gap-1"><span id="icon-lock-small" class="w-3 h-3"></span> ENCRYPTED MATRIX</p>
+          </div>
+          <button onclick="resetUnlockModule()" class="p-2 bg-phantom-900 hover:bg-red-500/20 text-neutral-500 hover:text-red-400 rounded-lg border border-phantom-700 transition-colors"><span id="icon-trash"></span></button>
+        </div>
+
+        <!-- Dynamic Device Matrix Display -->
+        <div class="mb-5 p-3 bg-phantom-900 rounded-xl border border-phantom-700 flex items-center justify-between">
+          <div>
+            <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">Your Hardware Matrix ID</p>
+            <p class="text-sm font-mono text-emerald-400 tracking-wider" id="viewer-device-id">CALCULATING...</p>
+          </div>
+          <button onclick="copyDeviceID()" class="p-2 text-neutral-400 hover:text-white bg-phantom-800 rounded-lg transition-colors" title="Copy ID"><span id="icon-copy" class="w-4 h-4"></span></button>
+        </div>
+
+        <div class="space-y-5">
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-neutral-400 uppercase tracking-wider flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><span id="icon-unlock-key"></span> Access Code / Passphrase</span>
+              <span id="brute-force-warn" class="text-[10px] text-red-400 hidden">Attempts Left: <span id="bf-count">3</span></span>
+            </label>
+            <div class="relative">
+              <input id="unlock-password" type="password" placeholder="Enter Access Code..." class="w-full bg-phantom-900 border border-phantom-700 rounded-xl pl-4 pr-11 py-3 text-sm text-white focus:border-emerald-500 transition-all shadow-inner" />
+              <button type="button" onclick="togglePasswordVisibility('unlock-password', this)" class="absolute right-3 top-3.5 text-neutral-500 hover:text-white"><span class="btn-eye-icon"></span></button>
+            </div>
+            <p class="text-[10px] text-neutral-500 mt-1 leading-tight" id="unlock-helper-text">If this is a secure link, send your Hardware ID to the creator to receive an Access Code.</p>
+          </div>
+          
+          <button id="btn-trigger-decrypt" onclick="handleDecrypt()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/20">
+            <span id="icon-btn-unlock"></span> Decrypt Payload
+          </button>
+        </div>
+      </div>
+
+      <div id="unlock-stage-viewer" class="space-y-5 hidden animate-in zoom-in-95 duration-300">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-phantom-800 border border-emerald-500/30 p-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/15 flex items-center justify-center border border-emerald-500/40 text-emerald-400" id="icon-success"></div>
+            <div>
+              <h2 class="font-extrabold text-white text-lg tracking-tight">Access Granted</h2>
+              <p class="text-emerald-400/80 text-xs mt-0.5 font-mono">Decrypted: <span id="viewing-file-name" class="text-neutral-400"></span></p>
+            </div>
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+            <button onclick="toggleFullscreenViewer(true)" class="flex-1 md:flex-none bg-phantom-700 hover:bg-phantom-600 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all border border-phantom-600 flex items-center justify-center gap-2">
+              <span id="icon-expand"></span> View Rendered
+            </button>
+            <button onclick="resetUnlockModule()" class="px-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl transition-all flex items-center justify-center" title="Burn & Close"><span id="icon-x"></span></button>
+          </div>
+        </div>
+
+        <div class="bg-phantom-900 border border-phantom-800 rounded-2xl p-6 min-h-[400px] max-h-[500px] shadow-inner relative overflow-y-auto" oncopy="handleClipboardTheft(event)">
+          <div class="flex items-center justify-between mb-4 pb-4 border-b border-phantom-800">
+            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Raw Data Inspector</span>
+            <span class="text-[10px] text-emerald-500 font-mono flex items-center gap-1"><span id="icon-shield-small" class="w-3 h-3"></span> ANTI-COPY ACTIVE</span>
+          </div>
+          <div id="inspector-content" class="rendered-content font-serif text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: IAM / ACCESS MANAGER -->
+    <section id="tab-iam" class="space-y-6 hidden animate-in fade-in duration-500">
+      <div class="mb-8 mt-4 flex flex-col md:flex-row items-start md:items-end justify-between border-b border-phantom-700 pb-6">
+        <div>
+          <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2 flex items-center gap-3">
+            <span id="icon-iam-header" class="text-emerald-500"></span> Identity Access Manager
+          </h1>
+          <p class="text-neutral-400 text-sm">Manage hardware-bound access codes for your shared Z-SACP links. Zero servers involved.</p>
+        </div>
+        <div class="mt-4 md:mt-0 text-right">
+          <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1">Your Hardware Matrix ID</p>
+          <p class="text-sm font-mono text-emerald-400 bg-phantom-900 px-3 py-1.5 rounded-lg border border-phantom-700 inline-block" id="creator-device-id">CALCULATING...</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Keyring List -->
+        <div class="bg-phantom-800 border border-phantom-700 rounded-2xl flex flex-col shadow-2xl h-[500px]">
+          <div class="p-5 border-b border-phantom-700 flex items-center justify-between bg-phantom-800/80 rounded-t-2xl">
+            <h3 class="font-bold text-white text-sm flex items-center gap-2"><span id="icon-keyring" class="w-4 h-4 text-emerald-400"></span> Local Keyring</h3>
+            <span class="text-xs bg-phantom-900 px-2 py-1 rounded text-neutral-400" id="keyring-count">0 Links</span>
+          </div>
+          <div class="flex-1 overflow-y-auto p-3 space-y-2" id="keyring-list">
+            <!-- Populated via JS -->
+            <div class="text-center p-8 text-neutral-500 text-sm">No secure links generated yet.</div>
+          </div>
+        </div>
+
+        <!-- Issue Access Code Panel -->
+        <div class="bg-phantom-800 border border-phantom-700 rounded-2xl p-6 shadow-2xl flex flex-col justify-center relative overflow-hidden group">
+          <div class="absolute inset-0 bg-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+          
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-phantom-900 border border-phantom-700 rounded-2xl mx-auto flex items-center justify-center text-emerald-400 shadow-inner mb-4" id="icon-mint"></div>
+            <h3 class="text-xl font-bold text-white">Mint Access Code</h3>
+            <p class="text-xs text-neutral-400 mt-2 max-w-sm mx-auto">Select a document from your keyring and enter the viewer's Hardware Matrix ID to generate a personalized decryption code.</p>
+          </div>
+
+          <div class="space-y-4 max-w-sm mx-auto w-full relative z-10">
+            <div>
+              <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Target Document ID</label>
+              <input type="text" id="iam-doc-id" readonly placeholder="Select from keyring..." class="w-full bg-phantom-900 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1">Viewer's Hardware Matrix ID</label>
+              <input type="text" id="iam-viewer-id" placeholder="e.g., A1B2C3D4" class="w-full bg-phantom-900 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white font-mono uppercase focus:outline-none focus:border-emerald-500" maxlength="8" />
+            </div>
+            
+            <button onclick="mintAccessCode()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-900 font-extrabold py-3.5 px-4 rounded-xl transition-all shadow-lg active:scale-[0.98] mt-4">
+              Generate Hardware Code
+            </button>
+
+            <div id="minted-code-box" class="hidden mt-6 p-4 bg-phantom-900 border border-emerald-500/30 rounded-xl text-center">
+              <p class="text-[10px] text-emerald-400 uppercase tracking-widest mb-2 font-bold">Personalized Access Code</p>
+              <p class="text-lg font-mono text-white tracking-widest select-all bg-phantom-800 py-2 rounded-lg border border-phantom-700" id="minted-code-output">XYZ-123</p>
+              <p class="text-[10px] text-neutral-500 mt-2">Send this code to the viewer. It will only work on their exact device.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- URL SHARE MODAL -->
+  <div id="share-modal" class="fixed inset-0 bg-phantom-900/90 backdrop-blur-sm z-[70] hidden flex-col items-center justify-center opacity-0 transition-opacity">
+    <div class="bg-phantom-800 border border-phantom-700 rounded-2xl p-8 max-w-md w-full shadow-2xl relative">
+      <button onclick="closeShareModal()" class="absolute top-4 right-4 text-neutral-500 hover:text-white"><span id="icon-close-modal" class="w-5 h-5"></span></button>
+      <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 mx-auto" id="icon-share-success"></div>
+      <h3 class="text-xl font-bold text-white text-center mb-2">Secure Link Generated</h3>
+      <p class="text-xs text-neutral-400 text-center mb-6">The payload has been encrypted and compressed into this URL. Viewers will need an Access Code to open it.</p>
+      
+      <div class="bg-phantom-900 border border-phantom-700 p-3 rounded-xl flex items-center justify-between mb-6">
+        <input type="text" id="share-url-output" readonly class="bg-transparent text-sm text-emerald-400 font-mono w-full outline-none truncate mr-2" />
+        <button onclick="copyShareUrl()" class="p-2 bg-phantom-800 hover:bg-phantom-700 text-white rounded-lg transition-colors shrink-0">Copy</button>
+      </div>
+      
+      <div class="text-center">
+        <button onclick="closeShareModal(); switchTab('iam');" class="text-sm font-bold text-emerald-500 hover:text-emerald-400 underline underline-offset-4 transition-colors">Go to Access Manager</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =====================================================================
+    // 1. HARDWARE MATRIX (Device ID Fingerprinting)
+    // =====================================================================
+    let myHardwareID = "UNKNOWN";
+
+    async function generateHardwareMatrix() {
+      // Collect entropy (Canvas, Screen, UA, Concurrency, Timezone)
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "#f60";
+      ctx.fillRect(125,1,62,20); ctx.fillStyle = "#069"; ctx.fillText("PhantomVault Matrix", 2, 15); ctx.fillStyle = "rgba(102, 204, 0, 0.7)"; ctx.fillText("PhantomVault Matrix", 4, 17);
+      const canvasHash = canvas.toDataURL();
+
+      const entropy = [
+        navigator.userAgent, screen.colorDepth, screen.width, screen.height,
+        new Date().getTimezoneOffset(), navigator.hardwareConcurrency, navigator.language, canvasHash
+      ].join('|||');
+
+      const buffer = new TextEncoder().encode(entropy);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      // 8 character Hex string as Matrix ID
+      const id = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8).toUpperCase();
+      myHardwareID = id;
+      document.getElementById('viewer-device-id').innerText = id;
+      document.getElementById('creator-device-id').innerText = id;
+      return id;
+    }
+
+    function copyDeviceID() {
+      navigator.clipboard.writeText(myHardwareID);
+      showToast("Hardware ID copied to clipboard.", "success");
+    }
+
+    // =====================================================================
+    // 2. ICONS & UI SETUP
+    // =====================================================================
+    const ICONS = {
+      zap: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+      filePlus: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>`,
+      unlock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>`,
+      sliders: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>`,
+      fileText: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+      lock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0"/></svg>`,
+      printer: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
+      eye: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+      eyeOff: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
+      shieldCheck: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
+      uploadCloud: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
+      fileKey: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
+      key: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
+      download: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
+      alert: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+      check: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+      imagePlus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="14" y1="4" x2="18" y2="4"/></svg>`,
+      expand: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>`,
+      close: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+      trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
+      x: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+      shield: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+      theme: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
+      print: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
+      link: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
+      iam: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+      copy: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+      toc: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`
+    };
+
+    function renderIcons() {
+      const mappings = {
+        'icon-brand-main': 'zap', 'icon-tab-create': 'filePlus', 'icon-tab-unlock': 'unlock', 'icon-tab-iam': 'iam',
+        'icon-sliders': 'sliders', 'icon-doc-title': 'fileText', 'icon-doc-key': 'lock',
+        'icon-doc-wm': 'printer', 'icon-btn-secure': 'shieldCheck', 'icon-upload-zone': 'uploadCloud',
+        'icon-file-ready': 'fileKey', 'icon-unlock-key': 'key', 'icon-btn-unlock': 'unlock',
+        'icon-success': 'check', 'icon-fs-download': 'download', 'icon-image-plus': 'imagePlus',
+        'icon-expand': 'expand', 'icon-fs-brand': 'zap', 'icon-fs-close': 'close', 'icon-trash': 'trash', 'icon-x': 'x', 
+        'icon-shield': 'shield', 'icon-shield-adv': 'shield', 'icon-shield-small': 'shield', 'icon-theme': 'theme', 
+        'icon-print': 'print', 'icon-link-gen': 'link', 'icon-pdf-dl': 'download', 'icon-iam-header': 'iam',
+        'icon-keyring': 'key', 'icon-mint': 'zap', 'icon-close-modal': 'x', 'icon-share-success': 'check',
+        'icon-copy': 'copy', 'icon-toc': 'toc', 'icon-lock-small': 'lock'
+      };
+      for (const [id, key] of Object.entries(mappings)) {
+        if(document.getElementById(id)) document.getElementById(id).innerHTML = ICONS[key];
+      }
+      document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
+    }
+
+    // =====================================================================
+    // 3. UI CONTROLLERS & ANTI-THEFT
+    // =====================================================================
+    let uploadedImages = []; 
+    let activeFile = null;
+    let decryptedPayloadData = null;
+    let urlPayloadHex = null;
+    let currentThemeIndex = 0;
+    const themes = ['theme-light', 'theme-dark', 'theme-sepia'];
+    let bruteForceCount = 0;
+
+    function switchTab(tabId) {
+      document.getElementById('tab-create').classList.toggle('hidden', tabId !== 'create');
+      document.getElementById('tab-unlock').classList.toggle('hidden', tabId !== 'unlock');
+      document.getElementById('tab-iam').classList.toggle('hidden', tabId !== 'iam');
+      
+      const tabs = ['create', 'unlock', 'iam'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`btn-tab-${t}`);
+        if(t === tabId) {
+          if(t==='iam') btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-emerald-400 shadow-sm whitespace-nowrap";
+          else btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-700 text-white shadow-sm whitespace-nowrap";
+        } else {
+          if(t==='iam') btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-emerald-400/60 hover:text-emerald-300 hover:bg-phantom-800 whitespace-nowrap";
+          else btn.className = "px-4 md:px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-neutral-400 hover:text-neutral-200 hover:bg-phantom-800 whitespace-nowrap";
+        }
+      });
+      if(tabId === 'iam') renderKeyring();
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+      btn.innerHTML = inp.type === 'password' ? `<span class="btn-eye-icon">${ICONS.eye}</span>` : `<span class="btn-eye-icon">${ICONS.eyeOff}</span>`;
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let bg = type === 'error' ? 'bg-red-950/90 border-red-500/30 text-red-200' : type === 'success' ? 'bg-emerald-950/90 border-emerald-500/30 text-emerald-200' : 'bg-phantom-800 border-phantom-600 text-neutral-200';
+      let icon = type === 'error' ? ICONS.alert : type === 'success' ? ICONS.check : ICONS.zap;
+      toast.className = `flex items-start gap-3 p-4 rounded-xl border ${bg} shadow-2xl transition-all duration-300 transform translate-x-12 opacity-0 max-w-[340px] z-[100]`;
+      toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-sm font-bold leading-relaxed tracking-wide">${message}</p></div>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
+      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3500);
+    }
+
+    function triggerAutoSave() {
+      const text = document.getElementById('doc-content').value;
+      localStorage.setItem('pv_draft', text);
+      const status = document.getElementById('save-status');
+      status.style.opacity = '1';
+      clearTimeout(window.saveTimer);
+      window.saveTimer = setTimeout(() => status.style.opacity = '0', 2000);
+    }
+    function loadDraft() { const saved = localStorage.getItem('pv_draft'); if(saved) document.getElementById('doc-content').value = saved; }
+
+    function handleClipboardTheft(e) {
+      e.preventDefault();
+      const warning = "PHANTOM VAULT DECOY PROTOCOL: Unauthorized clipboard duplication prevented. Export formally to retrieve contents.";
+      if(e.clipboardData) e.clipboardData.setData('text/plain', warning);
+      else window.clipboardData.setData('Text', warning);
+      showToast("Clipboard theft intercepted.", "error");
+    }
+
+    function cycleTheme() {
+      const container = document.getElementById('theme-container');
+      container.classList.remove(themes[currentThemeIndex]);
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      container.classList.add(themes[currentThemeIndex]);
+    }
+
+    function printPayload() {
+      if(!decryptedPayloadData) return;
+      const printWindow = window.open('', '_blank');
+      const cssLink = document.getElementById('katex-css').href;
+      printWindow.document.write(`
+        <html><head><title>Secure Print</title>
+        <link rel="stylesheet" href="${cssLink}">
+        <style>
+          body { font-family: Georgia, serif; line-height: 1.6; color: #000; max-width: 800px; margin: 0 auto; padding: 2rem; }
+          h1, h2, h3 { border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+          img { max-width: 100%; } table { width: 100%; border-collapse: collapse; }
+          th, td { border: 1px solid #ccc; padding: 8px; } pre, code { font-family: monospace; background: #f4f4f4; padding: 2px 4px; }
+          @media print { button { display: none; } }
+        </style>
+        </head><body onload="window.print(); window.close();">${document.getElementById('fs-content').innerHTML}</body></html>
+      `);
+      printWindow.document.close();
+    }
+
+    function generateTOC() {
+      const contentDiv = document.getElementById('fs-content');
+      const tocContainer = document.getElementById('toc-container');
+      tocContainer.innerHTML = '';
+      const headers = contentDiv.querySelectorAll('h1, h2, h3');
+      if(headers.length === 0) { tocContainer.innerHTML = '<p class="text-neutral-600 text-xs italic">No headers found.</p>'; return; }
+
+      headers.forEach((h, i) => {
+        h.id = 'heading-' + i;
+        const link = document.createElement('a');
+        link.href = '#' + h.id; link.className = 'toc-link'; link.innerText = h.innerText;
+        if(h.tagName === 'H2') link.style.paddingLeft = '0.75rem';
+        if(h.tagName === 'H3') link.style.paddingLeft = '1.5rem';
+        link.onclick = (e) => { e.preventDefault(); document.getElementById('reader-scroll-area').scrollTo({ top: h.offsetTop - 20, behavior: 'smooth' }); };
+        tocContainer.appendChild(link);
+      });
+    }
+
+    // =====================================================================
+    // 4. PARSERS & CRYPTO MATH (Z-SACP Serverless IAM)
+    // =====================================================================
+    function buildViewerHTML(text, images) {
+      let html = '';
+      if (typeof marked !== 'undefined') html = marked.parse(text);
+      if (images && images.length > 0) {
+        html += `<div class="mt-8 pt-8 border-t border-neutral-300">`;
+        for(let img of images) html += `<img src="${img.dataURL}" alt="Attached File" />`;
+        html += `</div>`;
+      }
+      return html;
+    }
+
+    function applyMathFormatting(elementId) {
+      const el = document.getElementById(elementId);
+      if (typeof renderMathInElement !== 'undefined') {
+        try { renderMathInElement(el, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true} ], throwOnError: false }); } 
+        catch (e) {}
+      }
+    }
+
+    function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])); }
+
+    function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
+    function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
+
+    // Native WebCrypto AES-GCM
+    async function internalEncrypt(dataStr, password) {
+      const enc = new TextEncoder(); const payloadBytes = enc.encode(dataStr);
+      const salt = window.crypto.getRandomValues(new Uint8Array(16));
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveKey']);
+      const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:50000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
+      const cipherBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, payloadBytes);
+      const finalBytes = new Uint8Array(28 + cipherBuffer.byteLength);
+      finalBytes.set(salt, 0); finalBytes.set(iv, 16); finalBytes.set(new Uint8Array(cipherBuffer), 28);
+      return bytesToHex(finalBytes);
+    }
+
+    async function internalDecrypt(hex, password) {
+      const bytes = hexToBytes(hex);
+      const salt = bytes.slice(0, 16), iv = bytes.slice(16, 28), ciphertext = bytes.slice(28);
+      const enc = new TextEncoder();
+      const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(password), {name:'PBKDF2'}, false, ['deriveKey']);
+      const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:50000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
+      const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
+      return new TextDecoder().decode(decrypted);
+    }
+
+    // Z-SACP URL Compression (Using Native CompressionStream)
+    async function compressToURL(hexStr) {
+      if(!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); // Fallback
+      const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
+      const buffer = await new Response(stream).arrayBuffer();
+      return btoa(String.fromCharCode(...new Uint8Array(buffer))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    async function decompressFromURL(b64) {
+      b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
+      if(!window.DecompressionStream) return atob(b64); // Fallback
+      const buffer = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
+      return await new Response(stream).text();
+    }
+
+    // Serverless Access Code Generation
+    // AccessCode = Encrypt(MasterVaultKey, ViewerHardwareID)
+    async function generateAccessCode(vaultKeyHex, viewerHardwareId) {
+      return await internalEncrypt(vaultKeyHex, viewerHardwareId);
+    }
+    
+    // Serverless Access Code Decryption
+    // MasterVaultKey = Decrypt(AccessCode, MyHardwareID)
+    async function resolveAccessCode(accessCodeHex) {
+      try {
+        return await internalDecrypt(accessCodeHex, myHardwareID);
+      } catch(e) { throw new Error("Hardware Matrix mismatch. This code is not valid for this device."); }
+    }
+
+
+    // =====================================================================
+    // 5. LOCAL KEYRING DB (For Z-SACP IAM)
+    // =====================================================================
+    function saveToKeyring(docId, title, vaultKey) {
+      let ring = JSON.parse(localStorage.getItem('pv_keyring') || '[]');
+      ring.push({ id: docId, title, key: vaultKey, date: new Date().toLocaleDateString() });
+      localStorage.setItem('pv_keyring', JSON.stringify(ring));
+    }
+
+    function renderKeyring() {
+      let ring = JSON.parse(localStorage.getItem('pv_keyring') || '[]');
+      document.getElementById('keyring-count').innerText = `${ring.length} Links`;
+      const list = document.getElementById('keyring-list');
+      if(ring.length === 0) { list.innerHTML = '<div class="text-center p-8 text-neutral-500 text-sm">No secure links generated yet.</div>'; return; }
+      
+      list.innerHTML = ring.reverse().map(doc => `
+        <div class="p-3 bg-phantom-900 border border-phantom-700 rounded-xl hover:border-emerald-500/50 cursor-pointer transition-colors" onclick="selectDocForIAM('${doc.id}')">
+          <div class="flex justify-between items-start mb-1">
+            <h4 class="text-sm font-bold text-white truncate pr-2">${doc.title}</h4>
+            <span class="text-[9px] text-neutral-500 font-mono">${doc.date}</span>
+          </div>
+          <p class="text-[10px] text-emerald-500/70 font-mono truncate">ID: ${doc.id}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectDocForIAM(id) {
+      document.getElementById('iam-doc-id').value = id;
+      showToast("Document selected. Enter Viewer Matrix ID.", "info");
+    }
+
+    async function mintAccessCode() {
+      const docId = document.getElementById('iam-doc-id').value;
+      const viewerId = document.getElementById('iam-viewer-id').value.toUpperCase().trim();
+      if(!docId || !viewerId) return showToast("Missing parameters.", "error");
+
+      let ring = JSON.parse(localStorage.getItem('pv_keyring') || '[]');
+      const doc = ring.find(d => d.id === docId);
+      if(!doc) return showToast("Document key not found in local keyring.", "error");
+
+      try {
+        const accessCode = await generateAccessCode(doc.key, viewerId);
+        document.getElementById('minted-code-output').innerText = accessCode.substring(0, 32) + "...";
+        document.getElementById('minted-code-box').classList.remove('hidden');
+        showToast("Access Code minted securely.", "success");
+      } catch(e) { showToast("Minting failed.", "error"); }
+    }
+
+
+    // =====================================================================
+    // 6. CORE APP FLOW (Generate & Decrypt)
+    // =====================================================================
+    async function handleGenerate(mode) {
+      const content = document.getElementById('doc-content').value;
+      let password = document.getElementById('doc-password').value;
+      const watermarkText = document.getElementById('doc-watermark').value;
+      let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
+      if (!filename.endsWith('.pdf')) filename += '.pdf';
+
+      const expiryInput = document.getElementById('doc-expiry').value;
+      const expiryTS = expiryInput && document.getElementById('enable-expiry').checked ? new Date(expiryInput).getTime() : null;
+
+      if (!content.trim() && uploadedImages.length === 0) return showToast('Add text or images to encrypt.', 'error');
+
+      // Setup Button UI
+      const btnId = mode === 'pdf' ? 'btn-lock-pdf' : 'btn-lock-link';
+      const btn = document.getElementById(btnId);
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+
+      try {
+        // If mode=link and no password, auto-generate strong master key
+        if(mode === 'link' && !password) {
+          const rand = window.crypto.getRandomValues(new Uint8Array(16));
+          password = Array.from(rand).map(b => b.toString(16).padStart(2, '0')).join('');
+        } else if (!password) {
+          password = "PHANTOM_DEFAULT"; // Fallback for PDF if lazy
+        }
+
+        const payloadMain = { rawText: content, watermarkText, images: uploadedImages, expiry: expiryTS };
+        const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
+
+        if (mode === 'pdf') {
+          let combinedHex = hexMain;
+          if(document.getElementById('enable-decoy').checked) {
+            const decoyPass = document.getElementById('decoy-password').value;
+            const decoyText = document.getElementById('decoy-content').value;
+            if(!decoyPass || !decoyText) throw new Error("Decoy parameters incomplete.");
+            const payloadDecoy = { rawText: decoyText, watermarkText: "DECOY ACTIVE", images: [], expiry: null };
+            const hexDecoy = await internalEncrypt(JSON.stringify(payloadDecoy), decoyPass);
+            combinedHex = hexMain + "FFFFAAAA" + hexDecoy; 
+          }
+
+          const pdfEngine = new AdvancedPDFEngine();
+          const decoyStr = "CONFIDENTIAL VAULT SECURED\n\nIf you are reading this in a standard viewer, access is DENIED.\nThis multimedia structure is cryptographically obfuscated.\nUse PhantomPDF Vault to decrypt the exact byte matrix.\n\n" + Math.random().toString(16).substring(2).repeat(30).toUpperCase();
+          const pdfBytes = pdfEngine.buildFormatted(decoyStr, watermarkText, combinedHex);
+
+          const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href = url; a.download = filename;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+          showToast('Secure Dual-Vault PDF Built!', 'success');
+        
+        } else if (mode === 'link') {
+          // Compress Hex Payload for URL Capacity
+          const compressed64 = await compressToURL(hexMain);
+          const shareUrl = window.location.origin + window.location.pathname + '#v=' + compressed64;
+          
+          // Save Master Key to IAM Keyring
+          const docId = 'DOC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+          saveToKeyring(docId, filename, password);
+          
+          document.getElementById('share-url-output').value = shareUrl;
+          document.getElementById('share-modal').classList.remove('hidden');
+          setTimeout(() => document.getElementById('share-modal').classList.remove('opacity-0'), 10);
+        }
+      } catch (err) { console.error(err); showToast(err.message || 'Encryption failed.', 'error'); }
+      finally { btn.disabled = false; btn.innerHTML = originalHtml; }
+    }
+
+    function closeShareModal() {
+      document.getElementById('share-modal').classList.add('opacity-0');
+      setTimeout(() => document.getElementById('share-modal').classList.add('hidden'), 300);
+    }
+    function copyShareUrl() {
+      const url = document.getElementById('share-url-output').value;
+      navigator.clipboard.writeText(url);
+      showToast("Secure Link copied. Send to viewer.", "success");
+    }
+
+    // --- DECRYPT FLOW ---
+    function setupDragAndDrop() {
+      const dropZone = document.getElementById('drop-zone');
+      ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
+      ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('border-emerald-500', 'bg-emerald-500/[0.05]'); }, false));
+      dropZone.addEventListener('drop', e => e.dataTransfer.files[0] && processFileEntity(e.dataTransfer.files[0]), false);
+    }
+    function triggerFileInput() { document.getElementById('pdf-file-input').click(); }
+    function handleFileSelect(event) { event.target.files[0] && processFileEntity(event.target.files[0]); }
+    
+    function processFileEntity(file) {
+      activeFile = file;
+      urlPayloadHex = null;
+      document.getElementById('target-file-name').innerText = file.name;
+      document.getElementById('unlock-helper-text').innerText = "Enter the primary or decoy passphrase.";
+      document.getElementById('unlock-stage-upload').classList.add('hidden');
+      document.getElementById('unlock-stage-process').classList.remove('hidden');
+    }
+
+    function resetUnlockModule() {
+      activeFile = null; decryptedPayloadData = null; urlPayloadHex = null;
+      document.getElementById('unlock-password').value = "";
+      document.getElementById('unlock-stage-process').classList.add('hidden');
+      document.getElementById('unlock-stage-viewer').classList.add('hidden');
+      document.getElementById('unlock-stage-upload').classList.remove('hidden');
+      toggleFullscreenViewer(false);
+      document.getElementById('fs-content').innerHTML = '';
+      document.getElementById('inspector-content').innerHTML = '';
+      // Reset hash if it was a URL unlock
+      if(window.location.hash.startsWith('#v=')) window.history.replaceState(null, null, ' ');
+    }
+
+    async function handleDecrypt() {
+      const decryptBtn = document.getElementById('btn-trigger-decrypt');
+      const passInput = document.getElementById('unlock-password').value;
+      if(!passInput) return showToast("Enter Access Code or Passphrase.", "error");
+
+      decryptBtn.disabled = true; decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+
+      try {
+        let rawHex = null;
+        let isDecoy = false;
+        let finalDecryptionKey = passInput;
+
+        if (urlPayloadHex) {
+          rawHex = urlPayloadHex;
+          // Z-SACP Logic: The input is an Access Code. We must decrypt it to get the Vault Key.
+          try {
+            finalDecryptionKey = await resolveAccessCode(passInput);
+          } catch(e) { throw new Error("Invalid Hardware Access Code."); }
+        } else if (activeFile) {
+          const textData = await activeFile.text(); 
+          const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
+          if (!match) throw new Error("No recognized Phantom Payload found.");
+          rawHex = match[1];
+        }
+
+        let payloads = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA") : [rawHex];
+        let decryptedJsonStr = null;
+
+        try { decryptedJsonStr = await internalDecrypt(payloads[0], finalDecryptionKey); } 
+        catch (e1) {
+          if(payloads[1]) {
+            try { decryptedJsonStr = await internalDecrypt(payloads[1], finalDecryptionKey); isDecoy = true; } 
+            catch (e2) { throw new Error("Invalid Decryption Key."); }
+          } else throw new Error("Invalid Decryption Key.");
+        }
+
+        decryptedPayloadData = JSON.parse(decryptedJsonStr);
+
+        if(decryptedPayloadData.expiry && Date.now() > decryptedPayloadData.expiry) {
+          resetUnlockModule();
+          throw new Error("FATAL: Payload has expired and self-destructed.");
+        }
+
+        document.getElementById('viewing-file-name').innerText = (activeFile ? activeFile.name : "SecureURL.phtm") + (isDecoy ? " (Decoy)" : "");
+        document.getElementById('fs-filename').innerText = activeFile ? activeFile.name : "SecureURL.phtm";
+        
+        const htmlContent = buildViewerHTML(decryptedPayloadData.rawText || "", decryptedPayloadData.images);
+        document.getElementById('inspector-content').innerHTML = htmlContent;
+        document.getElementById('fs-content').innerHTML = htmlContent;
+        
+        applyMathFormatting('inspector-content');
+        applyMathFormatting('fs-content');
+        generateTOC(); 
+
+        const wmFS = document.getElementById('fs-watermark');
+        if (decryptedPayloadData.watermarkText) {
+          document.getElementById('fs-watermark-text').innerText = decryptedPayloadData.watermarkText;
+          wmFS.classList.remove('hidden');
+        } else wmFS.classList.add('hidden');
+
+        document.getElementById('unlock-stage-process').classList.add('hidden');
+        document.getElementById('unlock-stage-viewer').classList.remove('hidden');
+        bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
+        showToast(isDecoy ? 'Decoy Vault Opened.' : 'Vault Unlocked.', 'success');
+
+      } catch (err) {
+        bruteForceCount++;
+        const warn = document.getElementById('brute-force-warn');
+        warn.classList.remove('hidden');
+        document.getElementById('bf-count').innerText = 3 - bruteForceCount;
+        if(bruteForceCount >= 3) {
+          urlPayloadHex = null; activeFile = null; // Corrupt RAM state
+          showToast("SECURITY LOCKOUT. Memory scrambled. Refresh required.", "error");
+          setTimeout(() => location.reload(), 2000);
+        } else {
+          showToast(err.message, 'error');
+        }
+      } finally {
+        decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Decrypt Payload`;
+      }
+    }
+
+    // Advanced PDF Engine for Clean Exports
+    class AdvancedPDFEngine {
+      constructor() { this.chunks=[]; this.objects=[]; this.byteLength=0; this.encoder=new TextEncoder(); this.append("%PDF-1.4\n%\xE2\xE3\xCF\xD3\n"); }
+      append(str) { const bytes = this.encoder.encode(str); this.chunks.push(bytes); const offset = this.byteLength; this.byteLength += bytes.length; return offset; }
+      addObj(contentStr) { const id = this.objects.length + 1; this.objects.push(this.byteLength); this.append(`${id} 0 obj\n${contentStr}\nendobj\n`); return id; }
+      buildFormatted(rawText, watermark) {
+        const catalogId = 1, pagesId = 2, fontRegId = 3, fontBoldId = 4;
+        let pagesData = []; let currentPage = { stream: `BT\n50 750 Td\n`, y: 750 };
+        const nextLine = (pts) => { currentPage.y-=pts; if(currentPage.y<50){ currentPage.stream+=`ET\n`; pagesData.push(currentPage); currentPage={stream:`BT\n50 750 Td\n`, y:750}; } else currentPage.stream+=`0 -${pts} Td\n`; };
+        const escapePdfStr = (str) => str.replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[^ -~]/g,'?');
+        
+        const blocks = failsafeParseToBlocks(rawText);
+        for(let block of blocks) {
+          if(block.type==='h1'){ currentPage.stream+=`/F2 24 Tf\n`; nextLine(30); currentPage.stream+=`(${escapePdfStr(block.text)}) Tj\n`; nextLine(10); }
+          else if(block.type==='h2'){ currentPage.stream+=`/F2 18 Tf\n`; nextLine(24); currentPage.stream+=`(${escapePdfStr(block.text)}) Tj\n`; nextLine(8); }
+          else if(block.type==='space'){ nextLine(14); }
+          else if(block.type==='p'){
+            nextLine(18); let cLen=0; 
+            for(let seg of block.segments){
+              currentPage.stream+=seg.b?`/F2 12 Tf\n`:`/F1 12 Tf\n`;
+              for(let w of seg.t.split(' ')){ if(cLen+w.length>90){ nextLine(16); cLen=0; } currentPage.stream+=`(${escapePdfStr(w+' ')}) Tj\n`; cLen+=w.length+1; }
+            }
+          }
+        }
+        currentPage.stream+=`ET\n`; pagesData.push(currentPage);
+        if(watermark){ let esc=escapePdfStr(watermark); for(let p of pagesData) p.stream+=`q 0.8 0 0 rg 0.15 gs\nBT /F2 64 Tf 0.707 0.707 -0.707 0.707 100 200 Tm (${esc}) Tj ET Q\n`; }
+
+        let kidsArray=[]; let currObjId=5; for(let i=0;i<pagesData.length;i++){ kidsArray.push(`${currObjId+1} 0 R`); currObjId+=2; }
+        this.addObj(`<< /Type /Catalog /Pages ${pagesId} 0 R >>`); this.addObj(`<< /Type /Pages /Kids [${kidsArray.join(' ')}] /Count ${pagesData.length} >>`);
+        this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`); this.addObj(`<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`);
+        for(let p of pagesData){ const sId=this.addObj(`<< /Length ${p.stream.length} >>\nstream\n${p.stream}\nendstream`); this.addObj(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 600 800] /Resources << /Font << /F1 ${fontRegId} 0 R /F2 ${fontBoldId} 0 R >> /ExtGState << /GS1 << /ca 0.3 >> >> >> /Contents ${sId} 0 R >>`); }
+        const infoId=this.addObj(`<< /Producer (PhantomVault Export) >>`);
+        const xrefOffset=this.byteLength; this.append(`xref\n0 ${this.objects.length+1}\n0000000000 65535 f \n`);
+        for(let off of this.objects) this.append(String(off).padStart(10,'0')+" 00000 n \n");
+        this.append(`trailer\n<< /Size ${this.objects.length+1} /Root ${catalogId} 0 R /Info ${infoId} 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+        const fBuf=new Uint8Array(this.byteLength); let off=0; for(let c of this.chunks){ fBuf.set(c,off); off+=c.length; } return fBuf;
+      }
+    }
+
+    function handleExportCleanPDF() {
+      if (!decryptedPayloadData) return;
+      try {
+        const pdfEngine = new AdvancedPDFEngine();
+        const pdfBytes = pdfEngine.buildFormatted(decryptedPayloadData.rawText || "", decryptedPayloadData.watermarkText);
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a'); link.href = url; link.download = `Clean_${activeFile?activeFile.name:'Export'}.pdf`;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+        showToast('Clean PDF exported securely.', 'success');
+      } catch (err) { showToast('PDF Export encountered an error.', 'error'); }
+    }
+
+    // Init script
+    window.onload = async () => { 
+      renderIcons(); 
+      loadDraft(); 
+      await generateHardwareMatrix();
+      
+      // Auto-load Hash link
+      if(window.location.hash.startsWith('#v=')) {
+        switchTab('unlock');
+        document.getElementById('target-file-name').innerText = "Secure Z-SACP URL Link";
+        document.getElementById('unlock-helper-text').innerText = "This is a device-locked link. Send your Hardware Matrix ID to the creator to receive an Access Code.";
+        document.getElementById('unlock-stage-upload').classList.add('hidden');
+        document.getElementById('unlock-stage-process').classList.remove('hidden');
+        try {
+          const compressed = window.location.hash.substring(3);
+          urlPayloadHex = await decompressFromURL(compressed);
+        } catch(e) { showToast("URL Payload is corrupted.", "error"); }
+      }
+    };
+  </script>
 </body>
 </html>
