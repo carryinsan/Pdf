@@ -284,7 +284,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
               <span id="brute-force-warn" class="text-[10px] text-red-500 hidden font-bold">Lockout: <span id="bf-count">3</span> tries left</span>
             </label>
             <div class="relative">
-              <!-- Full textarea to accommodate huge IAM access codes without truncation -->
               <textarea id="unlock-password" placeholder="Paste Passphrase or Access Code..." class="w-full h-20 bg-phantom-950 border border-phantom-700 rounded-xl p-4 text-sm text-white focus:border-emerald-500 transition-all shadow-inner font-mono resize-none break-all outline-none"></textarea>
             </div>
           </div>
@@ -391,7 +390,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
   </main>
 
-  <!-- URL SHARE MODAL (TRUNCATION FIXED) -->
+  <!-- URL SHARE MODAL -->
   <div id="share-modal" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-xl z-[70] hidden flex-col items-center justify-center opacity-0 transition-opacity">
     <div class="bg-phantom-900 border border-phantom-800 rounded-3xl p-8 max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative">
       <button onclick="closeShareModal()" class="absolute top-5 right-5 text-neutral-500 hover:text-white bg-phantom-800 p-2 rounded-lg border border-phantom-700"><span id="icon-close-modal" class="w-5 h-5"></span></button>
@@ -400,7 +399,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       <p class="text-xs text-neutral-400 text-center mb-6 leading-relaxed">The payload is safely encrypted into the URL below. The security tier requirements are completely hidden from the public string.</p>
       
       <div class="space-y-5">
-        <!-- Huge dedicated textarea for the massive URL so the user can see everything -->
         <div class="bg-phantom-950 border border-phantom-800 p-4 rounded-2xl flex flex-col gap-4 shadow-inner">
           <textarea id="share-url-output" readonly class="bg-transparent text-[11px] text-emerald-500 font-mono w-full outline-none break-all h-24 resize-none select-all"></textarea>
           <button onclick="copyShareUrl()" class="w-full py-3 bg-phantom-800 hover:bg-phantom-700 text-white rounded-xl text-sm font-bold transition-colors border border-phantom-700 shadow-md flex items-center justify-center gap-2"><span id="icon-copy-url"></span> Copy Entire Link</button>
@@ -421,7 +419,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
   <script>
     // =====================================================================
-    // 1. GLOBAL STRICT STATE & ICONS (Fixes "Not Defined" Bugs)
+    // 1. GLOBAL STRICT STATE & ICONS
     // =====================================================================
     window.VaultState = {
       images: [],
@@ -588,14 +586,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       else pinBox.classList.add('hidden');
     }
 
-    let currentThemeIndex = 0; const themes = ['theme-dark', 'theme-sepia', 'theme-light'];
-    function cycleTheme() {
-      const container = document.getElementById('theme-container');
-      container.classList.remove(themes[currentThemeIndex]);
-      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-      container.classList.add(themes[currentThemeIndex]);
-    }
-
     function triggerAutoSave() {
       const text = document.getElementById('doc-content').value;
       localStorage.setItem('pv_draft_abs', text);
@@ -627,9 +617,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function executePanicProtocol() {
       document.getElementById('panic-overlay').style.display = 'flex';
-      window.VaultState = {}; // Wipe RAM
-      document.body.innerHTML = ''; // Wipe DOM
-      window.location.replace('https://en.wikipedia.org/wiki/Special:Random'); // Divert
+      window.VaultState = {}; 
+      document.body.innerHTML = ''; 
+      window.location.replace('https://en.wikipedia.org/wiki/Special:Random');
     }
 
     function toggleFullscreenViewer(show) {
@@ -644,7 +634,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 5. PARSERS & RENDERING (MARKDOWN, MATH, TOC)
+    // 5. PARSERS & RENDERING
     // =====================================================================
     function failsafeParseToBlocks(text) {
       const blocks = [];
@@ -771,7 +761,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 6. CRYPTO ENGINE (Byte-Exact, Universal Master)
+    // 6. CRYPTO ENGINE
     // =====================================================================
     const DEFAULT_CIPHER_KEY = "PHTM_V10_ABS";
 
@@ -826,7 +816,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       throw new Error("Payload corrupt.");
     }
 
-    // LOOP-BASED BASE64 to prevent Call Stack Overflows on huge payloads
     function bufferToBase64(buf) {
       let binary = '';
       const bytes = new Uint8Array(buf);
@@ -927,7 +916,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 8. ERRORLESS FAILSAFE PDF ENGINE (Fixes Blank Pages & Overflows)
+    // 8. ERRORLESS FAILSAFE PDF ENGINE
     // =====================================================================
     class ReliablePDF {
         constructor() {
@@ -997,7 +986,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const content = document.getElementById('doc-content').value;
       let password = document.getElementById('doc-password').value;
       
-      // FIXED: Used optional chaining and default empty string because 'doc-watermark' does not exist in the HTML
       const watermarkText = document.getElementById('doc-watermark')?.value || ''; 
       
       let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
@@ -1012,7 +1000,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
       const btnId = mode === 'pdf' ? 'btn-lock-pdf' : 'btn-lock-link';
       const btn = document.getElementById(btnId);
-      if (!btn) return; // Fail safe
+      if (!btn) return;
       
       const originalHtml = btn.innerHTML;
       btn.disabled = true; 
@@ -1059,9 +1047,12 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           showToast('Secure PDF Built!', 'success');
         
         } else if (mode === 'link') {
-          if (hexMain.length > 500000) {
-             throw new Error("Payload too massive for URL compression. Please export as PDF instead.");
+          // FIXED: Prevents the Chrome hanging issue by stopping massively bloated URLs.
+          // Images and massive text blocks will exceed browser limits when converted to a URL hash.
+          if (hexMain.length > 30000) {
+             throw new Error("Payload is too massive for a URL Link! Browsers will crash. Please remove attached images or use the 'Export PDF' button instead.");
           }
+          
           const compressed64 = await compressToURL(hexMain);
           const shareUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
           
@@ -1195,7 +1186,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         
         applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
 
-        // FIXED: Safe check for missing HTML elements during decryption to prevent crash
         const wmFS = document.getElementById('fs-watermark');
         if (wmFS) {
             if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
@@ -1256,11 +1246,14 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       renderIcons(); loadDraft(); setupDragAndDrop();
       await generateHardwareMatrix();
       
-      if(window.location.hash.startsWith('#v=')) {
+      // FIXED: Switched from startsWith('#v=') to using URLSearchParams to properly detect the hashtag routing.
+      const hashString = window.location.hash.substring(1);
+      const urlParams = new URLSearchParams(hashString);
+      
+      if(urlParams.has('v')) {
         switchTab('unlock');
-        const params = new URLSearchParams(window.location.hash.substring(1));
-        const tier = params.get('t');
-        const compressed = params.get('v');
+        const tier = urlParams.get('t') || "1";
+        const compressed = urlParams.get('v');
 
         document.getElementById('target-file-name').innerText = "Decentralized URL Cargo Link";
         document.getElementById('unlock-stage-upload').classList.add('hidden');
