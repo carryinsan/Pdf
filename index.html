@@ -202,10 +202,10 @@
           </div>
 
           <div class="flex gap-3 pt-1">
-            <button onclick="handleGenerate('pdf')" class="flex-1 bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg">
+            <button onclick="handleGenerate('pdf')" id="btn-lock-pdf" class="flex-1 bg-phantom-800 hover:bg-phantom-700 border border-phantom-600 text-white font-bold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-lg">
               <span id="icon-pdf-dl"></span> Export PDF
             </button>
-            <button onclick="handleGenerate('link')" class="flex-[1.2] bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95" id="btn-lock-link">
+            <button onclick="handleGenerate('link')" id="btn-lock-link" class="flex-[1.2] bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95">
               <span id="icon-link-gen"></span> Generate URL Link
             </button>
           </div>
@@ -632,6 +632,17 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       window.location.replace('https://en.wikipedia.org/wiki/Special:Random'); // Divert
     }
 
+    function toggleFullscreenViewer(show) {
+      const viewer = document.getElementById('fullscreen-viewer');
+      if (show) {
+        viewer.classList.remove('hidden');
+        setTimeout(() => viewer.classList.remove('opacity-0'), 10);
+      } else {
+        viewer.classList.add('opacity-0');
+        setTimeout(() => viewer.classList.add('hidden'), 300);
+      }
+    }
+
     // =====================================================================
     // 5. PARSERS & RENDERING (MARKDOWN, MATH, TOC)
     // =====================================================================
@@ -985,7 +996,10 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     async function handleGenerate(mode) {
       const content = document.getElementById('doc-content').value;
       let password = document.getElementById('doc-password').value;
-      const watermarkText = document.getElementById('doc-watermark').value;
+      
+      // FIXED: Used optional chaining and default empty string because 'doc-watermark' does not exist in the HTML
+      const watermarkText = document.getElementById('doc-watermark')?.value || ''; 
+      
       let filename = document.getElementById('doc-filename').value.trim() || 'SecureDocument';
       if (!filename.endsWith('.pdf')) filename += '.pdf';
 
@@ -998,8 +1012,11 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
       const btnId = mode === 'pdf' ? 'btn-lock-pdf' : 'btn-lock-link';
       const btn = document.getElementById(btnId);
+      if (!btn) return; // Fail safe
+      
       const originalHtml = btn.innerHTML;
-      btn.disabled = true; btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
+      btn.disabled = true; 
+      btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>`;
 
       const expiryInput = document.getElementById('doc-expiry').value;
       const expiryTS = expiryInput && document.getElementById('enable-expiry').checked ? new Date(expiryInput).getTime() : null;
@@ -1178,9 +1195,12 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         
         applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
 
+        // FIXED: Safe check for missing HTML elements during decryption to prevent crash
         const wmFS = document.getElementById('fs-watermark');
-        if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
-        else wmFS.classList.add('hidden');
+        if (wmFS) {
+            if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
+            else wmFS.classList.add('hidden');
+        }
 
         document.getElementById('unlock-stage-process').classList.add('hidden');
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
@@ -1199,7 +1219,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             setTimeout(() => location.reload(), 2000);
           } else showToast(err.message, 'error');
         }
-      } finally { decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Penetrate Vault`; }
+      } finally { decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Execute Decryption`; }
     }
 
     function handleExportCleanPDF() {
