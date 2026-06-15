@@ -258,15 +258,15 @@
 
               <hr class="border-phantom-700">
 
-              <!-- Major Upgrade 1: WebAuthn Hardware Key -->
+              <!-- Major Upgrade 1: WebAuthn Device Biometrics / PIN -->
               <div>
-                <label class="flex items-center justify-between cursor-pointer group" title="Require a YubiKey or Biometrics">
+                <label class="flex items-center justify-between cursor-pointer group" title="Require Biometrics or System PIN">
                   <div class="flex flex-col">
-                    <span class="text-sm font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1"><span id="icon-fingerprint"></span> Hardware Key (MFA)</span>
+                    <span class="text-sm font-bold text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1"><span id="icon-fingerprint"></span> Device Biometrics/PIN</span>
                   </div>
                   <input type="checkbox" id="enable-webauthn" class="w-4 h-4 accent-emerald-500 bg-phantom-900 border-phantom-700 rounded">
                 </label>
-                <p class="text-[10px] text-neutral-500 mt-1">Binds encryption mathematically to a physical Security Key (FIDO2/WebAuthn).</p>
+                <p class="text-[10px] text-neutral-500 mt-1">Locks decryption exclusively to this device's Windows Hello, TouchID, FaceID, or PIN.</p>
               </div>
 
               <hr class="border-phantom-700">
@@ -470,20 +470,19 @@ setTimeout(() => el.remove(), 300);
 // 2. NEW FEATURES PIPELINES
 // =====================================================================
 // Global State
-let vaultFiles = []; // Replaces uploadedImages to hold any file type
+let vaultFiles = [];
 let activeFile = null;
 let decryptedPayloadData = null;
-let currentThemeIndex = 1; // Default to dark
+let currentThemeIndex = 1;
 const themes = ['theme-light', 'theme-dark', 'theme-sepia'];
-let webAuthnRequiredId = null; // Stores credential ID if MFA used
+let webAuthnRequiredId = null;
 // Feature 1: Panic Button (Shift + Esc)
 window.addEventListener('keydown', (e) => {
 if (e.shiftKey && e.key === 'Escape') {
 document.body.classList.add('panic-active');
 document.title = "404 Not Found";
-resetUnlockModule(); // Instantly wipe memory
+resetUnlockModule();
 }
-// Panic cancel (Triple Esc)
 if (e.key === 'Escape') {
 window.escCount = (window.escCount || 0) + 1;
 if(window.escCount >= 3) { document.body.classList.add('panic-active'); resetUnlockModule(); }
@@ -546,9 +545,9 @@ if(/[A-Z]/.test(pw) && /[a-z]/.test(pw)) strength += 25;
 if(/[0-9]/.test(pw) && /[^A-Za-z0-9]/.test(pw)) strength += 25;
 const bar = document.getElementById('pwd-strength-bar');
 bar.style.width = strength + '%';
-if(strength < 50) bar.style.backgroundColor = '#ef4444'; // red
-else if(strength < 100) bar.style.backgroundColor = '#eab308'; // yellow
-else bar.style.backgroundColor = '#10b981'; // green
+if(strength < 50) bar.style.backgroundColor = '#ef4444';
+else if(strength < 100) bar.style.backgroundColor = '#eab308';
+else bar.style.backgroundColor = '#10b981';
 }
 function generateStrongPassword() {
 const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
@@ -562,7 +561,7 @@ checkPasswordStrength(pw);
 showToast('Strong Master Key generated. Save it!', 'success');
 setTimeout(() => field.type = 'password', 5000);
 }
-// Feature 6: Audit Log (Local Storage Tracker)
+// Feature 6: Audit Log
 function logAccess(filename, success) {
 const logs = JSON.parse(localStorage.getItem('phantom_audit_logs') || '{}');
 logs[filename] = { time: new Date().toLocaleString(), success };
@@ -578,7 +577,7 @@ if(!decryptedPayloadData) return;
 let content = decryptedPayloadData.rawText;
 let mime = 'text/plain';
 if(format === 'html') {
-content = buildViewerHTML(content, []); // raw HTML structure
+content = buildViewerHTML(content, []);
 mime = 'text/html';
 }
 const blob = new Blob([content], { type: mime });
@@ -623,7 +622,6 @@ container.innerHTML = vaultFiles.map(f => {
 const isImg = f.type.startsWith('image/');
 return <div class="relative w-24 h-24 shrink-0 rounded-lg overflow-hidden border border-phantom-700 group bg-phantom-900 flex flex-col items-center justify-center text-center p-1"> ${isImg ?<img src="${f.dataURL}" class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-30 transition-opacity" />:<span class="text-emerald-500 mb-1">${ICONS.fileText}</span>} <span class="text-[9px] font-mono text-neutral-300 z-10 break-all truncate w-full px-1">${f.name}</span> <span class="text-[8px] text-neutral-500 z-10">${(f.size/1024).toFixed(1)}kb</span> <button onclick="removeVaultFile('${f.id}')" class="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-red-400 hover:text-red-300 z-20"> ${ICONS.trash} </button> </div> }).join('');
 }
-// Render files in Viewer
 function renderVaultFilesSidebar(files) {
 const header = document.getElementById('vault-files-header');
 const container = document.getElementById('vault-files-container');
@@ -682,7 +680,6 @@ tocContainer.appendChild(link);
 }
 function buildViewerHTML(text, files) {
 let html = '';
-// Marked Parser with Syntax Highlighting
 if (typeof marked !== 'undefined') {
 marked.setOptions({
 highlight: function(code, lang) {
@@ -692,7 +689,6 @@ return hljs.highlight(code, { language }).value;
 });
 html = marked.parse(text);
 } else { html = <p>${text.replace(/\n/g, '<br>')}</p>; }
-// Inline Images rendering
 if (files && files.length > 0) {
 const images = files.filter(f => f.type.startsWith('image/'));
 if(images.length > 0) {
@@ -713,39 +709,57 @@ renderMathInElement(el, { delimiters: [ {left: '
 }
 }
 // =====================================================================
-// 5. CRYPTO ENGINE & WEBAUTHN (MFA)
+// 5. CRYPTO ENGINE & WEBAUTHN (BIOMETRICS/PIN FIXED)
 // =====================================================================
 function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
 function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
 const FALLBACK_KEY = "PHTM_V8_MSTR";
-// MAJOR UPGRADE 1: WebAuthn Helper
+// MAJOR UPGRADE 1: Fixed WebAuthn (Device Biometrics / PIN)
 async function createWebAuthnCredential() {
-if(!window.PublicKeyCredential) throw new Error("WebAuthn not supported.");
+if(!window.PublicKeyCredential) throw new Error("Biometrics/PIN not supported by this browser.");
 const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
+const userId = new Uint8Array(16); window.crypto.getRandomValues(userId);
+const rpConfig = { name: "PhantomVault Local" };
+// Safely apply hostname if valid (fixes errors in iframes/file URIs)
+if (window.location.hostname) rpConfig.id = window.location.hostname;
+try {
 const cred = await navigator.credentials.create({
 publicKey: {
 challenge: challenge,
-rp: { name: "PhantomVault Local", id: window.location.hostname || "localhost" },
-user: { id: challenge, name: "vault_owner", displayName: "Vault Owner" },
+rp: rpConfig,
+user: { id: userId, name: "vault_owner", displayName: "Vault Owner" },
 pubKeyCredParams: [{alg: -7, type: "public-key"}, {alg: -257, type: "public-key"}],
-authenticatorSelection: { authenticatorAttachment: "cross-platform" }, // Requires Security Key
+authenticatorSelection: {
+authenticatorAttachment: "platform", // strictly Biometric/PIN (no YubiKey forced)
+userVerification: "required"
+},
 timeout: 60000
 }
 });
+if(!cred) throw new Error("Verification cancelled.");
 return { rawIdHex: bytesToHex(new Uint8Array(cred.rawId)) };
+} catch (err) {
+throw new Error("Biometric/PIN setup failed. Please check device settings or browser permissions. (" + err.message + ")");
+}
 }
 async function assertWebAuthnCredential(rawIdHex) {
-if(!window.PublicKeyCredential) throw new Error("WebAuthn not supported.");
+if(!window.PublicKeyCredential) throw new Error("Biometrics/PIN not supported by this browser.");
 const challenge = new Uint8Array(32); window.crypto.getRandomValues(challenge);
 const rawIdBytes = hexToBytes(rawIdHex);
-await navigator.credentials.get({
+try {
+const assertion = await navigator.credentials.get({
 publicKey: {
 challenge: challenge,
 allowCredentials: [{ id: rawIdBytes, type: 'public-key' }],
+userVerification: "required",
 timeout: 60000
 }
 });
-return true; // If it doesn't throw, user possesses the key
+if (!assertion) throw new Error("Verification cancelled.");
+return true;
+} catch (err) {
+throw new Error("Biometric/PIN verification failed. (" + err.message + ")");
+}
 }
 async function internalEncrypt(jsonString, password) {
 const enc = new TextEncoder();
@@ -863,15 +877,16 @@ const useWebAuthn = document.getElementById('enable-webauthn').checked;
 if (!content.trim() && vaultFiles.length === 0) return showToast('Add text or files to encrypt.', 'error');
 if (!basePassword) return showToast('Master Key required.', 'error');
 const lockBtn = document.getElementById('btn-lock-pdf');
-lockBtn.disabled = true; lockBtn.innerHTML = <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Compiling Matrix...;
+lockBtn.disabled = true;
+lockBtn.innerHTML = <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Compiling Matrix...;
 try {
 let finalMasterKey = basePassword;
 let mfaCredId = null;
 if (useWebAuthn) {
-showToast('Insert Security Key and touch it...', 'info');
+showToast('Awaiting Device Biometrics / PIN...', 'info');
 const authData = await createWebAuthnCredential();
 mfaCredId = authData.rawIdHex;
-finalMasterKey = basePassword + mfaCredId; // Cryptographic binding
+finalMasterKey = basePassword + mfaCredId;
 }
 const payloadMain = { rawText: content, watermarkText, files: vaultFiles, expiry: expiryTS };
 const hexMain = await internalEncrypt(JSON.stringify(payloadMain), finalMasterKey);
@@ -898,7 +913,11 @@ showToast('Secure Vault PDF Built & Downloaded!', 'success');
 console.error(err);
 showToast(err.message || 'Encryption failed.', 'error');
 }
-finally { lockBtn.disabled = false; lockBtn.innerHTML = <span id="icon-btn-secure">${ICONS.shieldCheck}</span> Encrypt Payload; }
+finally {
+// Always release the UI lock
+lockBtn.disabled = false;
+lockBtn.innerHTML = <span id="icon-btn-secure">${ICONS.shieldCheck}</span> Encrypt Payload;
+}
 }
 // --- DECRYPTION PIPELINE ---
 function setupDragAndDrop() {
@@ -925,7 +944,7 @@ const textData = await file.text();
 const mfaMatch = textData.match(//WebAuthnId\s*<([0-9a-fA-F]+)>/);
 webAuthnRequiredId = mfaMatch ? mfaMatch[1] : null;
 if(webAuthnRequiredId) {
-document.getElementById('target-file-status').innerHTML = <span class="text-emerald-400">ENCRYPTED + HARDWARE KEY REQUIRED</span>;
+document.getElementById('target-file-status').innerHTML = <span class="text-emerald-400">ENCRYPTED + DEVICE BIOMETRICS REQUIRED</span>;
 } else {
 document.getElementById('target-file-status').innerText = 'ENCRYPTED MATRIX';
 }
@@ -951,11 +970,11 @@ decryptBtn.disabled = true;
 decryptBtn.innerHTML = <svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Penetrating Vault...;
 try {
 let finalPass = basePass;
-// MFA Hardware Key Verification
+// MFA Device Biometrics / PIN Verification
 if (webAuthnRequiredId) {
-showToast('Hardware Key Required. Touch security key...', 'info');
+showToast('Awaiting Device Biometrics / PIN...', 'info');
 await assertWebAuthnCredential(webAuthnRequiredId);
-finalPass = basePass + webAuthnRequiredId; // Reconstruct mathematical key
+finalPass = basePass + webAuthnRequiredId;
 }
 const textData = await activeFile.text();
 const match = textData.match(//PhantomPayload\s*<([0-9a-fA-F]+)>/);
@@ -968,18 +987,17 @@ try { decryptedJsonStr = await internalDecrypt(payloads[0], finalPass); }
 catch (e1) {
 if(payloads[1]) {
 try { decryptedJsonStr = await internalDecrypt(payloads[1], finalPass); isDecoy = true; }
-catch (e2) { throw new Error("Invalid Passphrase or Hardware Key."); }
-} else throw new Error("Invalid Passphrase or Hardware Key.");
+catch (e2) { throw new Error("Invalid Passphrase or Authentication."); }
+} else throw new Error("Invalid Passphrase or Authentication.");
 }
 decryptedPayloadData = JSON.parse(decryptedJsonStr);
 // Feature 1: Time-Bomb Expiry Logic
 if(decryptedPayloadData.expiry && Date.now() > decryptedPayloadData.expiry) {
 throw new Error("FATAL: This payload has expired and permanently self-destructed.");
 }
-logAccess(activeFile.name, true); // Log success
+logAccess(activeFile.name, true);
 document.getElementById('viewing-file-name').innerText = activeFile.name + (isDecoy ? " (Decoy)" : "");
 document.getElementById('fs-filename').innerText = activeFile.name;
-// Render Output (Markdown + Files)
 const htmlContent = buildViewerHTML(decryptedPayloadData.rawText || "", decryptedPayloadData.files);
 document.getElementById('inspector-content').innerHTML = htmlContent;
 document.getElementById('fs-content').innerHTML = htmlContent;
@@ -995,14 +1013,14 @@ wmFS.classList.remove('hidden');
 document.getElementById('unlock-stage-process').classList.add('hidden');
 document.getElementById('unlock-stage-viewer').classList.remove('hidden');
 showToast(isDecoy ? 'Decoy Vault Opened.' : 'Main Vault Unlocked.', 'success');
-// Highlight syntax
 document.querySelectorAll('pre code').forEach((block) => hljs.highlightElement(block));
 } catch (err) {
-logAccess(activeFile.name, false); // Log failure
+logAccess(activeFile.name, false);
 showToast(err.message, 'error');
 if(err.message.includes("FATAL")) resetUnlockModule();
 } finally {
-decryptBtn.disabled = false; decryptBtn.innerHTML = <span id="icon-btn-unlock">${ICONS.unlock}</span> Decrypt File;
+decryptBtn.disabled = false;
+decryptBtn.innerHTML = <span id="icon-btn-unlock">${ICONS.unlock}</span> Decrypt File;
 }
 }
 function toggleFullscreenViewer(show) {
@@ -1020,7 +1038,7 @@ document.body.style.overflow = 'auto';
 function handleExportCleanPDF() {
 if (!decryptedPayloadData || !activeFile) return;
 showToast('Printing payload directly due to formatting restrictions.', 'info');
-printPayload(); // Directs to print mechanism for standard PDF saving
+printPayload();
 }
 function printPayload() {
 if(!decryptedPayloadData) return;
@@ -1030,7 +1048,6 @@ const hljsCss = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styl
 printWindow.document.write(<html><head><title>Print Secure Payload</title> <link rel="stylesheet" href="${cssLink}"> <link rel="stylesheet" href="${hljsCss}"> <style> body { font-family: Georgia, serif; line-height: 1.6; color: #000; max-width: 800px; margin: 0 auto; padding: 2rem; } h1, h2, h3 { border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; } img { max-width: 100%; height: auto; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #ccc; padding: 8px; } pre { background: #f4f4f4; padding: 10px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; } code { font-family: monospace; } @media print { button { display: none; } body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } } </style> </head><body onload="setTimeout(() => { window.print(); window.close(); }, 500);"> ${document.getElementById('fs-content').innerHTML} </body></html>);
 printWindow.document.close();
 }
-// Init script
 window.onload = () => {
 renderIcons();
 loadDraft();
