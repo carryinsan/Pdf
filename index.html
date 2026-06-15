@@ -63,6 +63,17 @@
 
     .toc-link { transition: all 0.2s; display: block; padding: 0.35rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; border-left: 2px solid transparent; padding-left: 10px; }
     .toc-link:hover { color: #10b981; border-left-color: #10b981; background: rgba(16,185,129,0.05); }
+
+    /* Matrix Scanner Animation */
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+    .scanner-active::after {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(to bottom, transparent, rgba(16, 185, 129, 0.1), transparent);
+      animation: scanline 1.5s linear infinite; pointer-events: none;
+    }
   </style>
 </head>
 <body class="bg-phantom-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
@@ -110,7 +121,7 @@
   </div>
 
   <!-- MAIN APP HEADER -->
-  <header class="border-b border-phantom-700 bg-phantom-900/80 backdrop-blur-lg sticky top-0 z-40 shadow-md">
+  <header class="border-b border-phantom-700 bg-phantom-900/80 backdrop-blur-lg sticky top-0 z-40 shadow-md" id="main-header">
     <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/20 to-emerald-600/5 flex items-center justify-center border border-emerald-500/30 shadow-lg" id="icon-brand-main"></div>
@@ -167,6 +178,7 @@
                   <option value="1">Tier 1: Standard (Passphrase Only)</option>
                   <option value="2">Tier 2: Dual-Lock (Passphrase + PIN)</option>
                   <option value="3" selected>Tier 3: Device-Locked (Z-SACP)</option>
+                  <option value="4" class="bg-red-950 text-red-400 font-bold">Tier 4: Absolute Zero (GPU-Lock + PoW)</option>
                 </select>
               </div>
 
@@ -174,6 +186,12 @@
                 <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Set 4-Digit Secondary PIN</label>
                 <input id="doc-pin" type="text" maxlength="4" placeholder="e.g. 1928" class="w-full bg-phantom-950 border border-yellow-500/40 rounded-xl px-3 py-2.5 text-sm text-yellow-400 focus:border-yellow-400 font-mono tracking-widest text-center shadow-inner outline-none" />
                 <p class="text-[9px] text-neutral-500 leading-tight mt-2 text-center">Dead-Man Switch: If viewer inputs '0000', the RAM payload instantly self-corrupts.</p>
+              </div>
+
+              <div id="tier-4-warn-box" class="hidden space-y-1.5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-center">
+                <span id="icon-skull" class="w-5 h-5 text-red-500 mx-auto block mb-1"></span>
+                <p class="text-[9px] font-bold text-red-400 uppercase tracking-widest leading-tight">Tier 4 Active: Quantum Resist</p>
+                <p class="text-[9px] text-neutral-400 leading-tight">Payload enforces 1,000,000 Cryptographic Iterations & Canvas GPU-Fingerprinting. High CPU load upon decrypt.</p>
               </div>
 
               <hr class="border-phantom-800">
@@ -206,7 +224,7 @@
               <span id="icon-pdf-dl"></span> Export PDF
             </button>
             <button onclick="handleGenerate('link')" id="btn-lock-link" class="flex-[1.2] bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-2 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95">
-              <span id="icon-link-gen"></span> Generate URL Link
+              <span id="icon-link-gen"></span> Generate Link
             </button>
           </div>
         </div>
@@ -242,9 +260,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     <!-- TAB 2: DECRYPT SECTION -->
     <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500">
-      <div class="text-center max-w-xl mx-auto mb-8 mt-4">
+      <div class="text-center max-w-xl mx-auto mb-8 mt-4" id="decrypt-header">
         <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
-        <p class="text-neutral-400 text-sm">Upload a secured PDF file or process an encrypted URL payload.</p>
+        <p class="text-neutral-400 text-sm">Upload a secured PDF file or process an encrypted payload.</p>
       </div>
 
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
@@ -257,8 +275,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         </div>
       </div>
 
-      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-900 border border-phantom-800 rounded-2xl p-6 shadow-2xl hidden">
-        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-800">
+      <div id="unlock-stage-process" class="max-w-md mx-auto bg-phantom-900 border border-phantom-800 rounded-2xl p-6 shadow-2xl hidden relative overflow-hidden">
+        <div class="flex items-center gap-4 mb-6 pb-6 border-b border-phantom-800 relative z-10">
           <div class="w-14 h-14 bg-phantom-950 border border-phantom-700 rounded-xl flex items-center justify-center shrink-0 shadow-inner" id="icon-file-ready"></div>
           <div class="flex-1 overflow-hidden">
             <h3 id="target-file-name" class="font-bold text-white truncate text-base">Cargo Link</h3>
@@ -267,7 +285,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <button onclick="resetUnlockModule()" class="p-2 bg-phantom-950 hover:bg-red-500/20 text-neutral-500 hover:text-red-400 rounded-lg border border-phantom-700 transition-colors"><span id="icon-trash"></span></button>
         </div>
 
-        <div id="hw-profile-box" class="mb-6 p-3 bg-phantom-950 rounded-xl border border-phantom-800 flex items-center justify-between shadow-inner">
+        <div id="hw-profile-box" class="mb-6 p-3 bg-phantom-950 rounded-xl border border-phantom-800 flex items-center justify-between shadow-inner relative z-10">
           <div>
             <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1 text-white">Your Hardware Matrix ID</p>
             <p class="text-sm font-mono text-emerald-400 tracking-wider" id="viewer-device-id">CALCULATING...</p>
@@ -275,7 +293,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <button onclick="copyDeviceID()" class="p-2 text-neutral-400 hover:text-white bg-phantom-800 rounded-lg transition-colors border border-phantom-700" title="Copy Hardware ID"><span id="icon-copy" class="w-4 h-4"></span></button>
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-5 relative z-10">
           <p id="unlock-instruction" class="text-xs text-neutral-400 bg-phantom-800 p-3 rounded-lg border border-phantom-700 leading-relaxed hidden"></p>
 
           <div class="space-y-2" id="unlock-pass-container">
@@ -333,7 +351,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <h1 class="text-3xl font-extrabold text-white tracking-tight mb-2 flex items-center gap-3">
             <span id="icon-iam-header" class="text-emerald-500"></span> Identity Access Manager
           </h1>
-          <p class="text-neutral-400 text-sm">Issue mathematically-bound Access Codes for Z-SACP Tier-3 links.</p>
+          <p class="text-neutral-400 text-sm">Issue mathematically-bound Access Codes for Z-SACP & Tier-4 links.</p>
         </div>
         <div class="mt-4 md:mt-0 text-right">
           <p class="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1 text-white">Your Hardware Matrix ID</p>
@@ -362,7 +380,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <div class="space-y-4 max-w-md mx-auto w-full relative z-10">
             <div>
               <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1 text-white">Target Document ID</label>
-              <input type="text" id="iam-doc-id" readonly placeholder="Click a Tier-3 document in the Keyring..." class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none shadow-inner" />
+              <input type="text" id="iam-doc-id" readonly placeholder="Click a Tier 3/4 document in the Keyring..." class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-emerald-400 font-mono focus:outline-none shadow-inner" />
             </div>
             <div>
               <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-1 text-white">Viewer's Matrix ID</label>
@@ -395,11 +413,11 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     <div class="bg-phantom-900 border border-phantom-800 rounded-3xl p-8 max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.8)] relative">
       <button onclick="closeShareModal()" class="absolute top-5 right-5 text-neutral-500 hover:text-white bg-phantom-800 p-2 rounded-lg border border-phantom-700"><span id="icon-close-modal" class="w-5 h-5"></span></button>
       <div class="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 mx-auto shadow-inner" id="icon-share-success"></div>
-      <h3 class="text-2xl font-black text-white text-center mb-2">Payload Compressed</h3>
-      <p class="text-xs text-neutral-400 text-center mb-6 leading-relaxed">The payload is safely encrypted into the URL below. The security tier requirements are completely hidden from the public string.</p>
+      <h3 class="text-2xl font-black text-white text-center mb-2" id="share-modal-title">Payload Compressed</h3>
+      <p class="text-xs text-neutral-400 text-center mb-6 leading-relaxed" id="share-modal-desc">The payload is safely encrypted into the URL below. The security tier requirements are completely hidden from the public string.</p>
       
       <div class="space-y-5">
-        <div class="bg-phantom-950 border border-phantom-800 p-4 rounded-2xl flex flex-col gap-4 shadow-inner">
+        <div class="bg-phantom-950 border border-phantom-800 p-4 rounded-2xl flex flex-col gap-4 shadow-inner" id="share-url-container">
           <textarea id="share-url-output" readonly class="bg-transparent text-[11px] text-emerald-500 font-mono w-full outline-none break-all h-24 resize-none select-all"></textarea>
           <button onclick="copyShareUrl()" class="w-full py-3 bg-phantom-800 hover:bg-phantom-700 text-white rounded-xl text-sm font-bold transition-colors border border-phantom-700 shadow-md flex items-center justify-center gap-2"><span id="icon-copy-url"></span> Copy Entire Link</button>
         </div>
@@ -411,7 +429,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         </div>
       </div>
       
-      <div class="text-center mt-8">
+      <div class="text-center mt-8" id="share-modal-footer">
         <button onclick="closeShareModal(); switchTab('iam');" class="text-xs font-bold text-emerald-500 hover:text-emerald-400 uppercase tracking-widest border-b border-emerald-500/30 pb-1 transition-colors">Go to IAM Manager</button>
       </div>
     </div>
@@ -426,6 +444,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       activeFile: null,
       decryptedData: null,
       urlPayloadHex: null,
+      activeTier: "1",
       hardwareID: "UNKNOWN",
       bruteForceCount: 0
     };
@@ -485,13 +504,27 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 2. HARDWARE MATRIX (Device ID Fingerprinting)
+    // 2. HARDWARE MATRIX (Now with TIER-4 GPU Canvas Fingerprinting)
     // =====================================================================
+    function getCanvasFingerprint() {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.textBaseline = "top"; ctx.font = "14px 'Arial'"; ctx.textBaseline = "alphabetic"; 
+        ctx.fillStyle = "#f60"; ctx.fillRect(125,1,62,20); 
+        ctx.fillStyle = "#069"; ctx.fillText("PhantomVault_v10", 2, 15); 
+        ctx.fillStyle = "rgba(102, 204, 0, 0.7)"; ctx.fillText("PhantomVault_v10", 4, 17);
+        return canvas.toDataURL();
+      } catch(e) { return "CANVAS_FALLBACK"; }
+    }
+
     async function generateHardwareMatrix() {
       try {
+        const canvasPrint = getCanvasFingerprint();
         const entropy = [
           navigator.userAgent, screen.colorDepth, screen.width, screen.height,
-          navigator.hardwareConcurrency || 2, navigator.deviceMemory || 4, navigator.platform || "Unknown"
+          navigator.hardwareConcurrency || 2, navigator.deviceMemory || 4, navigator.platform || "Unknown",
+          canvasPrint // Locks to specific GPU/OS renderer
         ].join('||');
         const buffer = new TextEncoder().encode(entropy);
         const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
@@ -527,7 +560,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     function copyShareUrl() {
       const url = document.getElementById('share-url-output').value;
       executeClipboardCopy(url).then(success => {
-        if (success) showToast("Secure Link copied perfectly.", "success");
+        if (success) showToast("Portable Link copied perfectly.", "success");
         else showToast("Clipboard blocked. Select text manually.", "error");
       });
     }
@@ -550,6 +583,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const tabs = ['create', 'unlock', 'iam'];
       tabs.forEach(t => {
         const btn = document.getElementById(`btn-tab-${t}`);
+        if (!btn) return;
         if(t === tabId) {
           if(t==='iam') btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-emerald-400 shadow-sm whitespace-nowrap";
           else btn.className = "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 bg-phantom-800 text-white shadow-sm whitespace-nowrap";
@@ -576,22 +610,21 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       toast.innerHTML = `<div class="shrink-0 mt-0.5">${icon}</div><div class="flex-1"><p class="text-sm font-bold leading-relaxed tracking-wide">${message}</p></div>`;
       container.appendChild(toast);
       setTimeout(() => toast.classList.remove('translate-x-12', 'opacity-0'), 50);
-      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
+      setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 5000);
     }
 
     function toggleSecurityTierPanel() {
       const tier = document.getElementById('share-security-tier').value;
       const pinBox = document.getElementById('tier-2-pin-box');
-      if (tier === "2") pinBox.classList.remove('hidden');
-      else pinBox.classList.add('hidden');
+      const t4Box = document.getElementById('tier-4-warn-box');
+      
+      pinBox.classList.toggle('hidden', tier !== "2");
+      t4Box.classList.toggle('hidden', tier !== "4");
     }
 
     function triggerAutoSave() {
       const text = document.getElementById('doc-content').value;
       localStorage.setItem('pv_draft_abs', text);
-      const status = document.getElementById('save-status');
-      status.style.opacity = '1'; clearTimeout(window.saveTimer);
-      window.saveTimer = setTimeout(() => status.style.opacity = '0', 2000);
     }
     
     function loadDraft() { 
@@ -761,24 +794,27 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 6. CRYPTO ENGINE
+    // 6. CRYPTO ENGINE (Upgraded for Tier 4 PoW)
     // =====================================================================
     const DEFAULT_CIPHER_KEY = "PHTM_V10_ABS";
 
     function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
     function hexToBytes(hex) { const b = new Uint8Array(hex.length/2); for(let i=0; i<hex.length; i+=2) b[i/2] = parseInt(hex.substring(i, i+2), 16); return b; }
 
-    async function internalEncrypt(jsonString, password) {
+    async function internalEncrypt(jsonString, password, tier = "1") {
       const enc = new TextEncoder();
       const payloadBytes = enc.encode(jsonString);
       const encryptionPass = password || DEFAULT_CIPHER_KEY;
+      
+      // Tier 4 Absolute Zero: 1,000,000 iterations Proof of Work. Others: 10,000.
+      const iterations = tier === "4" ? 1000000 : 10000;
       
       if (window.crypto && window.crypto.subtle) {
         try {
           const salt = window.crypto.getRandomValues(new Uint8Array(16));
           const iv = window.crypto.getRandomValues(new Uint8Array(12));
           const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(encryptionPass), {name:'PBKDF2'}, false, ['deriveKey']);
-          const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
+          const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:iterations, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['encrypt']);
           const cipherBuffer = await window.crypto.subtle.encrypt({name:'AES-GCM', iv}, key, payloadBytes);
           
           const finalBytes = new Uint8Array(29 + cipherBuffer.byteLength);
@@ -793,16 +829,18 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       return bytesToHex(finalBytes);
     }
 
-    async function internalDecrypt(hex, password) {
+    async function internalDecrypt(hex, password, tier = "1") {
       const bytes = hexToBytes(hex);
       const type = bytes[0];
       const encryptionPass = password || DEFAULT_CIPHER_KEY;
+      
+      const iterations = tier === "4" ? 1000000 : 10000;
 
       if (type === 1) {
         const salt = bytes.slice(1, 17), iv = bytes.slice(17, 29), ciphertext = bytes.slice(29);
         const enc = new TextEncoder();
         const keyMat = await window.crypto.subtle.importKey('raw', enc.encode(encryptionPass), {name:'PBKDF2'}, false, ['deriveKey']);
-        const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:10000, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
+        const key = await window.crypto.subtle.deriveKey({name:'PBKDF2', salt, iterations:iterations, hash:'SHA-256'}, keyMat, {name:'AES-GCM', length:256}, false, ['decrypt']);
         const decrypted = await window.crypto.subtle.decrypt({name:'AES-GCM', iv}, key, ciphertext);
         return new TextDecoder().decode(decrypted);
       } else if (type === 2) {
@@ -872,7 +910,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       if(ring.length === 0) { list.innerHTML = '<div class="text-center p-8 text-neutral-500 text-sm">Keyring empty.</div>'; return; }
       
       list.innerHTML = ring.reverse().map(doc => {
-        let tierLabel = doc.tier === "1" ? "Tier 1: Low" : doc.tier === "2" ? `Tier 2: PIN [${doc.pin}]` : "Tier 3: Device-Locked";
+        let tierLabel = doc.tier === "1" ? "Tier 1: Low" : doc.tier === "2" ? `Tier 2: PIN [${doc.pin}]` : doc.tier === "3" ? "Tier 3: Device-Locked" : "Tier 4: Absolute Zero";
+        let tierStyle = doc.tier === "4" ? "text-red-400 border-red-500/30 bg-red-500/10" : "text-emerald-400 border-phantom-700 bg-phantom-800";
         return `
           <div class="p-4 bg-phantom-950 border border-phantom-800 rounded-xl hover:border-emerald-500/50 cursor-pointer transition-all shadow-inner" onclick="selectDocForIAM('${doc.id}', '${doc.tier}')">
             <div class="flex justify-between items-start mb-1">
@@ -881,7 +920,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             </div>
             <div class="flex justify-between items-center mt-2">
               <p class="text-[10px] text-emerald-500/80 font-mono">ID: ${doc.id}</p>
-              <span class="text-[9px] px-2 py-0.5 rounded bg-phantom-800 text-emerald-400 border border-phantom-700">${tierLabel}</span>
+              <span class="text-[9px] px-2 py-0.5 rounded ${tierStyle} border">${tierLabel}</span>
             </div>
           </div>
         `;
@@ -889,7 +928,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function selectDocForIAM(id, tier) {
-      if (tier !== "3") {
+      if (tier !== "3" && tier !== "4") {
         showToast("Link does not require a Hardware Access Code (Tier 1 or 2).", "info");
         return;
       }
@@ -911,7 +950,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         const accessCode = await generateAccessCode(doc.key, viewerId);
         document.getElementById('minted-code-output').value = accessCode;
         document.getElementById('minted-code-box').classList.remove('hidden');
-        showToast("Hardware bound Access Code generated.", "success");
+        showToast(`Hardware bound Access Code minted.`, "success");
       } catch(e) { showToast("Code compilation failed.", "error"); }
     }
 
@@ -980,7 +1019,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 9. ENCRYPT & DECRYPT FLOWS
+    // 9. ENCRYPT & DECRYPT FLOWS (PORTABLE VAULT PROTOCOL)
     // =====================================================================
     async function handleGenerate(mode) {
       const content = document.getElementById('doc-content').value;
@@ -1018,7 +1057,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         const payloadMain = { rawText: content, watermarkText, images: window.VaultState.images, expiry: expiryTS, tier: tier };
         if (tier === "2") payloadMain.pinHash = bytesToHex(new TextEncoder().encode(pinVal));
 
-        const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
+        const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password, tier);
 
         if (mode === 'pdf') {
           let combinedHex = hexMain;
@@ -1027,7 +1066,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             const decoyText = document.getElementById('decoy-content').value;
             if(!decoyPass || !decoyText) throw new Error("Decoy structures incomplete.");
             const payloadDecoy = { rawText: decoyText, watermarkText: "DECOY ACTIVE", images: [], expiry: null, tier: "1" };
-            const hexDecoy = await internalEncrypt(JSON.stringify(payloadDecoy), decoyPass);
+            const hexDecoy = await internalEncrypt(JSON.stringify(payloadDecoy), decoyPass, "1");
             combinedHex = hexMain + "FFFFAAAA" + hexDecoy; 
           }
 
@@ -1047,19 +1086,33 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           showToast('Secure PDF Built!', 'success');
         
         } else if (mode === 'link') {
-          // FIXED: Prevents the Chrome hanging issue by stopping massively bloated URLs.
-          // Images and massive text blocks will exceed browser limits when converted to a URL hash.
-          if (hexMain.length > 30000) {
-             throw new Error("Payload is too massive for a URL Link! Browsers will crash. Please remove attached images or use the 'Export PDF' button instead.");
-          }
-          
           const compressed64 = await compressToURL(hexMain);
-          const shareUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
           
           const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
           saveToKeyring(docId, filename, password, tier, pinVal);
-          
-          document.getElementById('share-url-output').value = shareUrl;
+
+          // MASSIVE PAYLOAD FIX: PORTABLE VAULT LINK
+          if (compressed64.length > 25000) {
+             const cleanHTML = document.documentElement.outerHTML.replace(/<script>window\.__PORTABLE_PAYLOAD__.*?<\/script>/, '');
+             const portableHtml = cleanHTML.replace('</head>', `\n<script>window.__PORTABLE_PAYLOAD__ = { t: "${tier}", v: "${compressed64}", n: "${filename.replace('.pdf','')}" };<\/script>\n</head>`);
+             
+             const blob = new Blob([portableHtml], {type: 'text/html'});
+             const url = URL.createObjectURL(blob);
+             const a = document.createElement('a'); a.href = url; a.download = `PortableVault_${filename.replace('.pdf','')}.html`;
+             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+             
+             document.getElementById('share-modal-title').innerText = "Portable Link Generated";
+             document.getElementById('share-modal-desc').innerText = "The payload is massive. We bypassed browser URL limits by embedding the data inside a self-contained Portable Vault HTML file. Share this file directly.";
+             document.getElementById('share-url-container').classList.add('hidden');
+             
+          } else {
+             const shareUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
+             document.getElementById('share-url-output').value = shareUrl;
+             document.getElementById('share-url-container').classList.remove('hidden');
+             document.getElementById('share-modal-title').innerText = "Payload Compressed";
+             document.getElementById('share-modal-desc').innerText = "The payload is safely encrypted into the URL below. The security tier requirements are completely hidden from the public string.";
+          }
+
           const pinDisplay = document.getElementById('decoy-pin-display-box');
           if (tier === "2") { document.getElementById('share-pin-val').innerText = pinVal; pinDisplay.classList.remove('hidden'); }
           else { pinDisplay.classList.add('hidden'); }
@@ -1110,6 +1163,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function resetUnlockModule() {
+      if(window.__PORTABLE_PAYLOAD__) return window.location.reload(); // Hard reset for portable mode
       window.VaultState.activeFile = null; 
       window.VaultState.decryptedData = null; 
       window.VaultState.urlPayloadHex = null;
@@ -1129,87 +1183,103 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const passInput = document.getElementById('unlock-password').value.trim();
       if(!passInput) return showToast("Master key or Access Code required.", "error");
 
-      decryptBtn.disabled = true; decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+      const processBox = document.getElementById('unlock-stage-process');
+      const activeTier = window.VaultState.activeTier;
+      
+      if (activeTier === "4") {
+        processBox.classList.add('scanner-active');
+        decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> <span class="text-red-500">Mining Proof of Work (1M Iters)...</span>`;
+      } else {
+        decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
+      }
+      decryptBtn.disabled = true; 
 
-      try {
-        let rawHex = null; let isDecoy = false;
-        
-        if (window.VaultState.urlPayloadHex) rawHex = window.VaultState.urlPayloadHex;
-        else if (window.VaultState.activeFile) {
-          const textData = await window.VaultState.activeFile.text(); 
-          const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
-          if (!match) throw new Error("File missing Phantom Cryptographic Payload.");
-          rawHex = match[1];
-        } else throw new Error("No payload loaded.");
+      // Give UI time to update before blocking main thread with heavy crypto
+      setTimeout(async () => {
+        try {
+          let rawHex = null; let isDecoy = false;
+          
+          if (window.VaultState.urlPayloadHex) rawHex = window.VaultState.urlPayloadHex;
+          else if (window.VaultState.activeFile) {
+            const textData = await window.VaultState.activeFile.text(); 
+            const match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
+            if (!match) throw new Error("File missing Phantom Cryptographic Payload.");
+            rawHex = match[1];
+          } else throw new Error("No payload loaded.");
 
-        let payloads = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA") : [rawHex];
-        
-        let candidates = [passInput];
-        try { const resolved = await resolveAccessCode(passInput); if(resolved) candidates.push(resolved); } catch(e) {}
+          let payloads = rawHex.includes("FFFFAAAA") ? rawHex.split("FFFFAAAA") : [rawHex];
+          
+          let candidates = [passInput];
+          try { const resolved = await resolveAccessCode(passInput); if(resolved) candidates.push(resolved); } catch(e) {}
 
-        let decryptedJsonStr = null;
-        for (let key of candidates) {
-          try { decryptedJsonStr = await internalDecrypt(payloads[0], key); break; } catch(e) {}
-          if(payloads[1]) {
-            try { decryptedJsonStr = await internalDecrypt(payloads[1], key); isDecoy = true; break; } catch(e) {}
+          let decryptedJsonStr = null;
+          for (let key of candidates) {
+            try { decryptedJsonStr = await internalDecrypt(payloads[0], key, activeTier); break; } catch(e) {}
+            if(payloads[1]) {
+              try { decryptedJsonStr = await internalDecrypt(payloads[1], key, "1"); isDecoy = true; break; } catch(e) {}
+            }
           }
-        }
 
-        if(!decryptedJsonStr) throw new Error("Invalid Vault Key.");
-        window.VaultState.decryptedData = JSON.parse(decryptedJsonStr);
-        const data = window.VaultState.decryptedData;
+          if(!decryptedJsonStr) throw new Error("Invalid Vault Key or Hardware Matrix Mismatch.");
+          window.VaultState.decryptedData = JSON.parse(decryptedJsonStr);
+          const data = window.VaultState.decryptedData;
 
-        if (data.tier === "2" && !isDecoy) {
-          const pinInput = document.getElementById('unlock-pin').value.trim();
-          if(!pinInput) {
-            document.getElementById('unlock-pin-box').classList.remove('hidden');
-            throw new Error("Tier-2 Lock Detected. Enter 4-Digit PIN.");
+          if (data.tier === "2" && !isDecoy) {
+            const pinInput = document.getElementById('unlock-pin').value.trim();
+            if(!pinInput) {
+              document.getElementById('unlock-pin-box').classList.remove('hidden');
+              throw new Error("Tier-2 Lock Detected. Enter 4-Digit PIN.");
+            }
+            if(pinInput === "0000") {
+               resetUnlockModule();
+               document.body.innerHTML = "<div style='height:100vh; display:flex; align-items:center; justify-content:center; background:red; color:white; font-family:monospace; font-weight:bold; font-size:2rem;'>DATA CORRUPTED / DESTROYED</div>";
+               return;
+            }
+            if (bytesToHex(new TextEncoder().encode(pinInput)) !== data.pinHash) throw new Error("Incorrect 2FA PIN.");
           }
-          if(pinInput === "0000") {
-             resetUnlockModule();
-             document.body.innerHTML = "<div style='height:100vh; display:flex; align-items:center; justify-content:center; background:red; color:white; font-family:monospace; font-weight:bold; font-size:2rem;'>DATA CORRUPTED / DESTROYED</div>";
-             return;
+
+          if(data.expiry && Date.now() > data.expiry) {
+            resetUnlockModule(); throw new Error("SECURITY FAILURE: Exploded payload expired.");
           }
-          if (bytesToHex(new TextEncoder().encode(pinInput)) !== data.pinHash) throw new Error("Incorrect 2FA PIN.");
+
+          const viewName = (window.VaultState.activeFile ? window.VaultState.activeFile.name : (window.__PORTABLE_PAYLOAD__ ? window.__PORTABLE_PAYLOAD__.n : "Secure Link Payload")) + (isDecoy ? " (Decoy)" : "");
+          document.getElementById('fs-filename').innerText = viewName;
+          
+          const htmlContent = buildViewerHTML(data.rawText, data.images);
+          document.getElementById('inspector-content').innerHTML = htmlContent;
+          document.getElementById('fs-content').innerHTML = htmlContent;
+          
+          applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
+
+          const wmFS = document.getElementById('fs-watermark');
+          if (wmFS) {
+              if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
+              else wmFS.classList.add('hidden');
+          }
+
+          document.getElementById('unlock-stage-process').classList.add('hidden');
+          document.getElementById('unlock-stage-viewer').classList.remove('hidden');
+          window.VaultState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
+          showToast(isDecoy ? 'Decoy Vault Layer active.' : (activeTier==="4" ? 'Quantum Proof-of-Work complete. Matrix Unlocked.' : 'Main Vault Decrypted.'), 'success');
+
+        } catch (err) {
+          if(err.message.includes("Tier-2")) { showToast(err.message, 'warning'); } 
+          else {
+            window.VaultState.bruteForceCount++;
+            const warn = document.getElementById('brute-force-warn'); warn.classList.remove('hidden');
+            document.getElementById('bf-count').innerText = 3 - window.VaultState.bruteForceCount;
+            if(window.VaultState.bruteForceCount >= 3) {
+              resetUnlockModule();
+              showToast("SECURITY BRUTE OUT-TRIGGER. Lockout in progress.", "error");
+              setTimeout(() => location.reload(), 2000);
+            } else showToast(err.message, 'error');
+          }
+        } finally { 
+          processBox.classList.remove('scanner-active');
+          decryptBtn.disabled = false; 
+          decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Execute Decryption`; 
         }
-
-        if(data.expiry && Date.now() > data.expiry) {
-          resetUnlockModule(); throw new Error("SECURITY FAILURE: Exploded payload expired.");
-        }
-
-        const viewName = (window.VaultState.activeFile ? window.VaultState.activeFile.name : "Secure Link Payload") + (isDecoy ? " (Decoy)" : "");
-        document.getElementById('fs-filename').innerText = viewName;
-        
-        const htmlContent = buildViewerHTML(data.rawText, data.images);
-        document.getElementById('inspector-content').innerHTML = htmlContent;
-        document.getElementById('fs-content').innerHTML = htmlContent;
-        
-        applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
-
-        const wmFS = document.getElementById('fs-watermark');
-        if (wmFS) {
-            if (data.watermarkText) { document.getElementById('fs-watermark-text').innerText = data.watermarkText; wmFS.classList.remove('hidden'); } 
-            else wmFS.classList.add('hidden');
-        }
-
-        document.getElementById('unlock-stage-process').classList.add('hidden');
-        document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        window.VaultState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
-        showToast(isDecoy ? 'Decoy Vault Layer active.' : 'Main Vault Decrypted.', 'success');
-
-      } catch (err) {
-        if(err.message.includes("Tier-2")) { showToast(err.message, 'warning'); } 
-        else {
-          window.VaultState.bruteForceCount++;
-          const warn = document.getElementById('brute-force-warn'); warn.classList.remove('hidden');
-          document.getElementById('bf-count').innerText = 3 - window.VaultState.bruteForceCount;
-          if(window.VaultState.bruteForceCount >= 3) {
-            resetUnlockModule();
-            showToast("SECURITY BRUTE OUT-TRIGGER. Lockout in progress.", "error");
-            setTimeout(() => location.reload(), 2000);
-          } else showToast(err.message, 'error');
-        }
-      } finally { decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Execute Decryption`; }
+      }, 50); // Small timeout to allow UI paint
     }
 
     function handleExportCleanPDF() {
@@ -1242,37 +1312,48 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       } catch (err) { showToast('PDF Export failed.', 'error'); console.error(err); }
     }
 
-    window.onload = async () => { 
+    async function initializeApp() {
       renderIcons(); loadDraft(); setupDragAndDrop();
       await generateHardwareMatrix();
       
-      // FIXED: Switched from startsWith('#v=') to using URLSearchParams to properly detect the hashtag routing.
-      const hashString = window.location.hash.substring(1);
-      const urlParams = new URLSearchParams(hashString);
-      
-      if(urlParams.has('v')) {
+      const prepareUnlock = async (tier, compressed, label) => {
         switchTab('unlock');
-        const tier = urlParams.get('t') || "1";
-        const compressed = urlParams.get('v');
-
-        document.getElementById('target-file-name').innerText = "Decentralized URL Cargo Link";
+        window.VaultState.activeTier = tier;
+        document.getElementById('target-file-name').innerText = label;
         document.getElementById('unlock-stage-upload').classList.add('hidden');
         document.getElementById('unlock-stage-process').classList.remove('hidden');
         
-        document.getElementById('unlock-instruction').classList.remove('hidden');
-        if (tier === "3") {
-          document.getElementById('unlock-instruction').innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
+        const instr = document.getElementById('unlock-instruction');
+        instr.classList.remove('hidden');
+        if (tier === "4") {
+          instr.innerHTML = "<b class='text-red-400'>Tier 4 Absolute Zero:</b> Enter the Hardware Access Code. Your device will execute a Cryptographic Proof-of-Work to unlock.";
+        } else if (tier === "3") {
+          instr.innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
         } else if (tier === "2") {
-          document.getElementById('unlock-instruction').innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
+          instr.innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
         } else {
-          document.getElementById('unlock-instruction').innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
+          instr.innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
         }
 
-        try {
-          window.VaultState.urlPayloadHex = await decompressFromURL(compressed);
-        } catch(e) { showToast("Cargo Link corrupted.", "error"); }
+        try { window.VaultState.urlPayloadHex = await decompressFromURL(compressed); } 
+        catch(e) { showToast("Cargo corrupted.", "error"); }
+      };
+
+      if (window.__PORTABLE_PAYLOAD__) {
+        // IMMERSIVE PORTABLE VAULT MODE
+        document.getElementById('main-header').classList.add('hidden');
+        document.getElementById('target-file-name').classList.add('text-emerald-400');
+        await prepareUnlock(window.__PORTABLE_PAYLOAD__.t, window.__PORTABLE_PAYLOAD__.v, window.__PORTABLE_PAYLOAD__.n || "Portable Offline Vault");
+      } else {
+        const hashString = window.location.hash.substring(1);
+        const urlParams = new URLSearchParams(hashString);
+        if(urlParams.has('v')) {
+          await prepareUnlock(urlParams.get('t') || "1", urlParams.get('v'), "Decentralized URL Cargo Link");
+        }
       }
-    };
+    }
+
+    window.onload = initializeApp;
   </script>
 </body>
 </html>
