@@ -11,7 +11,7 @@
       theme: {
         extend: {
           fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], serif: ['Georgia', 'Cambria', 'serif'], mono: ['Fira Code', 'monospace'] },
-          colors: { phantom: { 950: '#020202', 900: '#09090b', 800: '#18181b', 700: '#27272a', 600: '#3f3f46', emerald: '#10b981', purple: '#8b5cf6' } }
+          colors: { phantom: { 950: '#020202', 900: '#09090b', 800: '#18181b', 700: '#27272a', 600: '#3f3f46', emerald: '#10b981', purple: '#8b5cf6', crimson: '#e11d48' } }
         }
       }
     }
@@ -56,14 +56,20 @@
     .toc-link { transition: all 0.2s; display: block; padding: 0.35rem 0; color: #a1a1aa; text-decoration: none; font-size: 0.875rem; border-left: 2px solid transparent; padding-left: 10px; }
     .toc-link:hover { color: #10b981; border-left-color: #10b981; background: rgba(16,185,129,0.05); }
 
-    .scan-line { width: 100%; height: 2px; background: rgba(139, 92, 246, 0.5); position: absolute; top: 0; left: 0; animation: scan 2s linear infinite; box-shadow: 0 0 10px rgba(139, 92, 246, 0.8); }
-    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    /* Phantom Grid Styles */
+    .grid-tile { transition: all 0.2s; cursor: pointer; }
+    .grid-tile.selected { background-color: rgba(225, 29, 72, 0.2); border-color: #e11d48; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4) inset; }
   </style>
 </head>
 <body class="bg-phantom-950 text-neutral-100 min-h-full font-sans antialiased flex flex-col selection:bg-emerald-500/30 selection:text-emerald-300 relative overflow-x-hidden">
 
   <!-- TOASTS -->
   <div id="toast-container" class="fixed top-5 right-5 z-[100] flex flex-col gap-3 max-w-sm pointer-events-none"></div>
+
+  <!-- PANIC DIVERTER -->
+  <div id="panic-overlay" class="fixed inset-0 bg-white z-[9999] hidden items-center justify-center">
+    <p class="text-black font-sans">Redirecting connection...</p>
+  </div>
 
   <!-- FULLSCREEN VIEWER -->
   <div id="fullscreen-viewer" class="fixed inset-0 bg-phantom-950/98 backdrop-blur-2xl z-[60] hidden flex-col opacity-0 transition-opacity duration-300">
@@ -155,20 +161,28 @@
                 <select id="share-security-tier" onchange="toggleSecurityTierPanel()" class="w-full bg-phantom-950 border border-phantom-700 rounded-xl px-4 py-3 text-sm text-white focus:border-emerald-500 transition-colors cursor-pointer">
                   <option value="1">Tier 1: Standard (Passphrase Only)</option>
                   <option value="2">Tier 2: Dual-Lock (Passphrase + PIN)</option>
-                  <option value="3" selected>Tier 3: Device-Locked (Z-SACP)</option>
-                  <option value="4" class="text-purple-400 font-bold">Tier 4: Protocol GORGON (Active PoW + Kinetic)</option>
+                  <option value="3">Tier 3: Device-Locked (Z-SACP)</option>
+                  <option value="4" class="text-crimson font-bold" selected>Tier 4: The Phantom Grid (Active Visual)</option>
                 </select>
               </div>
 
+              <!-- Tier 2 Pin Box -->
               <div id="tier-2-pin-box" class="hidden space-y-1.5 p-3 bg-yellow-500/5 border border-yellow-500/20 rounded-xl">
                 <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Set 4-Digit Secondary PIN</label>
                 <input id="doc-pin" type="text" maxlength="4" placeholder="e.g. 1928" class="w-full bg-phantom-950 border border-yellow-500/40 rounded-xl px-3 py-2.5 text-sm text-yellow-400 focus:border-yellow-400 font-mono tracking-widest text-center shadow-inner outline-none" />
                 <p class="text-[9px] text-neutral-500 leading-tight mt-2 text-center">Dead-Man Switch: If viewer inputs '0000', the RAM payload instantly self-corrupts.</p>
               </div>
 
-              <div id="tier-4-warn-box" class="hidden space-y-1.5 p-3 bg-purple-500/10 border border-purple-500/30 rounded-xl">
-                <p class="text-[10px] text-purple-400 font-bold uppercase tracking-widest text-center mb-1"><span id="icon-zap-small" class="inline-block w-3 h-3 mb-0.5"></span> Active Defense Initiated</p>
-                <p class="text-[9px] text-neutral-400 leading-tight text-center">Viewer's CPU will be forced to compute a Proof-of-Work algorithm and perform kinetic human verification before decryption begins. Automated brute-force impossible.</p>
+              <!-- Tier 4 Phantom Grid Box -->
+              <div id="tier-4-grid-box" class="space-y-3 p-4 bg-crimson/10 border border-crimson/30 rounded-xl shadow-inner">
+                <div class="text-center">
+                    <label class="text-[10px] font-bold text-crimson uppercase tracking-widest block flex items-center justify-center gap-1"><span id="icon-grid-small" class="w-3 h-3"></span> Set Visual Key</label>
+                    <p class="text-[9px] text-neutral-400 leading-tight mt-1">Select exactly 3 tiles. This pattern mathematically fuses with your Master Passphrase.</p>
+                </div>
+                <div class="grid grid-cols-3 gap-2 w-32 mx-auto" id="creator-phantom-grid">
+                    <!-- Grid generated via JS -->
+                </div>
+                <p class="text-[10px] font-mono text-center text-crimson mt-2" id="creator-grid-status">0 / 3 Selected</p>
               </div>
 
               <hr class="border-phantom-800">
@@ -244,7 +258,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
         <div id="drop-zone" class="border-2 border-dashed border-phantom-700 hover:border-emerald-500/50 bg-phantom-900/50 hover:bg-emerald-500/[0.02] rounded-3xl p-16 text-center transition-all cursor-pointer group shadow-xl relative overflow-hidden" onclick="triggerFileInput()">
-          <input type="file" id="pdf-file-input" accept="application/pdf,.html" class="hidden" onchange="handleFileSelect(event)">
+          <input type="file" id="pdf-file-input" accept="application/pdf" class="hidden" onchange="handleFileSelect(event)">
           <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-950 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 text-neutral-500 group-hover:text-emerald-400 transition-all shadow-inner relative z-10" id="icon-upload-zone"></div>
           <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors relative z-10">Load Encrypted Asset</h3>
           <p class="text-neutral-500 mt-2 mb-8 relative z-10">Drag & drop your locked PDF file here</p>
@@ -288,49 +302,21 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             <input id="unlock-pin" type="text" maxlength="4" placeholder="0000" class="w-full bg-phantom-950 border border-yellow-500/30 rounded-xl px-4 py-3 text-xl text-center font-mono tracking-widest text-white focus:border-yellow-500 shadow-inner outline-none" />
           </div>
 
-          <!-- Ghost Drop Download Status -->
-          <div id="ghost-download-ui" class="hidden space-y-2 border-t border-phantom-800 pt-4 text-center">
-              <p class="text-[10px] font-mono text-emerald-400 mb-1 animate-pulse">Extracting payload from Ghost Drop network...</p>
+          <!-- Tier 4 Grid Decrypt Box -->
+          <div id="unlock-grid-box" class="hidden space-y-3 p-4 bg-crimson/10 border border-crimson/30 rounded-xl shadow-inner mt-4">
+            <div class="text-center">
+                <label class="text-[10px] font-bold text-crimson uppercase tracking-widest block flex items-center justify-center gap-1"><span id="icon-grid-small-2" class="w-3 h-3"></span> Input Visual Key</label>
+                <p class="text-[9px] text-neutral-400 leading-tight mt-1">Tap the exact 3-tile sequence to construct the Decryption Hash.</p>
+            </div>
+            <div class="grid grid-cols-3 gap-2 w-32 mx-auto" id="viewer-phantom-grid">
+                <!-- Grid generated via JS -->
+            </div>
+            <p class="text-[10px] font-mono text-center text-crimson mt-2" id="viewer-grid-status">0 / 3 Selected</p>
           </div>
           
-          <button id="btn-trigger-decrypt" onclick="handleDecryptRouter()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg">
+          <button id="btn-trigger-decrypt" onclick="handleDecrypt()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg mt-4">
             <span id="icon-btn-unlock"></span> Execute Decryption
           </button>
-        </div>
-      </div>
-
-      <!-- TIER 4 GORGON ACTIVE DEFENSE UI -->
-      <div id="gorgon-defense-ui" class="max-w-md mx-auto bg-phantom-950 border border-purple-500/50 rounded-2xl p-6 shadow-[0_0_40px_rgba(139,92,246,0.3)] hidden relative overflow-hidden">
-        <div class="scan-line"></div>
-        <div class="text-center mb-6 relative z-10">
-          <div class="w-16 h-16 bg-purple-500/20 border border-purple-500/50 rounded-full mx-auto flex items-center justify-center text-purple-400 mb-4 shadow-[0_0_20px_rgba(139,92,246,0.5)] animate-pulse">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-          </div>
-          <h3 class="text-xl font-black text-white tracking-widest uppercase">Protocol Gorgon</h3>
-          <p class="text-xs text-purple-400 mt-2 font-mono" id="gorgon-status">AWAITING CPU ALLOCATION...</p>
-        </div>
-        
-        <div class="space-y-4 relative z-10">
-          <div>
-            <div class="flex justify-between text-[10px] font-mono text-neutral-400 mb-1">
-              <span>Cryptographic Proof-of-Work</span>
-              <span id="pow-progress-text">0%</span>
-            </div>
-            <div class="w-full h-2 bg-phantom-900 rounded-full overflow-hidden border border-phantom-800">
-              <div id="pow-progress-bar" class="h-full bg-purple-500 w-0 transition-all duration-300"></div>
-            </div>
-          </div>
-          
-          <div id="kinetic-zone-container" class="opacity-30 pointer-events-none transition-opacity duration-500">
-            <div class="flex justify-between text-[10px] font-mono text-neutral-400 mb-1 mt-4">
-              <span>Kinetic Human Verification</span>
-              <span id="kinetic-progress-text">0%</span>
-            </div>
-            <div id="kinetic-zone" class="w-full h-24 bg-phantom-900 border border-dashed border-purple-500/50 rounded-xl flex items-center justify-center cursor-crosshair relative overflow-hidden group">
-              <span class="text-xs text-purple-400/50 font-bold tracking-widest group-hover:text-purple-400 transition-colors pointer-events-none">MOVE CURSOR RANDOMLY HERE</span>
-              <div id="kinetic-progress-fill" class="absolute bottom-0 left-0 w-full bg-purple-500/20 h-0 transition-all duration-100 pointer-events-none"></div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -438,12 +424,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <button onclick="copyShareUrl()" class="w-full py-3 bg-phantom-800 hover:bg-phantom-700 text-white rounded-xl text-sm font-bold transition-colors border border-phantom-700 shadow-md flex items-center justify-center gap-2"><span id="icon-copy-url"></span> Copy Entire Link</button>
         </div>
 
-        <div id="microapp-share-box" class="bg-phantom-950 border border-purple-500/30 p-5 rounded-2xl flex flex-col gap-4 shadow-inner hidden text-center">
-            <p class="text-[10px] text-purple-400 font-mono mb-2">GHOST-DROP FALLBACK INITIATED</p>
-            <button onclick="downloadMicroApp()" id="btn-dl-microapp" class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-bold transition-colors shadow-lg flex items-center justify-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Backup Micro-Vault App</button>
-            <p class="text-[9px] text-neutral-500">If the public Ghost-Drop link fails, you can send this completely offline HTML file instead.</p>
-        </div>
-
         <div id="decoy-pin-display-box" class="hidden p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl text-center shadow-inner">
           <p class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-2">Tier 2 Protection Active</p>
           <p class="text-2xl font-mono text-white font-black tracking-widest" id="share-pin-val">0000</p>
@@ -459,88 +439,12 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
   <script>
     // =====================================================================
-    // 0. GHOST-DROP PROTOCOL (Serverless Steganographic Public Storage)
-    // =====================================================================
-    const PhantomBackend = (function() {
-        const Compressor = {
-            async toURL(hexStr) {
-                if (!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-                const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
-                const buffer = await new Response(stream).arrayBuffer();
-                let binary = ''; const bytes = new Uint8Array(buffer);
-                for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-            },
-            async fromURL(b64) {
-                b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
-                const binary = atob(b64); const bytes = new Uint8Array(binary.length);
-                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-                if (!window.DecompressionStream) return binary;
-                const stream = new Blob([bytes.buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
-                return await new Response(stream).text();
-            }
-        };
-
-        // Uses a highly reliable, free public API (Pixeldrain) as a blind dead-drop.
-        // It ONLY ever sees pure AES-256 encrypted noise.
-        const GhostDropNetwork = {
-            async upload(hexPayload) {
-                const blob = new Blob([hexPayload], { type: 'text/plain' });
-                const formData = new FormData();
-                formData.append('file', blob, 'artifact.bin');
-                
-                const res = await fetch('https://pixeldrain.com/api/file', { method: 'POST', body: formData });
-                if (!res.ok) throw new Error("Ghost Drop network rejected the payload.");
-                const data = await res.json();
-                if (!data.success) throw new Error("Ghost Drop failed to secure ID.");
-                return data.id; 
-            },
-            async download(fileId) {
-                const res = await fetch(`https://pixeldrain.com/api/file/${fileId}`);
-                if (!res.ok) throw new Error("Payload expired or destroyed from Ghost Drop network.");
-                return await res.text();
-            }
-        };
-
-        return {
-            async createSecureLink(hexPayload, tier, pinVal) {
-                // ~30KB safe physical URL limit
-                if (hexPayload.length < 30000) {
-                    const b64 = await Compressor.toURL(hexPayload); 
-                    const url = window.location.origin + window.location.pathname + `#t=${tier}&v=${b64}`;
-                    return { url, type: 'static', pin: pinVal };
-                } else {
-                    // Massive file -> Upload encrypted noise to public Ghost Drop
-                    const dropId = await GhostDropNetwork.upload(hexPayload);
-                    const url = window.location.origin + window.location.pathname + `#t=${tier}&drop=${dropId}`;
-                    return { url, type: 'ghost', dropId, payloadHex: hexPayload, pin: pinVal };
-                }
-            },
-            parseURLOnLoad() {
-                const hash = window.location.hash.substring(1);
-                const params = new URLSearchParams(hash);
-                if (params.has('v')) return { type: 'static', tier: params.get('t') || "1", payloadBase64: params.get('v') };
-                else if (params.has('drop')) return { type: 'ghost', tier: params.get('t') || "1", dropId: params.get('drop') };
-                return null;
-            },
-            async decompressStatic(b64) { return await Compressor.fromURL(b64); },
-            async fetchGhostDrop(dropId) { return await GhostDropNetwork.download(dropId); }
-        };
-    })();
-
-    // =====================================================================
     // 1. GLOBAL STRICT STATE & ICONS
     // =====================================================================
     window.VaultState = {
-      images: [],
-      activeFile: null,
-      decryptedData: null,
-      urlPayloadHex: null,
-      expectedTier: null,
-      ghostDropId: null,
-      hardwareID: "CALCULATING",
-      bruteForceCount: 0,
-      microAppBlob: null
+      images: [], activeFile: null, decryptedData: null, urlPayloadHex: null,
+      expectedTier: null, hardwareID: "CALCULATING", bruteForceCount: 0,
+      gridPatternCreator: [], gridPatternViewer: []
     };
 
     const ICONS = {
@@ -553,7 +457,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       eye: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
       eyeOff: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`,
       shieldCheck: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>`,
-      uploadCloud: `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/><polyline points="16 16 12 12 8 16"/></svg>`,
       fileKey: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="10" cy="14" r="2"/><line x1="12" y1="14" x2="16" y2="14"/><line x1="16" y1="14" x2="16" y2="12"/><line x1="14" y1="14" x2="14" y2="16"/></svg>`,
       key: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-neutral-500"><circle cx="7.5" cy="15.5" r="5.5"/><line x1="21" y1="2" x2="11.4" y2="11.6"/><line x1="21" y1="2" x2="21" y2="6"/><line x1="21" y1="6" x2="17" y2="6"/><line x1="17" y1="6" x2="17" y2="10"/><line x1="17" y1="10" x2="13" y2="10"/></svg>`,
       download: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
@@ -565,18 +468,16 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`,
       x: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
       shield: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-      theme: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`,
-      print: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`,
       link: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
       iam: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
       copy: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
       toc: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>`,
       skull: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></svg>`,
-      checkSmall: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+      grid: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`
     };
 
     function renderIcons() {
-      for (const [id, key] of Object.entries(mappings = {'icon-brand-main':'zap','icon-tab-create':'filePlus','icon-tab-unlock':'unlock','icon-tab-iam':'iam','icon-sliders':'sliders','icon-doc-title':'fileText','icon-doc-key':'lock','icon-btn-secure':'shieldCheck','icon-upload-zone':'uploadCloud','icon-file-ready':'fileKey','icon-unlock-key':'key','icon-btn-unlock':'unlock','icon-success':'check','icon-fs-download':'download','icon-image-plus':'imagePlus','icon-fs-brand':'zap','icon-fs-close':'close','icon-trash':'trash','icon-x':'x','icon-shield':'shield','icon-shield-adv':'shield','icon-shield-small':'shield','icon-link-gen':'link','icon-pdf-dl':'download','icon-iam-header':'iam','icon-keyring':'key','icon-mint':'zap','icon-close-modal':'x','icon-share-success':'check','icon-copy':'copy','icon-toc':'toc','icon-lock-small':'lock','icon-copy-key':'copy','icon-copy-url':'copy','icon-skull':'skull','icon-check-small':'checkSmall'})) {
+      for (const [id, key] of Object.entries({'icon-brand-main':'zap','icon-tab-create':'filePlus','icon-tab-unlock':'unlock','icon-tab-iam':'iam','icon-sliders':'sliders','icon-doc-title':'fileText','icon-doc-key':'lock','icon-btn-secure':'shieldCheck','icon-file-ready':'fileKey','icon-unlock-key':'key','icon-btn-unlock':'unlock','icon-success':'check','icon-fs-download':'download','icon-image-plus':'imagePlus','icon-fs-brand':'zap','icon-fs-close':'close','icon-trash':'trash','icon-x':'x','icon-shield':'shield','icon-shield-adv':'shield','icon-shield-small':'shield','icon-link-gen':'link','icon-pdf-dl':'download','icon-iam-header':'iam','icon-keyring':'key','icon-mint':'zap','icon-close-modal':'x','icon-share-success':'check','icon-copy':'copy','icon-toc':'toc','icon-lock-small':'lock','icon-copy-key':'copy','icon-copy-url':'copy','icon-skull':'skull','icon-grid-small':'grid','icon-grid-small-2':'grid'})) {
         const el = document.getElementById(id); if(el) el.innerHTML = ICONS[key];
       }
       document.querySelectorAll('.btn-eye-icon').forEach(el => el.innerHTML = ICONS.eye);
@@ -632,13 +533,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       setTimeout(() => { toast.classList.add('translate-x-12', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 4000);
     }
 
-    function toggleSecurityTierPanel() {
-      const tier = document.getElementById('share-security-tier').value;
-      const pinBox = document.getElementById('tier-2-pin-box'); const warnBox = document.getElementById('tier-4-warn-box');
-      pinBox.classList.add('hidden'); warnBox.classList.add('hidden');
-      if (tier === "2") pinBox.classList.remove('hidden'); if (tier === "4") warnBox.classList.remove('hidden');
-    }
-
     function updateMetrics() {
       const txt = document.getElementById('doc-content').value || ""; let bytes = new TextEncoder().encode(txt).length;
       window.VaultState.images.forEach(img => { bytes += Math.round((img.dataURL.length * 3) / 4); });
@@ -654,16 +548,86 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       else { viewer.classList.add('opacity-0'); setTimeout(() => viewer.classList.add('hidden'), 300); }
     }
 
+    // =====================================================================
+    // 3. TIER 4: PHANTOM GRID ENGINE
+    // =====================================================================
+    function initPhantomGrid(containerId, isViewer) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        const stateArr = isViewer ? window.VaultState.gridPatternViewer : window.VaultState.gridPatternCreator;
+        stateArr.length = 0; // reset
+        
+        for (let i = 0; i < 9; i++) {
+            const tile = document.createElement('div');
+            tile.className = "w-full aspect-square bg-phantom-950 border border-phantom-700 rounded-lg grid-tile flex items-center justify-center";
+            tile.onclick = () => handleGridClick(i, tile, isViewer);
+            container.appendChild(tile);
+        }
+        updateGridStatus(isViewer);
+    }
+
+    function handleGridClick(index, tileElem, isViewer) {
+        const stateArr = isViewer ? window.VaultState.gridPatternViewer : window.VaultState.gridPatternCreator;
+        const pos = stateArr.indexOf(index);
+        
+        if (pos > -1) {
+            stateArr.splice(pos, 1);
+            tileElem.classList.remove('selected');
+            tileElem.innerHTML = '';
+        } else {
+            if (stateArr.length >= 3) return; // Max 3
+            stateArr.push(index);
+            tileElem.classList.add('selected');
+            tileElem.innerHTML = `<span class="text-crimson font-black text-xs">${stateArr.length}</span>`;
+        }
+        updateGridStatus(isViewer);
+    }
+
+    function updateGridStatus(isViewer) {
+        const len = isViewer ? window.VaultState.gridPatternViewer.length : window.VaultState.gridPatternCreator.length;
+        const statusEl = document.getElementById(isViewer ? 'viewer-grid-status' : 'creator-grid-status');
+        statusEl.innerText = `${len} / 3 Selected`;
+        if(len === 3) statusEl.classList.add('animate-pulse'); else statusEl.classList.remove('animate-pulse');
+    }
+
+    function getGridHash(isViewer) {
+        const arr = isViewer ? window.VaultState.gridPatternViewer : window.VaultState.gridPatternCreator;
+        if(arr.length !== 3) return "";
+        // Sort to ensure absolute order doesn't fail unless we want strict sequence. 
+        // Strict sequence is better. We join exactly as clicked: "4-1-8"
+        return arr.join('-');
+    }
+
+    function toggleSecurityTierPanel() {
+      const tier = document.getElementById('share-security-tier').value;
+      const pinBox = document.getElementById('tier-2-pin-box');
+      const gridBox = document.getElementById('tier-4-grid-box');
+      
+      pinBox.classList.add('hidden'); gridBox.classList.add('hidden');
+      
+      if (tier === "2") pinBox.classList.remove('hidden');
+      if (tier === "4") {
+          gridBox.classList.remove('hidden');
+          initPhantomGrid('creator-phantom-grid', false);
+      }
+    }
+
     function setUnlockInstructions(tier) {
         const inst = document.getElementById('unlock-instruction'); inst.classList.remove('hidden');
-        if (tier === "4") inst.innerHTML = "<b class='text-purple-400'>Protocol GORGON:</b> Enter Master Key. Prepare for Active Defense CPU allocation.";
+        document.getElementById('unlock-grid-box').classList.add('hidden');
+        
+        if (tier === "4") {
+            inst.innerHTML = "<b class='text-crimson'>Protocol Phantom Grid:</b> Enter Master Key and input the Visual Cipher below.";
+            document.getElementById('unlock-grid-box').classList.remove('hidden');
+            initPhantomGrid('viewer-phantom-grid', true);
+        }
         else if (tier === "3") inst.innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
         else if (tier === "2") inst.innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
         else inst.innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
     }
 
     // =====================================================================
-    // 3. STORAGE FAULT TOLERANCE
+    // 4. STORAGE FAULT TOLERANCE
     // =====================================================================
     function triggerAutoSave() { try { localStorage.setItem('pv_draft_abs', document.getElementById('doc-content').value); } catch (e) { } }
     function loadDraft() { try { const saved = localStorage.getItem('pv_draft_abs'); if(saved) document.getElementById('doc-content').value = saved; } catch (e) { } }
@@ -677,7 +641,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         if(ring.length === 0) { list.innerHTML = '<div class="text-center p-8 text-neutral-500 text-sm">Keyring empty.</div>'; return; }
         
         list.innerHTML = ring.reverse().map(doc => {
-          let tierLabel = doc.tier === "1" ? "Tier 1: Low" : doc.tier === "2" ? `Tier 2: PIN [${doc.pin}]` : doc.tier === "4" ? "Tier 4: GORGON" : "Tier 3: Device-Locked";
+          let tierLabel = doc.tier === "1" ? "Tier 1: Low" : doc.tier === "2" ? `Tier 2: PIN [${doc.pin}]` : doc.tier === "4" ? "Tier 4: Grid" : "Tier 3: Device-Locked";
           return `
             <div class="p-4 bg-phantom-950 border border-phantom-800 rounded-xl hover:border-emerald-500/50 cursor-pointer transition-all shadow-inner" onclick="selectDocForIAM('${doc.id}', '${doc.tier}')">
               <div class="flex justify-between items-start mb-1"><h4 class="text-sm font-bold text-white truncate pr-2">${doc.title}</h4><span class="text-[9px] text-neutral-500 font-mono">${doc.date}</span></div>
@@ -688,21 +652,43 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 4. PARSERS & RENDERING
+    // 5. PARSERS & RENDERING
     // =====================================================================
+    function failsafeParseToBlocks(text) {
+      const blocks = []; const lines = (text || "").split('\n');
+      for(let line of lines) {
+        if(line.startsWith('# ')) { blocks.push({ type: 'h1', text: line.substring(2) }); }
+        else if(line.startsWith('## ')) { blocks.push({ type: 'h2', text: line.substring(3) }); }
+        else if(line.trim() === '') { blocks.push({ type: 'space' }); }
+        else {
+          const segments = []; let currentStr = "", isBold = false, i = 0;
+          while(i < line.length) {
+            if(line[i] === '*' && line[i+1] === '*') { if(currentStr) segments.push({ b: isBold, t: currentStr }); isBold = !isBold; currentStr = ""; i += 2; } 
+            else { currentStr += line[i]; i++; }
+          }
+          if(currentStr) segments.push({ b: isBold, t: currentStr }); blocks.push({ type: 'p', segments });
+        }
+      } return blocks;
+    }
+
     function buildViewerHTML(text, images) {
       let html = '';
-      if (typeof marked !== 'undefined' && marked.parse) html = marked.parse(text || ""); else html = `<p>${(text||"").replace(/\n/g, '<br>')}</p>`;
-      if (images && images.length > 0) {
-        html += `<div class="mt-8 pt-8 border-t border-phantom-700">`; for(let img of images) html += `<img src="${img.dataURL}" alt="Secure Media" />`; html += `</div>`;
+      if (typeof marked !== 'undefined' && marked.parse) html = marked.parse(text || "");
+      else {
+        const blocks = failsafeParseToBlocks(text);
+        for(let block of blocks) {
+          if(block.type === 'h1') html += `<h1>${escapeHTML(block.text)}</h1>`;
+          else if(block.type === 'h2') html += `<h2>${escapeHTML(block.text)}</h2>`;
+          else if(block.type === 'space') html += `<div class="h-4"></div>`;
+          else if(block.type === 'p') { html += `<p>`; for(let seg of block.segments) html += seg.b ? `<strong>${escapeHTML(seg.t)}</strong>` : escapeHTML(seg.t); html += `</p>`; }
+        }
       }
+      if (images && images.length > 0) { html += `<div class="mt-8 pt-8 border-t border-phantom-700">`; for(let img of images) html += `<img src="${img.dataURL}" alt="Secure Media" />`; html += `</div>`; }
       return html;
     }
 
-    function applyMathFormatting(elementId) {
-      const el = document.getElementById(elementId);
-      if (typeof renderMathInElement !== 'undefined') { try { renderMathInElement(el, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true} ], throwOnError: false }); } catch (e) {} }
-    }
+    function applyMathFormatting(elementId) { const el = document.getElementById(elementId); if (typeof renderMathInElement !== 'undefined') { try { renderMathInElement(el, { delimiters: [ {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}, {left: '\\[', right: '\\]', display: true} ], throwOnError: false }); } catch (e) {} } }
+    function escapeHTML(str) { return (str || "").replace(/[&<>'"]/g, tag => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag])); }
 
     function generateTOC() {
       const contentDiv = document.getElementById('fs-content'); const tocContainer = document.getElementById('toc-container'); tocContainer.innerHTML = '';
@@ -748,8 +734,27 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 5. CRYPTO ENGINE BASE
+    // 6. COMPRESSOR & CRYPTO ENGINE
     // =====================================================================
+    const Compressor = {
+        async toURL(hexStr) {
+            if (!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
+            const buffer = await new Response(stream).arrayBuffer();
+            let binary = ''; const bytes = new Uint8Array(buffer);
+            for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+            return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+        },
+        async fromURL(b64) {
+            b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
+            const binary = atob(b64); const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            if (!window.DecompressionStream) return binary;
+            const stream = new Blob([bytes.buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
+            return await new Response(stream).text();
+        }
+    };
+
     const DEFAULT_CIPHER_KEY = "PHTM_V10_ABS";
 
     function bytesToHex(bytes) { let hex = ''; for (let i = 0; i < bytes.length; i++) hex += bytes[i].toString(16).padStart(2, '0'); return hex; }
@@ -789,80 +794,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     async function generateAccessCode(vaultKey, viewerHardwareId) { return await internalEncrypt(vaultKey, viewerHardwareId); }
     async function resolveAccessCode(accessCode) { try { return await internalDecrypt(accessCode, window.VaultState.hardwareID); } catch(e) { throw new Error("Matrix mismatch."); } }
 
-    // =====================================================================
-    // 6. MICRO-VAULT APP COMPILER (The Ultimate Fallback)
-    // =====================================================================
-    function generateMicroAppHTML(tier, payload64) {
-      let rawHTML = document.documentElement.outerHTML;
-      let injectedScript = `\n<script>\nwindow.addEventListener('DOMContentLoaded', () => { setTimeout(() => { window.location.hash = "#t=${tier}&v=${payload64}"; }, 100); });\n<\/script>\n`;
-      return "<!DOCTYPE html>\n<html>\n" + rawHTML + injectedScript + "</html>";
-    }
-
-    function downloadMicroApp() {
-        if (!window.VaultState.microAppBlob) return;
-        const url = URL.createObjectURL(window.VaultState.microAppBlob); const a = document.createElement('a');
-        a.href = url; a.download = `SecureVault_${Math.random().toString(36).substr(2,5)}.html`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-    }
 
     // =====================================================================
-    // 7. TIER 4: GORGON ACTIVE DEFENSE
-    // =====================================================================
-    async function digestMessage(message) {
-      const msgUint8 = new TextEncoder().encode(message);
-      if (crypto.subtle) { try { const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); } catch(e) { } }
-      let hash = 0; for (let i = 0; i < message.length; i++) { const char = message.charCodeAt(i); hash = ((hash << 5) - hash) + char; hash = hash & hash; }
-      return Math.abs(hash).toString(16);
-    }
-
-    async function runGorgonDefense(basePayload) {
-        document.getElementById('unlock-stage-process').classList.add('hidden');
-        const ui = document.getElementById('gorgon-defense-ui'); ui.classList.remove('hidden');
-        const status = document.getElementById('gorgon-status'); const pBar = document.getElementById('pow-progress-bar'); const pText = document.getElementById('pow-progress-text');
-        status.innerText = "COMPUTING CRYPTOGRAPHIC PROOF...";
-        
-        let targetPrefix = "000"; let nonce = 0; let found = false; let startTime = Date.now(); let maxDuration = 4000; 
-        
-        return new Promise((resolve) => {
-            const grind = async () => {
-                for (let i = 0; i < 300; i++) { nonce++; let hash = await digestMessage(basePayload.substring(0, 100) + nonce); if (hash.startsWith(targetPrefix)) found = true; }
-                let elapsed = Date.now() - startTime; let pct = Math.min(100, Math.floor((elapsed / maxDuration) * 100));
-                pBar.style.width = pct + '%'; pText.innerText = pct + '%';
-
-                if (found || elapsed > maxDuration) {
-                    pBar.style.width = '100%'; pText.innerText = '100%';
-                    status.innerText = "AWAITING KINETIC ENTROPY...";
-                    document.getElementById('kinetic-zone-container').classList.remove('opacity-30'); document.getElementById('kinetic-zone-container').classList.remove('pointer-events-none');
-                    let kineticScore = 0; const maxKinetic = 150;
-                    const kZone = document.getElementById('kinetic-zone'); const kFill = document.getElementById('kinetic-progress-fill'); const kText = document.getElementById('kinetic-progress-text');
-                    
-                    const moveHandler = (e) => {
-                        kineticScore += Math.abs(e.movementX) + Math.abs(e.movementY) > 0 ? 1 : 0;
-                        let kPct = Math.min(100, Math.floor((kineticScore / maxKinetic) * 100));
-                        kFill.style.height = kPct + '%'; kText.innerText = kPct + '%';
-                        if (kineticScore >= maxKinetic) {
-                            kZone.removeEventListener('mousemove', moveHandler); status.innerText = "DEFENSE SATISFIED. DECRYPTING...";
-                            setTimeout(() => { ui.classList.add('hidden'); resolve(true); }, 500);
-                        }
-                    };
-                    kZone.addEventListener('mousemove', moveHandler);
-                    setTimeout(() => { kZone.removeEventListener('mousemove', moveHandler); if(kineticScore < maxKinetic) resolve("FAILED"); }, 10000);
-                } else { requestAnimationFrame(grind); }
-            };
-            grind();
-        });
-    }
-
-    function executeSchrodingerDecoy() {
-        document.getElementById('gorgon-defense-ui').classList.add('hidden');
-        const decoyHTML = `<div style="font-family: monospace; color: #10b981;"><h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1><p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p><p>DO NOT alert the primary handlers. Await further signal.</p></div>`;
-        document.getElementById('inspector-content').innerHTML = decoyHTML; document.getElementById('fs-content').innerHTML = decoyHTML;
-        document.getElementById('fs-filename').innerText = "Operation_Report.pdf (CLASSIFIED)"; document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        showToast('Protocol GORGON bypassed. Intel decrypted.', 'success');
-    }
-
-    // =====================================================================
-    // 8. GENERATION & GHOST-DROP INTEGRATION
+    // 7. GENERATION & DECRYPTION 
     // =====================================================================
     async function handleGenerate(mode) {
       const content = document.getElementById('doc-content').value;
@@ -875,6 +809,14 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       if (!content.trim() && window.VaultState.images.length === 0) return showToast('Add elements to secure.', 'error');
       if (!password && mode === 'pdf') password = "PHANTOM_DEFAULT"; 
       if (tier === "2" && (!pinVal || pinVal.length !== 4)) return showToast('Secondary PIN must be 4 digits.', 'error');
+      
+      let finalPassword = password;
+      if (tier === "4") {
+          const gridHash = getGridHash(false);
+          if(gridHash.length !== 5) return showToast('Phantom Grid requires exactly 3 tiles to be selected.', 'error');
+          // Fuse the password with the visual pattern mathematically
+          finalPassword = password + "::GRID::" + gridHash;
+      }
 
       const btn = document.getElementById(mode === 'pdf' ? 'btn-lock-pdf' : 'btn-lock-link');
       if (!btn) return;
@@ -885,43 +827,36 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const expiryTS = expiryInput && document.getElementById('enable-expiry').checked ? new Date(expiryInput).getTime() : null;
 
       try {
-        if(mode === 'link' && !password) {
-          const rand = window.crypto.getRandomValues(new Uint8Array(16)); password = Array.from(rand).map(b => b.toString(16).padStart(2, '0')).join('');
+        if(mode === 'link' && !password && tier !== "4") {
+          const rand = window.crypto.getRandomValues(new Uint8Array(16)); finalPassword = Array.from(rand).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
         const payloadMain = { rawText: content, images: window.VaultState.images, expiry: expiryTS, tier: tier };
         if (tier === "2") payloadMain.pinHash = bytesToHex(new TextEncoder().encode(pinVal));
 
-        const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
+        const hexMain = await internalEncrypt(JSON.stringify(payloadMain), finalPassword);
 
         if (mode === 'pdf') {
           showToast('Use "Generate Link" for advanced routing/Micro-Vaults in this environment.', 'success');
         } else if (mode === 'link') {
-          const linkResult = await PhantomBackend.createSecureLink(hexMain, tier, pinVal);
           
+          const compressed64 = await Compressor.toURL(hexMain);
+
+          // URL LIMIT ENFORCEMENT
+          if (compressed64.length > 30000) {
+              throw new Error("Payload exceeds URL physical limits. Please remove images, or request the Custom Node.js Backend deployment to enable massive file routing.");
+          }
+          
+          const url = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
           const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-          saveToKeyring(docId, filename, password, tier, pinVal);
+          saveToKeyring(docId, filename, finalPassword, tier, pinVal);
 
           const modal = document.getElementById('share-modal');
           const urlBox = document.getElementById('url-share-box');
-          const microBox = document.getElementById('microapp-share-box');
           const pinDisplay = document.getElementById('decoy-pin-display-box');
           
           urlBox.classList.remove('hidden');
-          document.getElementById('share-url-output').value = linkResult.url;
-
-          if (linkResult.type === 'ghost') {
-              document.getElementById('share-title').innerText = "Ghost-Drop Deployed";
-              document.getElementById('share-desc').innerText = "Payload is huge. We secretly uploaded the encrypted noise to a public steganographic drop. You may safely close this browser.";
-              // Fallback micro-app generation just in case Pixeldrain gets blocked by their ISP
-              const microHTML = generateMicroAppHTML(tier, hexMain);
-              window.VaultState.microAppBlob = new Blob([microHTML], {type: 'text/html'});
-              microBox.classList.remove('hidden');
-          } else {
-              microBox.classList.add('hidden');
-              document.getElementById('share-title').innerText = "Payload Compressed";
-              document.getElementById('share-desc').innerText = "The payload is safely encrypted mathematically into the URL below.";
-          }
+          document.getElementById('share-url-output').value = url;
 
           if (tier === "2") { document.getElementById('share-pin-val').innerText = pinVal; pinDisplay.classList.remove('hidden'); }
           else { pinDisplay.classList.add('hidden'); }
@@ -929,28 +864,15 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           modal.classList.remove('hidden');
           setTimeout(() => modal.classList.remove('opacity-0'), 10);
         }
-      } catch (err) { console.error(err); showToast(err.message || 'Encryption failed.', 'error'); }
-      finally { btn.disabled = false; btn.innerHTML = originalHtml; }
+      } catch (err) { 
+          console.error(err); 
+          showToast(err.message || 'Encryption failed.', 'error'); 
+      } finally { 
+          btn.disabled = false; btn.innerHTML = originalHtml; 
+      }
     }
 
     function closeShareModal() { document.getElementById('share-modal').classList.add('opacity-0'); setTimeout(() => document.getElementById('share-modal').classList.add('hidden'), 300); }
-
-    function selectDocForIAM(id, tier) {
-      if (tier !== "3" && tier !== "4") return showToast("Link does not require a Hardware Access Code.", "info");
-      document.getElementById('iam-doc-id').value = id; document.getElementById('iam-viewer-id').focus(); showToast("Document selected. Input the Viewer Matrix ID.", "success");
-    }
-
-    async function mintAccessCode() {
-      const docId = document.getElementById('iam-doc-id').value; const viewerId = document.getElementById('iam-viewer-id').value.toUpperCase().trim();
-      if(!docId || !viewerId) return showToast("Select document and enter Viewer ID.", "error");
-      let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_abs') || '[]'); const doc = ring.find(d => d.id === docId);
-      if(!doc) return showToast("Key missing from local ring.", "error");
-      try {
-        const accessCode = await generateAccessCode(doc.key, viewerId);
-        document.getElementById('minted-code-output').value = accessCode; document.getElementById('minted-code-box').classList.remove('hidden');
-        showToast("Hardware bound Access Code generated.", "success");
-      } catch(e) { showToast("Code compilation failed.", "error"); }
-    }
 
     function triggerFileInput() { document.getElementById('pdf-file-input').click(); }
     function handleFileSelect(event) { event.target.files[0] && processFileEntity(event.target.files[0]); }
@@ -966,7 +888,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       document.getElementById('target-file-name').innerText = file.name;
       
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         const text = e.target.result;
         let match = text.match(/#t=([0-9])&v=([a-zA-Z0-9_\-]+)/);
         if(!match) match = text.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
@@ -974,7 +896,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           try {
             document.getElementById('unlock-instruction').innerText = "Encrypted Document. Enter Password.";
             document.getElementById('unlock-instruction').classList.remove('hidden'); document.getElementById('unlock-pin-box').classList.add('hidden');
-            if(file.name.endsWith('.html')) { PhantomBackend.decompressStatic(match[2]).then(hex => window.VaultState.urlPayloadHex = hex); }
+            if(file.name.endsWith('.html')) { window.VaultState.urlPayloadHex = await Compressor.fromURL(match[2]); }
           } catch(err) {}
         }
       };
@@ -984,61 +906,28 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function resetUnlockModule() {
       window.VaultState.activeFile = null; window.VaultState.decryptedData = null; window.VaultState.urlPayloadHex = null;
-      window.VaultState.ghostDropId = null; window.VaultState.expectedTier = null;
+      window.VaultState.expectedTier = null;
       document.getElementById('unlock-password').value = ""; document.getElementById('unlock-pin').value = "";
       document.getElementById('unlock-pin-box').classList.add('hidden'); document.getElementById('unlock-instruction').classList.add('hidden');
       document.getElementById('unlock-stage-process').classList.add('hidden'); document.getElementById('unlock-stage-viewer').classList.add('hidden');
-      document.getElementById('unlock-stage-upload').classList.remove('hidden'); document.getElementById('gorgon-defense-ui').classList.add('hidden');
-      document.getElementById('ghost-download-ui').classList.add('hidden');
+      document.getElementById('unlock-stage-upload').classList.remove('hidden'); document.getElementById('unlock-grid-box').classList.add('hidden');
       toggleFullscreenViewer(false);
       document.getElementById('fs-content').innerHTML = ''; document.getElementById('inspector-content').innerHTML = '';
-      if(window.location.hash.includes('&v=') || window.location.hash.includes('#drop=')) window.history.replaceState(null, null, ' ');
+      if(window.location.hash.includes('&v=')) window.history.replaceState(null, null, ' ');
     }
 
-    // THE MASTER DECRYPT ROUTER
-    async function handleDecryptRouter() {
-        const passInput = document.getElementById('unlock-password').value.trim();
-        if(!passInput) return showToast("Master key required.", "error");
+    async function handleDecrypt() {
+      let passInput = document.getElementById('unlock-password').value.trim();
+      let tier = window.VaultState.expectedTier || "1";
 
-        let tier = window.VaultState.expectedTier || "1";
+      if(!passInput) return showToast("Master key required.", "error");
 
-        // GHOST DROP DOWNLOAD PHASE
-        if (window.VaultState.ghostDropId && !window.VaultState.urlPayloadHex) {
-            await fetchGhostPayload(passInput);
-            return; 
-        }
+      if (tier === "4") {
+          const gridHash = getGridHash(true);
+          if (gridHash.length !== 5) return showToast("Phantom Grid requires exactly 3 tiles.", "error");
+          passInput = passInput + "::GRID::" + gridHash;
+      }
 
-        // TIER 4 ACTIVE DEFENSE PHASE
-        if (tier === "4" || (window.VaultState.decryptedData && window.VaultState.decryptedData.tier === "4")) {
-            let gorgonResult = await runGorgonDefense(passInput);
-            if(gorgonResult === "FAILED") return executeSchrodingerDecoy();
-        }
-        
-        handleDecrypt(passInput);
-    }
-
-    async function fetchGhostPayload(passInput) {
-        const btn = document.getElementById('btn-trigger-decrypt');
-        btn.disabled = true;
-        btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Extracting Ghost Drop...`;
-
-        document.getElementById('ghost-download-ui').classList.remove('hidden');
-
-        try {
-            const hex = await PhantomBackend.fetchGhostDrop(window.VaultState.ghostDropId);
-            window.VaultState.urlPayloadHex = hex;
-            document.getElementById('ghost-download-ui').classList.add('hidden');
-            
-            // Re-route to decrypt now that we have the payload
-            handleDecryptRouter();
-        } catch(e) {
-            showToast("Ghost Drop payload missing, expired, or blocked by network.", "error");
-            btn.disabled = false;
-            btn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Retry Extraction`;
-        }
-    }
-
-    async function handleDecrypt(passInput) {
       const decryptBtn = document.getElementById('btn-trigger-decrypt');
       decryptBtn.disabled = true; decryptBtn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`;
 
@@ -1049,7 +938,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         else if (window.VaultState.activeFile) {
           const textData = await window.VaultState.activeFile.text(); 
           let match = textData.match(/#t=([0-9])&v=([a-zA-Z0-9_\-]+)/);
-          if (match) { rawHex = await PhantomBackend.decompressStatic(match[2]); } 
+          if (match) { rawHex = await Compressor.fromURL(match[2]); } 
           else { match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/); if (!match) throw new Error("File missing Cryptographic Payload."); rawHex = match[1]; }
         } else throw new Error("No payload loaded.");
 
@@ -1064,7 +953,17 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           if(payloads[1]) { try { decryptedJsonStr = await internalDecrypt(payloads[1], key); isDecoy = true; break; } catch(e) {} }
         }
 
-        if(!decryptedJsonStr) throw new Error("Invalid Vault Key.");
+        if(!decryptedJsonStr) {
+            // Decoy logic on Tier 4 brute failure
+            if (tier === "4") {
+                const decoyHTML = `<div style="font-family: monospace; color: #10b981;"><h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1><p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p><p>DO NOT alert the primary handlers. Await further signal.</p></div>`;
+                document.getElementById('inspector-content').innerHTML = decoyHTML; document.getElementById('fs-content').innerHTML = decoyHTML;
+                document.getElementById('fs-filename').innerText = "Operation_Report.pdf (CLASSIFIED)"; document.getElementById('unlock-stage-process').classList.add('hidden'); document.getElementById('unlock-stage-viewer').classList.remove('hidden');
+                return showToast('Phantom Grid activated. Decoy Intel deployed.', 'success');
+            }
+            throw new Error("Invalid Vault Key or Grid Pattern.");
+        }
+        
         window.VaultState.decryptedData = JSON.parse(decryptedJsonStr);
         const data = window.VaultState.decryptedData;
 
@@ -1084,7 +983,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         document.getElementById('inspector-content').innerHTML = htmlContent; document.getElementById('fs-content').innerHTML = htmlContent;
         applyMathFormatting('inspector-content'); applyMathFormatting('fs-content'); generateTOC(); 
 
-        document.getElementById('unlock-stage-process').classList.add('hidden'); document.getElementById('gorgon-defense-ui').classList.add('hidden');
+        document.getElementById('unlock-stage-process').classList.add('hidden'); 
         document.getElementById('unlock-stage-viewer').classList.remove('hidden');
         window.VaultState.bruteForceCount = 0; document.getElementById('brute-force-warn').classList.add('hidden');
         showToast(isDecoy ? 'Decoy Vault Layer active.' : 'Main Vault Decrypted.', 'success');
@@ -1104,21 +1003,25 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     window.onload = async () => { 
       renderIcons(); loadDraft(); setupDragAndDrop(); generateHardwareMatrix(); 
-      const route = PhantomBackend.parseURLOnLoad();
       
-      if(route) {
+      const hashString = window.location.hash.substring(1);
+      const urlParams = new URLSearchParams(hashString);
+      
+      if(urlParams.has('v')) {
         switchTab('unlock');
+        const tier = urlParams.get('t') || "1";
+        const compressed = urlParams.get('v');
+
         document.getElementById('target-file-name').innerText = "Decentralized URL Cargo Link";
         document.getElementById('unlock-stage-upload').classList.add('hidden');
         document.getElementById('unlock-stage-process').classList.remove('hidden');
         
-        if (route.type === 'static') {
-            window.VaultState.expectedTier = route.tier; setUnlockInstructions(route.tier);
-            try { window.VaultState.urlPayloadHex = await PhantomBackend.decompressStatic(route.payloadBase64); } catch(e) { showToast("Cargo Link corrupted.", "error"); }
-        } else if (route.type === 'ghost') {
-            window.VaultState.expectedTier = route.tier; window.VaultState.ghostDropId = route.dropId;
-            setUnlockInstructions(route.tier); showToast("Ghost-Drop routing identified.", "success");
-        }
+        window.VaultState.expectedTier = tier;
+        setUnlockInstructions(tier);
+
+        try {
+          window.VaultState.urlPayloadHex = await Compressor.fromURL(compressed);
+        } catch(e) { showToast("Cargo Link corrupted.", "error"); }
       }
     };
   </script>
