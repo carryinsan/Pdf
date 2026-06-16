@@ -125,6 +125,18 @@
     </div>
   </header>
 
+  <!-- P2P HOST ALERT BANNER -->
+  <div id="live-host-banner" class="w-full bg-emerald-500/10 border-b border-emerald-500/30 hidden">
+    <div class="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        <span class="text-xs font-bold text-emerald-400 tracking-widest uppercase">P2P Mesh Host Active</span>
+        <span class="text-[10px] text-emerald-500/70 font-mono hidden md:inline">| Room: <span id="host-room-id" class="text-white"></span></span>
+      </div>
+      <p class="text-[10px] text-emerald-300 font-mono">DO NOT CLOSE THIS TAB until receiver decrypts data.</p>
+    </div>
+  </div>
+
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6">
 
     <!-- TAB 1: ENCRYPT SECTION -->
@@ -246,7 +258,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     <section id="tab-unlock" class="space-y-6 hidden animate-in fade-in duration-500">
       <div class="text-center max-w-xl mx-auto mb-8 mt-4">
         <h1 class="text-4xl font-extrabold text-white tracking-tight mb-2">Decryption Matrix</h1>
-        <p class="text-neutral-400 text-sm">Upload a secured PDF file, open a Micro-App, or process a URL payload.</p>
+        <p class="text-neutral-400 text-sm">Upload a secured PDF file, or process an encrypted URL payload.</p>
       </div>
 
       <div id="unlock-stage-upload" class="max-w-2xl mx-auto">
@@ -254,7 +266,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <input type="file" id="pdf-file-input" accept="application/pdf,.html" class="hidden" onchange="handleFileSelect(event)">
           <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-phantom-950 border border-phantom-700 flex items-center justify-center group-hover:border-emerald-500/30 text-neutral-500 group-hover:text-emerald-400 transition-all shadow-inner relative z-10" id="icon-upload-zone"></div>
           <h3 class="text-xl font-bold text-white group-hover:text-emerald-300 transition-colors relative z-10">Load Encrypted Asset</h3>
-          <p class="text-neutral-500 mt-2 mb-8 relative z-10">Drag & drop your locked PDF or Micro-Vault HTML file here</p>
+          <p class="text-neutral-500 mt-2 mb-8 relative z-10">Drag & drop your locked PDF file here</p>
           <span class="inline-flex bg-phantom-800 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors border border-phantom-600 relative z-10 shadow-md">Browse Local Files</span>
         </div>
       </div>
@@ -293,6 +305,17 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <div id="unlock-pin-box" class="hidden space-y-2 border-t border-phantom-800 pt-5 mt-2">
             <label class="text-[10px] font-bold text-yellow-500 uppercase tracking-widest block text-center">Tier-2 Lock: Enter PIN</label>
             <input id="unlock-pin" type="text" maxlength="4" placeholder="0000" class="w-full bg-phantom-950 border border-yellow-500/30 rounded-xl px-4 py-3 text-xl text-center font-mono tracking-widest text-white focus:border-yellow-500 shadow-inner outline-none" />
+          </div>
+
+          <!-- P2P LIVE DOWNLOAD UI (Hidden by default) -->
+          <div id="live-download-ui" class="hidden space-y-2 border-t border-phantom-800 pt-4">
+              <div class="flex justify-between text-[10px] font-mono text-emerald-400 mb-1">
+                  <span>Establishing P2P Tunnel...</span>
+                  <span id="live-dl-text">0%</span>
+              </div>
+              <div class="w-full h-2 bg-phantom-950 rounded-full overflow-hidden border border-phantom-800">
+                  <div id="live-dl-bar" class="h-full bg-emerald-500 w-0 transition-all duration-300"></div>
+              </div>
           </div>
           
           <button id="btn-trigger-decrypt" onclick="handleDecryptRouter()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-phantom-950 font-extrabold py-4 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-lg">
@@ -440,12 +463,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           <button onclick="copyShareUrl()" class="w-full py-3 bg-phantom-800 hover:bg-phantom-700 text-white rounded-xl text-sm font-bold transition-colors border border-phantom-700 shadow-md flex items-center justify-center gap-2"><span id="icon-copy-url"></span> Copy Entire Link</button>
         </div>
 
-        <div id="microapp-share-box" class="bg-phantom-950 border border-purple-500/30 p-5 rounded-2xl flex flex-col gap-4 shadow-inner hidden text-center">
-            <p class="text-[10px] text-purple-400 font-mono mb-2">PAYLOAD EXCEEDS URL LIMIT (30KB). FALLBACK INITIATED.</p>
-            <button onclick="downloadMicroApp()" id="btn-dl-microapp" class="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-bold transition-colors shadow-lg flex items-center justify-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download Micro-Vault App</button>
-            <p class="text-[9px] text-neutral-500">Send this secure HTML file instead of a link. It functions exactly like the link but handles unlimited data size without a server.</p>
-        </div>
-
         <div id="decoy-pin-display-box" class="hidden p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-2xl text-center shadow-inner">
           <p class="text-[10px] text-yellow-500 font-bold uppercase tracking-widest mb-2">Tier 2 Protection Active</p>
           <p class="text-2xl font-mono text-white font-black tracking-widest" id="share-pin-val">0000</p>
@@ -461,6 +478,207 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
   <script>
     // =====================================================================
+    // 0. PHANTOM BACKEND (Integrated WebRTC Mesh & Compressor)
+    // =====================================================================
+    const PhantomBackend = (function() {
+        const CryptoUtils = {
+            async encryptSignal(dataObj, secretKey) {
+                const keyMaterial = await crypto.subtle.importKey("raw", new TextEncoder().encode(secretKey), "PBKDF2", false, ["deriveKey"]);
+                const salt = crypto.getRandomValues(new Uint8Array(16));
+                const key = await crypto.subtle.deriveKey(
+                    { name: "PBKDF2", salt, iterations: 1000, hash: "SHA-256" },
+                    keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt"]
+                );
+                const iv = crypto.getRandomValues(new Uint8Array(12));
+                const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(dataObj)));
+                
+                const bundle = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+                bundle.set(salt, 0); bundle.set(iv, salt.length); bundle.set(new Uint8Array(encrypted), salt.length + iv.length);
+                return btoa(String.fromCharCode(...bundle));
+            },
+            async decryptSignal(b64String, secretKey) {
+                try {
+                    const bundle = new Uint8Array(atob(b64String).split('').map(c => c.charCodeAt(0)));
+                    const salt = bundle.slice(0, 16), iv = bundle.slice(16, 28), data = bundle.slice(28);
+                    const keyMaterial = await crypto.subtle.importKey("raw", new TextEncoder().encode(secretKey), "PBKDF2", false, ["deriveKey"]);
+                    const key = await crypto.subtle.deriveKey(
+                        { name: "PBKDF2", salt, iterations: 1000, hash: "SHA-256" },
+                        keyMaterial, { name: "AES-GCM", length: 256 }, false, ["decrypt"]
+                    );
+                    const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+                    return JSON.parse(new TextDecoder().decode(decrypted));
+                } catch (e) { return null; }
+            }
+        };
+
+        const Compressor = {
+            async toURL(hexStr) {
+                if (!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
+                const buffer = await new Response(stream).arrayBuffer();
+                let binary = ''; const bytes = new Uint8Array(buffer);
+                for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+                return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+            },
+            async fromURL(b64) {
+                b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
+                const binary = atob(b64); const bytes = new Uint8Array(binary.length);
+                for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                if (!window.DecompressionStream) return binary;
+                const stream = new Blob([bytes.buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
+                return await new Response(stream).text();
+            }
+        };
+
+        const SIGNALING_SERVER = 'wss://echo.websocket.events'; 
+
+        class LiveSessionHost {
+            constructor(payloadHex, tier) {
+                this.payload = payloadHex;
+                this.tier = tier;
+                this.roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+                this.peer = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                this.ws = new WebSocket(SIGNALING_SERVER);
+                this.channel = this.peer.createDataChannel('phantom-vault-transfer');
+                this.setupHost();
+            }
+            async setupHost() {
+                this.ws.onopen = async () => {
+                    const offer = await this.peer.createOffer();
+                    await this.peer.setLocalDescription(offer);
+                };
+                this.ws.onmessage = async (e) => {
+                    const msg = await CryptoUtils.decryptSignal(e.data, this.roomId);
+                    if (!msg) return; 
+                    if (msg.type === 'peer-joined') {
+                        const encOffer = await CryptoUtils.encryptSignal({ type: 'offer', sdp: this.peer.localDescription }, this.roomId);
+                        this.ws.send(encOffer);
+                    } else if (msg.type === 'answer') {
+                        await this.peer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+                    } else if (msg.type === 'ice-candidate') {
+                        await this.peer.addIceCandidate(new RTCIceCandidate(msg.candidate));
+                    }
+                };
+                this.peer.onicecandidate = async (e) => {
+                    if (e.candidate) {
+                        const encIce = await CryptoUtils.encryptSignal({ type: 'ice-candidate', candidate: e.candidate }, this.roomId);
+                        this.ws.send(encIce);
+                    }
+                };
+                this.channel.onopen = () => {
+                    showToast("P2P Tunnel Established! Streaming payload...", "success");
+                    this.ws.close(); 
+                    const chunkSize = 16384; 
+                    const metadata = JSON.stringify({ size: this.payload.length, tier: this.tier });
+                    this.channel.send(`META:${metadata}`);
+                    let offset = 0;
+                    const sendChunk = () => {
+                        while (offset < this.payload.length) {
+                            if (this.channel.bufferedAmount > this.channel.bufferedAmountLowThreshold) {
+                                this.channel.onbufferedamountlow = () => { this.channel.onbufferedamountlow = null; sendChunk(); };
+                                return;
+                            }
+                            this.channel.send(this.payload.slice(offset, offset + chunkSize));
+                            offset += chunkSize;
+                        }
+                        this.channel.send('EOF');
+                        setTimeout(() => { document.getElementById('live-host-banner').classList.add('hidden'); }, 3000);
+                    };
+                    setTimeout(sendChunk, 500); 
+                };
+            }
+        }
+
+        class LiveSessionClient {
+            constructor(roomId, onProgress, onComplete, onError) {
+                this.roomId = roomId;
+                this.onProgress = onProgress;
+                this.onComplete = onComplete;
+                this.onError = onError;
+                this.peer = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+                this.ws = new WebSocket(SIGNALING_SERVER);
+                this.buffer = "";
+                this.expectedSize = 0;
+                this.tier = "1";
+                this.setupClient();
+            }
+            async setupClient() {
+                this.ws.onopen = async () => {
+                    const encJoin = await CryptoUtils.encryptSignal({ type: 'peer-joined' }, this.roomId);
+                    this.ws.send(encJoin);
+                    // Connection timeout failsafe
+                    setTimeout(() => { if(this.expectedSize === 0) this.onError("Host unreachable or offline."); }, 15000);
+                };
+                this.ws.onmessage = async (e) => {
+                    const msg = await CryptoUtils.decryptSignal(e.data, this.roomId);
+                    if (!msg) return;
+                    if (msg.type === 'offer') {
+                        await this.peer.setRemoteDescription(new RTCSessionDescription(msg.sdp));
+                        const answer = await this.peer.createAnswer();
+                        await this.peer.setLocalDescription(answer);
+                        const encAnswer = await CryptoUtils.encryptSignal({ type: 'answer', sdp: answer }, this.roomId);
+                        this.ws.send(encAnswer);
+                    } else if (msg.type === 'ice-candidate') {
+                        await this.peer.addIceCandidate(new RTCIceCandidate(msg.candidate));
+                    }
+                };
+                this.peer.onicecandidate = async (e) => {
+                    if (e.candidate) {
+                        const encIce = await CryptoUtils.encryptSignal({ type: 'ice-candidate', candidate: e.candidate }, this.roomId);
+                        this.ws.send(encIce);
+                    }
+                };
+                this.peer.ondatachannel = (e) => {
+                    const receiveChannel = e.channel;
+                    receiveChannel.onmessage = (event) => {
+                        if (typeof event.data === 'string' && event.data.startsWith('META:')) {
+                            const meta = JSON.parse(event.data.substring(5));
+                            this.expectedSize = meta.size; this.tier = meta.tier;
+                            return;
+                        }
+                        if (event.data === 'EOF') {
+                            this.ws.close(); this.onComplete({ hex: this.buffer, tier: this.tier });
+                            return;
+                        }
+                        this.buffer += event.data;
+                        if (this.onProgress && this.expectedSize > 0) {
+                            this.onProgress(Math.floor((this.buffer.length / this.expectedSize) * 100));
+                        }
+                    };
+                };
+            }
+        }
+
+        return {
+            async createSecureLink(hexPayload, tier, pinVal) {
+                if (hexPayload.length < 30000) {
+                    const b64 = await Compressor.toURL(hexPayload); 
+                    const url = window.location.origin + window.location.pathname + `#t=${tier}&v=${b64}`;
+                    return { url, isLive: false, pin: pinVal };
+                } else {
+                    const host = new LiveSessionHost(hexPayload, tier);
+                    const url = window.location.origin + window.location.pathname + `#live=${host.roomId}`;
+                    window.__phantomLiveHost = host; 
+                    return { url, isLive: true, pin: pinVal, roomId: host.roomId };
+                }
+            },
+            parseURLOnLoad() {
+                const hash = window.location.hash.substring(1);
+                const params = new URLSearchParams(hash);
+                if (params.has('v')) return { type: 'static', tier: params.get('t') || "1", payloadBase64: params.get('v') };
+                else if (params.has('live')) return { type: 'live', roomId: params.get('live').toUpperCase() };
+                return null;
+            },
+            async decompressStatic(b64) { return await Compressor.fromURL(b64); },
+            connectLiveSession(roomId, onProgressCallback) {
+                return new Promise((resolve, reject) => {
+                    new LiveSessionClient(roomId, onProgressCallback, resolve, reject);
+                });
+            }
+        };
+    })();
+
+    // =====================================================================
     // 1. GLOBAL STRICT STATE & ICONS
     // =====================================================================
     window.VaultState = {
@@ -468,9 +686,10 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       activeFile: null,
       decryptedData: null,
       urlPayloadHex: null,
+      expectedTier: null,
+      liveRoomId: null,
       hardwareID: "CALCULATING",
-      bruteForceCount: 0,
-      microAppBlob: null
+      bruteForceCount: 0
     };
 
     const ICONS = {
@@ -528,7 +747,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 2. HARDWARE MATRIX - SYNCHRONOUS AND ULTRA FAST (Fixes the infinite loading)
+    // 2. HARDWARE MATRIX
     // =====================================================================
     function generateHardwareMatrix() {
       const entropy = [
@@ -536,17 +755,11 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         navigator.hardwareConcurrency || 2, navigator.deviceMemory || 4, navigator.platform || "Unknown"
       ].join('||');
       
-      // Fast mathematical hashing (djb2 variant)
       let hash = 5381;
-      for (let i = 0; i < entropy.length; i++) {
-        hash = ((hash << 5) + hash) + entropy.charCodeAt(i);
-      }
-      // Convert to strict 8-character positive hex format
+      for (let i = 0; i < entropy.length; i++) hash = ((hash << 5) + hash) + entropy.charCodeAt(i);
       const id = (Math.abs(hash)).toString(16).padStart(8, '0').substring(0, 8).toUpperCase();
       
       window.VaultState.hardwareID = id;
-      
-      // Instantly inject into UI
       const vId = document.getElementById('viewer-device-id');
       const cId = document.getElementById('creator-device-id');
       if(vId) vId.innerText = id;
@@ -569,23 +782,9 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       }
     }
 
-    function copyDeviceID() {
-      executeClipboardCopy(window.VaultState.hardwareID).then(success => { if(success) showToast("Hardware ID copied.", "success"); });
-    }
-    function copyShareUrl() {
-      const url = document.getElementById('share-url-output').value;
-      executeClipboardCopy(url).then(success => {
-        if (success) showToast("Secure Link copied perfectly.", "success");
-        else showToast("Clipboard blocked. Select text manually.", "error");
-      });
-    }
-    function copyMintedAccessCode() {
-      const keyBuffer = document.getElementById('minted-code-output').value;
-      executeClipboardCopy(keyBuffer).then(success => {
-        if (success) showToast("Access Code copied perfectly.", "success");
-        else showToast("Clipboard blocked. Select text manually.", "error");
-      });
-    }
+    function copyDeviceID() { executeClipboardCopy(window.VaultState.hardwareID).then(s => { if(s) showToast("Hardware ID copied.", "success"); }); }
+    function copyShareUrl() { executeClipboardCopy(document.getElementById('share-url-output').value).then(s => { if(s) showToast("Secure Link copied perfectly.", "success"); else showToast("Clipboard blocked. Select text manually.", "error"); }); }
+    function copyMintedAccessCode() { executeClipboardCopy(document.getElementById('minted-code-output').value).then(s => { if(s) showToast("Access Code copied perfectly.", "success"); else showToast("Clipboard blocked. Select text manually.", "error"); }); }
 
     function switchTab(tabId) {
       document.getElementById('tab-create').classList.toggle('hidden', tabId !== 'create');
@@ -654,37 +853,34 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function executePanicProtocol() {
       document.getElementById('panic-overlay').style.display = 'flex';
-      window.VaultState = {}; 
-      document.body.innerHTML = ''; 
+      window.VaultState = {}; document.body.innerHTML = ''; 
       window.location.replace('https://en.wikipedia.org/wiki/Special:Random');
     }
 
     function toggleFullscreenViewer(show) {
       const viewer = document.getElementById('fullscreen-viewer');
-      if (show) {
-        viewer.classList.remove('hidden');
-        setTimeout(() => viewer.classList.remove('opacity-0'), 10);
-      } else {
-        viewer.classList.add('opacity-0');
-        setTimeout(() => viewer.classList.add('hidden'), 300);
-      }
+      if (show) { viewer.classList.remove('hidden'); setTimeout(() => viewer.classList.remove('opacity-0'), 10); } 
+      else { viewer.classList.add('opacity-0'); setTimeout(() => viewer.classList.add('hidden'), 300); }
+    }
+
+    function setUnlockInstructions(tier) {
+        const inst = document.getElementById('unlock-instruction');
+        inst.classList.remove('hidden');
+        if (tier === "4") inst.innerHTML = "<b class='text-purple-400'>Protocol GORGON:</b> Enter Master Key. Prepare for Active Defense CPU allocation.";
+        else if (tier === "3") inst.innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
+        else if (tier === "2") inst.innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
+        else inst.innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
     }
 
     // =====================================================================
-    // 4. STORAGE FAULT TOLERANCE (Fixes the "Not Defined" / Crash bugs)
+    // 4. STORAGE FAULT TOLERANCE
     // =====================================================================
     function triggerAutoSave() {
-      try {
-        const text = document.getElementById('doc-content').value;
-        localStorage.setItem('pv_draft_abs', text);
-      } catch (e) { /* Ignore silently if storage is blocked */ }
+      try { localStorage.setItem('pv_draft_abs', document.getElementById('doc-content').value); } catch (e) { }
     }
     
     function loadDraft() { 
-      try {
-        const saved = localStorage.getItem('pv_draft_abs'); 
-        if(saved) document.getElementById('doc-content').value = saved; 
-      } catch (e) { /* Ignore silently */ }
+      try { const saved = localStorage.getItem('pv_draft_abs'); if(saved) document.getElementById('doc-content').value = saved; } catch (e) { }
     }
 
     function saveToKeyring(docId, title, vaultKey, tier, pinVal) {
@@ -692,9 +888,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         let ring = JSON.parse(localStorage.getItem('pv_iam_keyring_abs') || '[]');
         ring.push({ id: docId, title, key: vaultKey, tier, pin: pinVal, date: new Date().toLocaleDateString() });
         localStorage.setItem('pv_iam_keyring_abs', JSON.stringify(ring));
-      } catch (e) {
-        console.warn("Local storage is disabled. Keys cannot be saved to the Keyring permanently.");
-      }
+      } catch (e) { console.warn("Local storage is disabled."); }
     }
 
     function renderKeyring() {
@@ -720,8 +914,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           `;
         }).join('');
       } catch (e) {
-        const list = document.getElementById('keyring-list');
-        list.innerHTML = '<div class="text-center p-8 text-red-500 text-sm font-bold">Storage Access Blocked by Browser.</div>';
+        document.getElementById('keyring-list').innerHTML = '<div class="text-center p-8 text-red-500 text-sm font-bold">Storage Access Blocked by Browser.</div>';
         document.getElementById('keyring-count').innerText = `Error`;
       }
     }
@@ -767,7 +960,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           }
         }
       }
-      
       if (images && images.length > 0) {
         html += `<div class="mt-8 pt-8 border-t border-phantom-700">`;
         for(let img of images) html += `<img src="${img.dataURL}" alt="Secure Media" />`;
@@ -852,7 +1044,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 6. CRYPTO ENGINE & COMPRESSION
+    // 6. CRYPTO ENGINE BASE
     // =====================================================================
     const DEFAULT_CIPHER_KEY = "PHTM_V10_ABS";
 
@@ -907,37 +1099,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       throw new Error("Payload corrupt.");
     }
 
-    function bufferToBase64(buf) {
-      let binary = ''; const bytes = new Uint8Array(buf);
-      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-      return window.btoa(binary);
-    }
-
-    function base64ToBuffer(b64) {
-      const binary = window.atob(b64); const bytes = new Uint8Array(binary.length);
-      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      return bytes.buffer;
-    }
-
-    async function compressToURL(hexStr) {
-      if(!window.CompressionStream) return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); 
-      try {
-        const stream = new Blob([hexStr]).stream().pipeThrough(new CompressionStream('deflate'));
-        const buffer = await new Response(stream).arrayBuffer();
-        return bufferToBase64(buffer).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-      } catch(e) { return btoa(hexStr).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
-    }
-
-    async function decompressFromURL(b64) {
-      b64 = b64.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((b64.length + 3) % 4);
-      if(!window.DecompressionStream) return atob(b64); 
-      try {
-        const buffer = base64ToBuffer(b64);
-        const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream('deflate'));
-        return await new Response(stream).text();
-      } catch(e) { return atob(b64); }
-    }
-
     async function generateAccessCode(vaultKey, viewerHardwareId) { return await internalEncrypt(vaultKey, viewerHardwareId); }
     async function resolveAccessCode(accessCode) {
       try { return await internalDecrypt(accessCode, window.VaultState.hardwareID); } 
@@ -945,37 +1106,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     // =====================================================================
-    // 7. MICRO-VAULT APP COMPILER (The Massive Link Solution)
+    // 7. TIER 4: GORGON ACTIVE DEFENSE (PoW + Kinetic)
     // =====================================================================
-    function generateMicroAppHTML(tier, payload64) {
-      // Clones the current DOM entirely 
-      let rawHTML = document.documentElement.outerHTML;
-      let injectedScript = `
-        <script>
-          window.addEventListener('DOMContentLoaded', () => {
-             setTimeout(() => {
-                window.location.hash = "#t=${tier}&v=${payload64}";
-             }, 100);
-          });
-        <\/script>
-      `;
-      return "<!DOCTYPE html>\n<html>\n" + rawHTML + "\n" + injectedScript + "</html>";
-    }
-
-    function downloadMicroApp() {
-        if (!window.VaultState.microAppBlob) return;
-        const url = URL.createObjectURL(window.VaultState.microAppBlob);
-        const a = document.createElement('a');
-        a.href = url; a.download = `SecureVault_${Math.random().toString(36).substr(2,5)}.html`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-
-    // =====================================================================
-    // 8. TIER 4: GORGON ACTIVE DEFENSE (PoW + Kinetic)
-    // =====================================================================
-    // Extremely fast local implementation of SHA-256 for PoW grinding
     async function digestMessage(message) {
       const msgUint8 = new TextEncoder().encode(message);
       if (crypto.subtle) {
@@ -983,9 +1115,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
               const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
               const hashArray = Array.from(new Uint8Array(hashBuffer));
               return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-          } catch(e) { /* fallback below */ }
+          } catch(e) { }
       }
-      // Synchronous fallback hash if crypto is not available
       let hash = 0;
       for (let i = 0; i < message.length; i++) {
           const char = message.charCodeAt(i);
@@ -1047,10 +1178,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
                         if (kineticScore >= maxKinetic) {
                             kZone.removeEventListener('mousemove', moveHandler);
                             status.innerText = "DEFENSE SATISFIED. DECRYPTING...";
-                            setTimeout(() => {
-                                ui.classList.add('hidden');
-                                resolve(true); 
-                            }, 500);
+                            setTimeout(() => { ui.classList.add('hidden'); resolve(true); }, 500);
                         }
                     };
                     kZone.addEventListener('mousemove', moveHandler);
@@ -1068,8 +1196,24 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         });
     }
 
+    function executeSchrodingerDecoy() {
+        document.getElementById('gorgon-defense-ui').classList.add('hidden');
+        const decoyHTML = `
+            <div style="font-family: monospace; color: #10b981;">
+                <h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1>
+                <p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p>
+                <p>DO NOT alert the primary handlers. Await further signal.</p>
+            </div>
+        `;
+        document.getElementById('inspector-content').innerHTML = decoyHTML;
+        document.getElementById('fs-content').innerHTML = decoyHTML;
+        document.getElementById('fs-filename').innerText = "Operation_Report.pdf (CLASSIFIED)";
+        document.getElementById('unlock-stage-viewer').classList.remove('hidden');
+        showToast('Protocol GORGON bypassed. Intel decrypted.', 'success');
+    }
+
     // =====================================================================
-    // 9. ENCRYPT & DECRYPT FLOWS
+    // 8. GENERATION & DECRYPTION ROUTING (Integrated with P2P Backend)
     // =====================================================================
     async function handleGenerate(mode) {
       const content = document.getElementById('doc-content').value;
@@ -1107,37 +1251,29 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         const hexMain = await internalEncrypt(JSON.stringify(payloadMain), password);
 
         if (mode === 'pdf') {
-          showToast('Secure PDF logic initialized. (Use "Generate Link" for advanced routing/Micro-Vaults in this environment)', 'success');
-        
+          showToast('Use "Generate Link" for advanced P2P routing/Micro-Vaults in this environment.', 'success');
         } else if (mode === 'link') {
-          const compressed64 = await compressToURL(hexMain);
+            
+          const linkResult = await PhantomBackend.createSecureLink(hexMain, tier, pinVal);
           
           const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
           saveToKeyring(docId, filename, password, tier, pinVal);
 
           const modal = document.getElementById('share-modal');
           const urlBox = document.getElementById('url-share-box');
-          const microBox = document.getElementById('microapp-share-box');
           const pinDisplay = document.getElementById('decoy-pin-display-box');
           
-          urlBox.classList.add('hidden');
-          microBox.classList.add('hidden');
+          urlBox.classList.remove('hidden');
+          document.getElementById('share-url-output').value = linkResult.url;
 
-          // URL SAFE LIMIT CHECK (Approx 30KB) -> Generates the WORMHOLE ARTIFACT
-          if (compressed64.length > 30000) {
-             document.getElementById('share-title').innerText = "Wormhole Artifact Compiled";
-             document.getElementById('share-desc').innerText = "Payload exceeds physics of standard URLs. We compiled an autonomous HTML Vault.";
-             
-             const microHTML = generateMicroAppHTML(tier, compressed64);
-             window.VaultState.microAppBlob = new Blob([microHTML], {type: 'text/html'});
-             microBox.classList.remove('hidden');
-
+          if (linkResult.isLive) {
+              document.getElementById('share-title').innerText = "Live Mesh Established";
+              document.getElementById('share-desc').innerText = "Payload exceeds URL limits. We created a P2P tunnel. Keep this tab open until the receiver downloads it.";
+              document.getElementById('live-host-banner').classList.remove('hidden');
+              document.getElementById('host-room-id').innerText = linkResult.roomId;
           } else {
-             document.getElementById('share-title').innerText = "Payload Compressed";
-             document.getElementById('share-desc').innerText = "The payload is safely encrypted into the URL below.";
-             const shareUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
-             document.getElementById('share-url-output').value = shareUrl;
-             urlBox.classList.remove('hidden');
+              document.getElementById('share-title').innerText = "Payload Compressed";
+              document.getElementById('share-desc').innerText = "The payload is safely encrypted into the URL below.";
           }
 
           if (tier === "2") { document.getElementById('share-pin-val').innerText = pinVal; pinDisplay.classList.remove('hidden'); }
@@ -1157,7 +1293,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
 
     function selectDocForIAM(id, tier) {
       if (tier !== "3" && tier !== "4") {
-        showToast("Link does not require a Hardware Access Code (Tier 1 or 2).", "info");
+        showToast("Link does not require a Hardware Access Code.", "info");
         return;
       }
       document.getElementById('iam-doc-id').value = id;
@@ -1192,7 +1328,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     }
 
     function processFileEntity(file) {
-      if (file.type !== "application/pdf" && !file.name.endsWith('.pdf') && !file.name.endsWith('.html')) return showToast('Invalid format.', 'error');
       window.VaultState.activeFile = file; 
       window.VaultState.urlPayloadHex = null;
       document.getElementById('target-file-name').innerText = file.name;
@@ -1200,7 +1335,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       const reader = new FileReader();
       reader.onload = function(e) {
         const text = e.target.result;
-        // Detect HTML Micro-App or PDF
         let match = text.match(/#t=([0-9])&v=([a-zA-Z0-9_\-]+)/);
         if(!match) match = text.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
         
@@ -1210,22 +1344,20 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             document.getElementById('unlock-instruction').classList.remove('hidden');
             document.getElementById('unlock-pin-box').classList.add('hidden');
             if(file.name.endsWith('.html')) {
-                // Pre-decompress the micro-app payload
-                decompressFromURL(match[2]).then(hex => window.VaultState.urlPayloadHex = hex);
+                PhantomBackend.decompressStatic(match[2]).then(hex => window.VaultState.urlPayloadHex = hex);
             }
           } catch(err) {}
         }
       };
       reader.readAsText(file.slice(0, 8000));
-
       document.getElementById('unlock-stage-upload').classList.add('hidden');
       document.getElementById('unlock-stage-process').classList.remove('hidden');
     }
 
     function resetUnlockModule() {
-      window.VaultState.activeFile = null; 
-      window.VaultState.decryptedData = null; 
-      window.VaultState.urlPayloadHex = null;
+      window.VaultState.activeFile = null; window.VaultState.decryptedData = null; window.VaultState.urlPayloadHex = null;
+      window.VaultState.liveRoomId = null; window.VaultState.expectedTier = null;
+      
       document.getElementById('unlock-password').value = ""; document.getElementById('unlock-pin').value = "";
       document.getElementById('unlock-pin-box').classList.add('hidden');
       document.getElementById('unlock-instruction').classList.add('hidden');
@@ -1233,48 +1365,58 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       document.getElementById('unlock-stage-viewer').classList.add('hidden');
       document.getElementById('unlock-stage-upload').classList.remove('hidden'); 
       document.getElementById('gorgon-defense-ui').classList.add('hidden');
+      document.getElementById('live-download-ui').classList.add('hidden');
       toggleFullscreenViewer(false);
       document.getElementById('fs-content').innerHTML = ''; document.getElementById('inspector-content').innerHTML = '';
-      if(window.location.hash.includes('&v=')) window.history.replaceState(null, null, ' ');
+      if(window.location.hash.includes('&v=') || window.location.hash.includes('#live=')) window.history.replaceState(null, null, ' ');
     }
 
-    // Router handles PoW before Decrypt
+    // THE MASTER DECRYPT ROUTER
     async function handleDecryptRouter() {
         const passInput = document.getElementById('unlock-password').value.trim();
         if(!passInput) return showToast("Master key required.", "error");
 
-        // Check if Tier 4 is expected based on URL param
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const tier = urlParams.get('t') || "1";
+        let tier = window.VaultState.expectedTier || "1";
 
-        if (tier === "4") {
-            // Trigger Active Defense
-            let gorgonResult = await runGorgonDefense(passInput);
-            if(gorgonResult === "FAILED") {
-                // SCHRODINGER DECOY: They failed the kinetic check (bot detected)
-                return executeSchrodingerDecoy();
-            } else {
-                handleDecrypt(passInput);
-            }
-        } else {
-            handleDecrypt(passInput);
+        // P2P DOWNLOAD PHASE
+        if (window.VaultState.liveRoomId && !window.VaultState.urlPayloadHex) {
+            await downloadLivePayload(passInput);
+            return; 
         }
+
+        // TIER 4 ACTIVE DEFENSE PHASE
+        if (tier === "4" || (window.VaultState.decryptedData && window.VaultState.decryptedData.tier === "4")) {
+            let gorgonResult = await runGorgonDefense(passInput);
+            if(gorgonResult === "FAILED") return executeSchrodingerDecoy();
+        }
+        
+        // STANDARD DECRYPT PHASE
+        handleDecrypt(passInput);
     }
 
-    function executeSchrodingerDecoy() {
-        document.getElementById('gorgon-defense-ui').classList.add('hidden');
-        const decoyHTML = `
-            <div style="font-family: monospace; color: #10b981;">
-                <h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1>
-                <p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p>
-                <p>DO NOT alert the primary handlers. Await further signal.</p>
-            </div>
-        `;
-        document.getElementById('inspector-content').innerHTML = decoyHTML;
-        document.getElementById('fs-content').innerHTML = decoyHTML;
-        document.getElementById('fs-filename').innerText = "Operation_Report.pdf (CLASSIFIED)";
-        document.getElementById('unlock-stage-viewer').classList.remove('hidden');
-        showToast('Protocol GORGON bypassed. Intel decrypted.', 'success');
+    async function downloadLivePayload(passInput) {
+        const btn = document.getElementById('btn-trigger-decrypt');
+        btn.disabled = true;
+        btn.innerHTML = `<svg class="w-5 h-5 animate-spin mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Establishing P2P Tunnel...`;
+
+        document.getElementById('live-download-ui').classList.remove('hidden');
+
+        try {
+            const result = await PhantomBackend.connectLiveSession(window.VaultState.liveRoomId, (progress) => {
+                document.getElementById('live-dl-bar').style.width = progress + '%';
+                document.getElementById('live-dl-text').innerText = progress + '%';
+            });
+            window.VaultState.urlPayloadHex = result.hex;
+            window.VaultState.expectedTier = result.tier;
+            document.getElementById('live-download-ui').classList.add('hidden');
+            
+            // Re-route to decrypt now that we have the payload
+            handleDecryptRouter();
+        } catch(e) {
+            showToast("Host offline or network blocked.", "error");
+            btn.disabled = false;
+            btn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Retry Connection`;
+        }
     }
 
     async function handleDecrypt(passInput) {
@@ -1288,9 +1430,8 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         else if (window.VaultState.activeFile) {
           const textData = await window.VaultState.activeFile.text(); 
           let match = textData.match(/#t=([0-9])&v=([a-zA-Z0-9_\-]+)/);
-          if (match) {
-            rawHex = await decompressFromURL(match[2]);
-          } else {
+          if (match) { rawHex = await PhantomBackend.decompressStatic(match[2]); } 
+          else {
             match = textData.match(/\/PhantomPayload\s*<([0-9a-fA-F]+)>/);
             if (!match) throw new Error("File missing Cryptographic Payload.");
             rawHex = match[1];
@@ -1362,40 +1503,31 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       } finally { decryptBtn.disabled = false; decryptBtn.innerHTML = `<span id="icon-btn-unlock">${ICONS.unlock}</span> Execute Decryption`; }
     }
 
-    function handleExportCleanPDF() {
-      showToast("PDF Export initialized. Please use external compiler for advanced DOM rendering.", "info");
-    }
+    function handleExportCleanPDF() { showToast("PDF Export initialized.", "info"); }
 
-    window.onload = () => { 
+    window.onload = async () => { 
       renderIcons(); loadDraft(); setupDragAndDrop();
-      generateHardwareMatrix(); // Made completely synchronous and instant
+      generateHardwareMatrix(); 
       
-      const hashString = window.location.hash.substring(1);
-      const urlParams = new URLSearchParams(hashString);
+      const route = PhantomBackend.parseURLOnLoad();
       
-      if(urlParams.has('v')) {
+      if(route) {
         switchTab('unlock');
-        const tier = urlParams.get('t') || "1";
-        const compressed = urlParams.get('v');
-
         document.getElementById('target-file-name').innerText = "Decentralized URL Cargo Link";
         document.getElementById('unlock-stage-upload').classList.add('hidden');
         document.getElementById('unlock-stage-process').classList.remove('hidden');
         
-        document.getElementById('unlock-instruction').classList.remove('hidden');
-        if (tier === "4") {
-          document.getElementById('unlock-instruction').innerHTML = "<b class='text-purple-400'>Protocol GORGON:</b> Enter Master Key. Prepare for Active Defense CPU allocation.";
-        } else if (tier === "3") {
-          document.getElementById('unlock-instruction').innerHTML = "<b>Device-Bound Security:</b> Copy your Hardware Matrix ID below and send it to the link creator to obtain the Decryption Code.";
-        } else if (tier === "2") {
-          document.getElementById('unlock-instruction').innerHTML = "<b>2FA Verification Active:</b> Enter the Primary Passphrase below. You will then be prompted for a 4-Digit secondary PIN.";
-        } else {
-          document.getElementById('unlock-instruction').innerHTML = "<b>Standard Link:</b> Enter the vault Passphrase to unlock cargo.";
+        if (route.type === 'static') {
+            window.VaultState.expectedTier = route.tier;
+            setUnlockInstructions(route.tier);
+            try { window.VaultState.urlPayloadHex = await PhantomBackend.decompressStatic(route.payloadBase64); } 
+            catch(e) { showToast("Cargo Link corrupted.", "error"); }
+        } else if (route.type === 'live') {
+            window.VaultState.expectedTier = "UNKNOWN"; // Host will supply tier over P2P
+            window.VaultState.liveRoomId = route.roomId;
+            document.getElementById('unlock-instruction').classList.remove('hidden');
+            document.getElementById('unlock-instruction').innerHTML = "<b class='text-emerald-400 animate-pulse'>Live P2P Link Detected:</b> Enter the Master Key. A direct WebRTC tunnel will open to the host to stream the payload.";
         }
-
-        try {
-          decompressFromURL(compressed).then(res => window.VaultState.urlPayloadHex = res);
-        } catch(e) { showToast("Cargo Link corrupted.", "error"); }
       }
     };
   </script>
