@@ -28,11 +28,10 @@
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; border: 2px solid #09090b; }
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
-    select, input[type="datetime-local"], input[type="text"], input[type="password"] {
+    select, input[type="text"], input[type="password"] {
       appearance: none; background-color: #020202; color: #ffffff;
       border: 1px solid #27272a; border-radius: 0.5rem; outline: none;
     }
-    input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     textarea::placeholder, input::placeholder { color: #52525b; }
 
     .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; line-height: 1.2; }
@@ -593,8 +592,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
     function getGridHash(isViewer) {
         const arr = isViewer ? window.VaultState.gridPatternViewer : window.VaultState.gridPatternCreator;
         if(arr.length !== 3) return "";
-        // Sort to ensure absolute order doesn't fail unless we want strict sequence. 
-        // Strict sequence is better. We join exactly as clicked: "4-1-8"
         return arr.join('-');
     }
 
@@ -814,7 +811,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
       if (tier === "4") {
           const gridHash = getGridHash(false);
           if(gridHash.length !== 5) return showToast('Phantom Grid requires exactly 3 tiles to be selected.', 'error');
-          // Fuse the password with the visual pattern mathematically
           finalPassword = password + "::GRID::" + gridHash;
       }
 
@@ -842,21 +838,41 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
           
           const compressed64 = await Compressor.toURL(hexMain);
 
-          // URL LIMIT ENFORCEMENT
-          if (compressed64.length > 30000) {
-              throw new Error("Payload exceeds URL physical limits. Please remove images, or request the Custom Node.js Backend deployment to enable massive file routing.");
-          }
-          
-          const url = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
-          const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-          saveToKeyring(docId, filename, finalPassword, tier, pinVal);
-
+          let finalUrl = "";
           const modal = document.getElementById('share-modal');
           const urlBox = document.getElementById('url-share-box');
           const pinDisplay = document.getElementById('decoy-pin-display-box');
+
+          if (compressed64.length > 30000) {
+              // ----------------------------------------------------
+              // ROUTE TO NODE.JS BACKEND FOR MASSIVE FILES
+              // ----------------------------------------------------
+              showToast('Massive payload detected. Routing to Secure Node...', 'info');
+              const res = await fetch('/api/seal', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ payloadHex: compressed64, tier: tier })
+              });
+              const data = await res.json();
+              if (!data.success) throw new Error(data.error || "Backend connection failed.");
+              
+              finalUrl = window.location.origin + window.location.pathname + `#t=${tier}&node=${data.vaultId}`;
+              document.getElementById('share-title').innerText = "Node.js Vault Sealed";
+              document.getElementById('share-desc').innerText = "Massive payload securely hosted on your backend infrastructure.";
+          } else {
+              // ----------------------------------------------------
+              // STATIC URL ROUTING (No server needed)
+              // ----------------------------------------------------
+              finalUrl = window.location.origin + window.location.pathname + `#t=${tier}&v=${compressed64}`;
+              document.getElementById('share-title').innerText = "Payload Compressed";
+              document.getElementById('share-desc').innerText = "The payload is safely encrypted mathematically into the URL below.";
+          }
           
+          const docId = 'ID-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+          saveToKeyring(docId, filename, finalPassword, tier, pinVal);
+
           urlBox.classList.remove('hidden');
-          document.getElementById('share-url-output').value = url;
+          document.getElementById('share-url-output').value = finalUrl;
 
           if (tier === "2") { document.getElementById('share-pin-val').innerText = pinVal; pinDisplay.classList.remove('hidden'); }
           else { pinDisplay.classList.add('hidden'); }
@@ -954,7 +970,6 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         }
 
         if(!decryptedJsonStr) {
-            // Decoy logic on Tier 4 brute failure
             if (tier === "4") {
                 const decoyHTML = `<div style="font-family: monospace; color: #10b981;"><h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1><p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p><p>DO NOT alert the primary handlers. Await further signal.</p></div>`;
                 document.getElementById('inspector-content').innerHTML = decoyHTML; document.getElementById('fs-content').innerHTML = decoyHTML;
