@@ -28,10 +28,11 @@
     ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; border: 2px solid #09090b; }
     ::-webkit-scrollbar-thumb:hover { background: #10b981; }
     
-    select, input[type="text"], input[type="password"] {
+    select, input[type="datetime-local"], input[type="text"], input[type="password"] {
       appearance: none; background-color: #020202; color: #ffffff;
       border: 1px solid #27272a; border-radius: 0.5rem; outline: none;
     }
+    input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
     textarea::placeholder, input::placeholder { color: #52525b; }
 
     .rendered-content h1 { font-size: 2.2rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; border-bottom: 2px solid currentColor; padding-bottom: 0.5rem; line-height: 1.2; }
@@ -853,7 +854,16 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ payloadHex: compressed64, tier: tier })
               });
-              const data = await res.json();
+              
+              // FIX: Safely parse backend response to prevent "Unexpected token T" crash
+              const resText = await res.text();
+              let data;
+              try {
+                  data = JSON.parse(resText);
+              } catch (parseErr) {
+                  throw new Error("Server error: " + (resText.substring(0, 50) || "Backend did not return JSON."));
+              }
+              
               if (!data.success) throw new Error(data.error || "Backend connection failed.");
               
               finalUrl = window.location.origin + window.location.pathname + `#t=${tier}&node=${data.vaultId}`;
@@ -963,13 +973,26 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
         let candidates = [passInput];
         try { const resolved = await resolveAccessCode(passInput); if(resolved) candidates.push(resolved); } catch(e) {}
 
-        let decryptedJsonStr = null;
+        // FIX: Wrap JSON.parse safely directly inside the decryption validation loop 
+        // to prevent parsing garbled tier-1 XOR fallback bytes.
+        let parsedDecryptedData = null;
         for (let key of candidates) {
-          try { decryptedJsonStr = await internalDecrypt(payloads[0], key); break; } catch(e) {}
-          if(payloads[1]) { try { decryptedJsonStr = await internalDecrypt(payloads[1], key); isDecoy = true; break; } catch(e) {} }
+          try { 
+              let str = await internalDecrypt(payloads[0], key); 
+              parsedDecryptedData = JSON.parse(str); 
+              break; 
+          } catch(e) {}
+          if(payloads[1]) { 
+              try { 
+                  let str = await internalDecrypt(payloads[1], key); 
+                  parsedDecryptedData = JSON.parse(str); 
+                  isDecoy = true; 
+                  break; 
+              } catch(e) {} 
+          }
         }
 
-        if(!decryptedJsonStr) {
+        if(!parsedDecryptedData) {
             if (tier === "4") {
                 const decoyHTML = `<div style="font-family: monospace; color: #10b981;"><h1 style="color:red; text-transform:uppercase; border-bottom:1px solid red;">TOP SECRET // MAJESTIC-12</h1><p>The operative known as 'MOCKINGBIRD' has compromised the secure facility. Extraction required at coordinates: 34°12'09.4"N 118°10'33.1"W.</p><p>DO NOT alert the primary handlers. Await further signal.</p></div>`;
                 document.getElementById('inspector-content').innerHTML = decoyHTML; document.getElementById('fs-content').innerHTML = decoyHTML;
@@ -979,7 +1002,7 @@ The raw text and images will be packaged, hex-encoded, compressed, and encrypted
             throw new Error("Invalid Vault Key or Grid Pattern.");
         }
         
-        window.VaultState.decryptedData = JSON.parse(decryptedJsonStr);
+        window.VaultState.decryptedData = parsedDecryptedData;
         const data = window.VaultState.decryptedData;
 
         if (data.tier === "2" && !isDecoy) {
